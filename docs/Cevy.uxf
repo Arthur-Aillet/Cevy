@@ -56,4 +56,6 @@ System executed on
 ressources and given Component Groups
 when signal is sent
 --
-camera_destroyed_reciver.</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+for my_event in camera_destroy_recv.read() {
+  print(my_event.secs);
+}</panel_attributes><additional_attributes></additional_attributes></element></diagram>
