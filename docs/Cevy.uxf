@@ -1,0 +1,14 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>540</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
+Class or Structure</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
+Group of Components</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
+Classes accessing one or
+multiple Component group
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
+Interract with entity pool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
+Global and Unique
+data of some kind</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
+Ecs Setup and managing class
+Connect systems</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>330</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
+Connect systems
+without Ecs management
+Create abstraction layer</panel_attributes><additional_attributes></additional_attributes></element></diagram>
