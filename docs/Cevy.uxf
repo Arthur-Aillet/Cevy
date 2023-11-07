@@ -1,14 +1,59 @@
-<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>540</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
-Class or Structure</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
-Group of Components</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>90</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>377</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
+Class or Structure holding data
+
+
+--
+*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
+Group of Components
+
+
+--
+*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
 Classes accessing one or
 multiple Component group
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
-Interract with entity pool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
+
+--
+*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
+Interract with entity pool
+
+
+--
+*Exemple:*
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>377</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
 Global and Unique
-data of some kind</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>210</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
+data of some kind
+
+--
+*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
 Ecs Setup and managing class
-Connect systems</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>330</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
+Connect systems
+
+--
+*Exemple:*
+app::new()
+  .add_plugin(camera_plugin)
+  .add_system(Start, spawn_player::new())
+  .init_ressource(clock::new())</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
 Connect systems
 without Ecs management
-Create abstraction layer</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+Create abstraction layer
+--
+*Exemple:*
+app.add_system(Start, spawn_camera)
+  .add_system(Update, move_camera)
+  .add_system(PostUpdate, destroy_camera)
+  .add_event&lt;CameraDestroyed&gt;::new()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>377</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;EventWriter&gt;&gt;
+Send a message holding
+
+
+--
+*Exemple:*
+EventWriter&lt;CameraDestroyed&gt;.send(
+  CurrentTick {
+    secs: 21892;
+})</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;EventReader&gt;&gt;
+System executed on
+ressources and given Component Groups
+when signal is sent
+--
+camera_destroyed_reciver.</panel_attributes><additional_attributes></additional_attributes></element></diagram>
