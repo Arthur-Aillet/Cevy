@@ -36,6 +36,7 @@ fn debug_player_hp(
     - Custom ordering
 - Conditional running
 - Optional Querys
+- Multithreaded
 - Querys filters
     - With
     - Without
@@ -300,6 +301,6 @@ plugins to control bases, holding utilities for all games
  - StateTransition `// Run between each states transition`
  - RunFixedUpdateLoop `//This will run FixedUpdate zero to many times,
 		based on how much time has elapsed.`
- - Update
+ - Update `// Default Stage when adding system`
  - PostUpdate
  - Last
