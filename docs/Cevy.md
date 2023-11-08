@@ -1,48 +1,5 @@
 <h1 style="font-size:60px;">C++evy</h1>
 
-# **`<<System>>`**
-
-Function accessing one or
-multiple component group
-
-----
-**Exemple Rust:**
-```rust
-
-fn hello_world() {
-    println!("hello world!");
-}
-
-.add_systems(Update, hello_world)
-
-//Advanced querys
-fn debug_player_hp(
-    query: Query<
-      (&Health, Option<&PlayerName>),
-      (With<Player>, Without<Enemy>)
-    >,
-)
-
-```
-**Exemple C++:**
-```cpp
-
-
-```
-*Features*
-
-- Scheduler:
-    - Custom set of steps
-    - Custom ordering
-- Conditional running
-- Optional Querys
-- Multithreaded
-- Querys filters
-    - With
-    - Without
-    - Or
-- Extract Schedule as Depedencie graph
-
 # **`<<Component>>`**
 
 Basic structure holding data, Ecs main building bloc
@@ -93,6 +50,48 @@ class Entity {
 }
 
 ```
+# **`<<System>>`**
+
+Function accessing one or
+multiple component group
+
+----
+**Exemple Rust:**
+```rust
+
+fn hello_world() {
+    println!("hello world!");
+}
+
+.add_systems(Update, hello_world)
+
+//Advanced querys
+fn debug_player_hp(
+    query: Query<
+      (&Health, Option<&PlayerName>),
+      (With<Player>, Without<Enemy>)
+    >,
+)
+
+```
+**Exemple C++:**
+```cpp
+
+
+```
+*Features*
+
+- Scheduler:
+    - Custom set of steps
+    - Custom ordering
+- Conditional running
+- Optional Querys
+- Multithreaded
+- Querys filters
+    - With
+    - Without
+    - Or
+- Extract Schedule as Depedencie graph
 
 # **`<<App>>`**
 
