@@ -1,61 +1,176 @@
-<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>377</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>340</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
 Class or Structure holding data
 
 
 --
-*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
+*Exemple Rust:*
+
+#[derive(Component)]
+struct Position {
+	f64 x;
+	f64 y;
+}
+
+*Exemple C++:*
+
+class Position : public Component {
+	float x;
+	float y;
+};</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
 Group of Components
 
 
 --
-*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>70</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
+*Exemple Rust:*
+
+commands.spawn((Camera, Position(3., 3.)));
+
+*Exemple C++:*
+
+Enity camera =
+   new Entity(new Camera, new Position(3, 3));
+
+class Entity {
+    public:
+    Entity(Component* ...) { // Vargs
+    }
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
 Classes accessing one or
 multiple Component group
 
 --
-*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
+*Exemple Rust:*
+
+*Exemple C++:*
+
+*Features*
+
+- Scheduler:
+Custom set of steps
+Custom ordering
+- Conditional running
+- Extract Schedule as Depedencie graph</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
 Interract with entity pool
 
 
 --
-*Exemple:*
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>377</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
+*Exemple Rust:*
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
 Global and Unique
 data of some kind
 
 --
-*Exemple:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>230</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
+*Exemple Rust:*
+    .init_ressource(clock::new())
+
+fn greet_people(time: Res&lt;Time&gt;, query: Query&lt;&amp;Name, With&lt;Person&gt;&gt;) {
+    for name in &amp;query {
+        println!("hello {}!", name.0);
+    }
+}
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
 Ecs Setup and managing class
 Connect systems
 
 --
-*Exemple:*
-app::new()
-  .add_plugin(camera_plugin)
-  .add_system(Start, spawn_player::new())
-  .init_ressource(clock::new())</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>107</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
+*Exemple Rust:*
+fn main() {
+  app::new()
+    .add_plugin(camera_plugin)
+    .add_system(Start, spawn_player)
+    .init_ressource(clock::new())
+    .run()
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
 Connect systems
 without Ecs management
 Create abstraction layer
 --
-*Exemple:*
-app.add_system(Start, spawn_camera)
-  .add_system(Update, move_camera)
-  .add_system(PostUpdate, destroy_camera)
-  .add_event&lt;CameraDestroyed&gt;::new()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>377</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;EventWriter&gt;&gt;
+*Exemple Rust:*
+impl Plugin for HelloPlugin {
+  fn build(&amp;self, app: &amp;mut App) {
+    app.add_system(Start, spawn_camera)
+      .add_system(Update, move_camera)
+      .add_system(PostUpdate, destroy_camera)
+      .add_event&lt;CameraDestroyed&gt;::new()
+  }
+}
+*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventWriter&gt;&gt;
 Send a message holding
 
 
 --
-*Exemple:*
-EventWriter&lt;CameraDestroyed&gt;.send(
-  CurrentTick {
-    secs: 21892;
-})</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>647</x><y>390</y><w>250</w><h>150</h></coordinates><panel_attributes>&lt;&lt;EventReader&gt;&gt;
+*Exemple Rust:*
+fn event_trigger(
+    time: Res&lt;Clock&gt;,
+    mut cam_event: EventWriter&lt;CameraDestroyed&gt;)
+{
+    cam_event.send(
+      CurrentTick {
+        secs: 21892;
+    })
+}
+
+
+
+*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventReader&gt;&gt;
 System executed on
 ressources and given Component Groups
 when signal is sent
 --
-for my_event in camera_destroy_recv.read() {
-  print(my_event.secs);
+*Exemple Rust:*
+fn event_listener(mut events: EventReader&lt;MyEvent&gt;) {
+    for my_event in events.read() {
+        info!("{}", my_event.message);
+    }
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>0</y><w>320</w><h>610</h></coordinates><panel_attributes>&lt;&lt;GameEngine&gt;&gt;
+App superset creating the default ECS App and adding
+plugins to control bases, holding utilities for all games
+
+--
+*Ressources:*
+	- Asset Manager
+	- Global Timer
+	- Font Manager
+*Default Stages:*
+At Start:
+	- PreStartup
+	- Startup         // Once at start
+	- PostStartup
+At Each
+	- First
+	- PreUpdate
+	- StateTransition // Run between each states transition
+	- RunFixedUpdateLoop
+	//This will run FixedUpdate zero to many times,
+		based on how much time has elapsed.
+	- Update
+	- PostUpdate
+	- Last
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1730</x><y>1210</y><w>40</w><h>40</h></coordinates><panel_attributes></panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>620</y><w>320</w><h>490</h></coordinates><panel_attributes>&lt;&lt;State&gt;&gt;
+Interract with entity pool
+
+
+--
+*Exemple Rust:*
+#[derive(..., States)]
+enum AppState {
+    #[default]
+    Menu,
+    InGame,
+}
+
+App::new()
+	 .add_state::&lt;AppState&gt;()
+	 .add_systems(OnExit(AppState::Menu), ...)
+	 .add_systems(OnEnter(AppState::InGame), ...)
+	 .add_systems(
+	 	 Update, (...).run_if(in_state(AppState::InGame)),
+	 )
+
+
+fn menu(
+    mut next_state: ResMut&lt;NextState&lt;AppState&gt;&gt;) {
+		if ... {
+				next_state.set(AppState::InGame);
+		}
 }</panel_attributes><additional_attributes></additional_attributes></element></diagram>
