@@ -285,6 +285,10 @@ plugins to control bases, holding utilities for all games
  - Global Timer
  - Font Manager
 
+**Components**
+
+ - Position
+
 **Default Stages:**
 
 *At Start:*

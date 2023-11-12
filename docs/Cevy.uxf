@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>340</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>340</x><y>100</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Component&gt;&gt;
 Class or Structure holding data
 
 
@@ -16,7 +16,7 @@ struct Position {
 class Position : public Component {
 	float x;
 	float y;
-};</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
+};</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>100</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Entiy&gt;&gt;
 Group of Components
 
 
@@ -34,7 +34,7 @@ class Entity {
     public:
     Entity(Component* ...) { // Vargs
     }
-}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>0</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>100</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
 Classes accessing one or
 multiple Component group
 
@@ -49,13 +49,13 @@ multiple Component group
 Custom set of steps
 Custom ordering
 - Conditional running
-- Extract Schedule as Depedencie graph</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
+- Extract Schedule as Depedencie graph</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>410</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Command&gt;&gt;
 Interract with entity pool
 
 
 --
 *Exemple Rust:*
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>410</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Resource&gt;&gt;
 Global and Unique
 data of some kind
 
@@ -68,7 +68,7 @@ fn greet_people(time: Res&lt;Time&gt;, query: Query&lt;&amp;Name, With&lt;Person
         println!("hello {}!", name.0);
     }
 }
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>310</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>410</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;App&gt;&gt;
 Ecs Setup and managing class
 Connect systems
 
@@ -80,7 +80,7 @@ fn main() {
     .add_system(Start, spawn_player)
     .init_ressource(clock::new())
     .run()
-}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>720</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;Plugins&gt;&gt;
 Connect systems
 without Ecs management
 Create abstraction layer
@@ -94,7 +94,7 @@ impl Plugin for HelloPlugin {
       .add_event&lt;CameraDestroyed&gt;::new()
   }
 }
-*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventWriter&gt;&gt;
+*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>720</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventWriter&gt;&gt;
 Send a message holding
 
 
@@ -112,7 +112,7 @@ fn event_trigger(
 
 
 
-*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>620</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventReader&gt;&gt;
+*Exemple C++:*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>720</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;EventReader&gt;&gt;
 System executed on
 ressources and given Component Groups
 when signal is sent
@@ -122,7 +122,7 @@ fn event_listener(mut events: EventReader&lt;MyEvent&gt;) {
     for my_event in events.read() {
         info!("{}", my_event.message);
     }
-}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>0</y><w>320</w><h>610</h></coordinates><panel_attributes>&lt;&lt;GameEngine&gt;&gt;
+}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>100</y><w>320</w><h>610</h></coordinates><panel_attributes>&lt;&lt;GameEngine&gt;&gt;
 App superset creating the default ECS App and adding
 plugins to control bases, holding utilities for all games
 
@@ -146,7 +146,7 @@ At Each
 	- Update
 	- PostUpdate
 	- Last
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1730</x><y>1210</y><w>40</w><h>40</h></coordinates><panel_attributes></panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>620</y><w>320</w><h>490</h></coordinates><panel_attributes>&lt;&lt;State&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1730</x><y>1310</y><w>40</w><h>40</h></coordinates><panel_attributes></panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1020</x><y>720</y><w>320</w><h>490</h></coordinates><panel_attributes>&lt;&lt;State&gt;&gt;
 Interract with entity pool
 
 
