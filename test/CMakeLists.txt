@@ -1,6 +1,6 @@
-file(GLOB FILES_TEST_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} "*")
+file(GLOB TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 
-set(TEST_SOURCES
-  ${FILES_TEST_SOURCES}
-  PARENT_SCOPE)
+add_executable(test ${TEST_SOURCES})
 
+target_link_libraries(test PUBLIC cevy)
+target_link_libraries(test PUBLIC criterion)
