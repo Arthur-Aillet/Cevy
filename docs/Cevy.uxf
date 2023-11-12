@@ -28,11 +28,11 @@ commands.spawn((Camera, Position(3., 3.)));
 *Exemple C++:*
 
 Enity camera =
-   new Entity(new Camera, new Position(3, 3));
+   new entity(new Camera, new Position(3, 3));
 
-class Entity {
+class entity {
     public:
-    Entity(Component* ...) { // Vargs
+    entity(Component* ...) { // Vargs
     }
 }</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>100</y><w>320</w><h>300</h></coordinates><panel_attributes>&lt;&lt;System&gt;&gt;
 Classes accessing one or

@@ -2,25 +2,22 @@
 #include <string>
 #include <iostream>
 
-Entity::Entity(std::size_t new_id) : id(new_id)
+entity::entity(std::size_t new_id) : _id(new_id)
 {
 }
 
-Entity::~Entity()
+
+void entity::display()
 {
+    std::cout << this->_id << std::endl;
 }
 
-void Entity::display()
+entity::operator std::size_t&()
 {
-    std::cout << this->id << std::endl;
+    return this->_id;
 }
 
-Entity::operator std::size_t&()
+entity::operator std::size_t() const
 {
-    return this->id;
-}
-
-Entity::operator std::size_t() const
-{
-    return this->id;
+    return this->_id;
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-class Entity {
+class entity {
     public:
-        explicit Entity(std::size_t new_id);
+        explicit entity(std::size_t new_id);
         void display();
 
         operator std::size_t() const;
