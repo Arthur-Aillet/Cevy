@@ -1,4 +1,4 @@
-add_library(test.a
+add_library(entity.a
     STATIC
-    test.cpp
+    entity.cpp
   )

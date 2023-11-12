@@ -11,7 +11,7 @@ file(GLOB CEVY_HEADERS RELATIVE ${PROJECT_SOURCE_DIR} "includes/*")
 
 add_subdirectory(src)
 add_library(cevy SHARED ${CEVY_HEADERS})
-target_link_libraries(cevy test.a)
+target_link_libraries(cevy entity.a)
 set_target_properties(cevy PROPERTIES LINKER_LANGUAGE CXX)
 
 add_subdirectory(test)

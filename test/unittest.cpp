@@ -1,5 +1,8 @@
 #include <criterion/criterion.h>
 
+#include "../includes/test.hpp"
+
 Test(misc, passing) {
-    cr_assert(1);
+    Entity test = Entity(3);
+    cr_assert(3 == test);
 }
