@@ -2,11 +2,12 @@
 
 #include <vector>
 #include <optional>
+#include <iostream>
 
-template<typename Component, typename Alloc = std::allocator<Component>>
+template<typename Type, typename Alloc = std::allocator<Type>>
 class sparse_array {
     public:
-        using value_type = std::optional<Component>;
+        using value_type = std::optional<Type>;
         using reference_type = value_type&;
         using const_reference_type = value_type const &;
         using container_t = std::vector<value_type, Alloc>;
@@ -48,14 +49,14 @@ class sparse_array {
         size_type size () const { return _data.size(); };
         void resize (size_type len) { _data.resize(len, std::nullopt); };
 
-        reference_type insert_at(size_type pos, Component const &val) {
+        reference_type insert_at(size_type pos, Type const &val) {
             if (pos > _data.size())
                 _data.resize(pos + 1, std::nullopt);
             _data[pos] = std::optional(val);
             return _data[pos];
         }
 
-        reference_type insert_at(size_type pos, Component &&val) {
+        reference_type insert_at(size_type pos, Type &&val) {
             if (pos > _data.size())
                 _data.resize(pos + 1, std::nullopt);
             _data[pos] = std::optional(val);
@@ -71,12 +72,25 @@ class sparse_array {
             _data[pos] = std::nullopt;
         }
 
-        size_type get_index(value_type const &elem) const {
-            value_type const *ptr = std::addressof(elem);
-            for (size_type i = 0; _data[i] != _data.size(); i++) {
-                if (ptr == std::addressof(_data[i]))
-                    return i;
+        reference_type insert(Type &&val) {
+            for (auto& element : _data) {
+                if (!element) {
+                    element = std::optional(val);
+                    return element;
+                }
             }
-            return -1;
+            _data.push_back(std::optional(val));
+            return _data.back();
+        }
+
+        std::optional<size_type> get_index(value_type const &elem) const {
+            value_type const *ptr = std::addressof(elem);
+
+            for (size_type i = 0; i != _data.size(); i++) {
+                if (ptr == std::addressof(_data[i])) {
+                    return i;
+                }
+            }
+            return std::nullopt;
         }
 };

@@ -19,7 +19,7 @@ Test(sparse_array, size) {
     cr_assert(test.size() == 4);
 }
 
-Test(sparse_array, insert) {
+Test(sparse_array, insert_at) {
     sparse_array<int> test;
     test.insert_at(3, 4);
     cr_assert(test[3] == 4);
@@ -43,9 +43,30 @@ Test(sparse_array, get_index) {
     int var = 3;
     test.insert_at(2, var);
     cr_assert(test[2] == 3);
-    cr_assert(test.get_index(var) == -1);
-    cr_assert(test.get_index(*(test.begin() + 1)) == 1);
+    cr_assert(test.get_index(var).has_value() == false);
+    cr_assert(test.get_index(*(test.begin() + 1)).value() == 1);
 }
+
+void print_sparse(sparse_array<int> arr) {
+    for (auto& elm : arr) {
+        std::cout << elm.value_or(-1) << ", ";
+    }
+    std::cout << std::endl;
+}
+
+Test(sparse_array, insert) {
+    sparse_array<int> test;
+    test.insert_at(2, 3);
+    test.insert_at(4, 2);
+    test.insert_at(3, 5);
+    cr_assert(1 == test.insert(1));
+    cr_assert(4 == test.insert(4));
+    int pr = test.insert(6).value_or(100);
+    cr_assert(6 == pr);
+    auto &fst = test.insert(7);
+    cr_assert(6 == test.get_index(fst).value());
+}
+
 
 /*
 Test(sparse_array, get) {

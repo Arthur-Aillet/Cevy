@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./sparse_array.hpp"
+#include "./entity.hpp"
 
 #include <unordered_map>
 #include <any>
@@ -10,6 +11,7 @@
 class registery {
     private:
         std::unordered_map<std::type_index, std::any> _components_arrays;
+        sparse_array<entity> entities;
     public:
         template <class Component>
         sparse_array<Component> &register_component() {
