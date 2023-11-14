@@ -1,11 +1,10 @@
-#include "./entity.hpp"
+#include "entity.hpp"
 #include <string>
 #include <iostream>
 
 entity::entity(std::size_t new_id) : _id(new_id)
 {
 }
-
 
 void entity::display()
 {

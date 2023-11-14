@@ -1,5 +1,6 @@
+#pragma once
+
 #include <vector>
-#include <iostream>
 #include <optional>
 
 template<typename Component, typename Alloc = std::allocator<Component>>
@@ -72,9 +73,7 @@ class sparse_array {
 
         size_type get_index(value_type const &elem) const {
             value_type const *ptr = std::addressof(elem);
-            std::cout << ptr << std::endl;
             for (size_type i = 0; _data[i] != _data.size(); i++) {
-                std::cout << std::addressof(_data[i]) << std::endl;
                 if (ptr == std::addressof(_data[i]))
                     return i;
             }
