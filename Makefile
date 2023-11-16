@@ -11,6 +11,6 @@ build:
 
 test:
 	cmake -DTESTS=on -S . -B ./build
-	make --no-print-directory -C build tests-run
+	make --no-print-directory -C build tests-run-cevy
 
 .PHONY: all build test
