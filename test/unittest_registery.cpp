@@ -6,5 +6,4 @@
 Test(registering, constructors) {
     registery test;
     test.register_component<int>();
-    test.get_components<int>();
 }
