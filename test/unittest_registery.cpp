@@ -4,9 +4,19 @@
 #include "../src/sparse_array.hpp"
 
 Test(registering, constructors) {
-    registery test;
-    test.register_component<int>();
-    test.get_components<int>();
-    test.spawn_entity();
-    test.kill_entity(test.entity_from_index(3));
+    registery app;
+}
+
+Test(registering, register_comp) {
+    registery app;
+    app.register_component<int>();
+    app.get_components<int>();
+}
+
+Test(registering, add_component) {
+    registery app;
+    app.register_component<int>();
+    auto player = app.spawn_entity();
+    app.add_component(player, 32);
+    app.add_component(player, 32);
 }

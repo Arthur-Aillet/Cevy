@@ -40,6 +40,25 @@ class registery {
             }
         }
 
+        template <typename Component>
+        typename sparse_array<Component>::reference_type add_component(entity const &to, Component &&c) {
+            auto &array = get_components<Component>();
+            return array.insert_at(to, std::forward<Component>(c));
+        }
+
+        template <typename Component, typename ... Params>
+        typename sparse_array<Component>::reference_type emplace_component(entity const &to, Params &&... p) {
+            auto &array = get_components<Component>();
+            return array.emplace_at(to, p...);
+        }
+
+        template <typename Component>
+        void remove_component(entity const &from) {
+            auto &array = get_components<Component>();
+            if (from < array.size())
+                array.erase(from);
+        }
+
         template <class Component>
         sparse_array<Component> &register_component() {
             erase_access f_e = [] (registery & reg, entity const & entity) {
