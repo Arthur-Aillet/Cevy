@@ -10,7 +10,6 @@
 #include <tuple>
 #include <functional>
 
-
 class registery {
     public:
         using erase_access = std::function<void (registery &, entity const &)>;
@@ -20,14 +19,36 @@ class registery {
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<entity> _entities;
     public:
+        entity spawn_entity() {
+            size_t pos = _entities.first_free();
+            entity new_e = entity(pos);
+
+            _entities.insert_at(pos, new_e);
+            return new_e;
+        }
+
+        entity entity_from_index(std::size_t idx) {
+            entity new_e = entity(idx);
+
+            _entities.insert_at(idx, new_e);
+            return new_e;
+        }
+
+        void kill_entity(entity const &e) {
+            for (auto const& [type, data] : _components_arrays) {
+                auto f_e = std::get<1>(data);
+                f_e(*this, e);
+            }
+        }
+
         template <class Component>
         sparse_array<Component> &register_component() {
-            erase_access f = [] (registery & reg, entity const & entity) {
+            erase_access f_e = [] (registery & reg, entity const & entity) {
                 reg.get_components<Component>()[entity] = std::nullopt;
             };
             std::any a = std::make_any<sparse_array<Component>>();
 
-            _components_arrays.insert({std::type_index(typeid(Component)), std::make_tuple(a, f)});
+            _components_arrays.insert({std::type_index(typeid(Component)), std::make_tuple(a, f_e)});
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
         }
 

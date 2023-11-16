@@ -83,6 +83,15 @@ class sparse_array {
             return _data.back();
         }
 
+        size_t first_free() {
+            for (size_t i = 0; i != _data.size(); i++) {
+                if (!_data[i]) {
+                    return i;
+                }
+            }
+            return _data.size();
+        }
+
         std::optional<size_type> get_index(value_type const &elem) const {
             value_type const *ptr = std::addressof(elem);
 
