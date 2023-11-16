@@ -67,7 +67,6 @@ Test(sparse_array, insert) {
     cr_assert(6 == test.get_index(fst).value());
 }
 
-
 /*
 Test(sparse_array, get) {
     sparse_array<int> test;

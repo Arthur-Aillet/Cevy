@@ -36,15 +36,16 @@ class registery {
 
         void kill_entity(entity const &e) {
             for (auto const& [type, data] : _components_arrays) {
-                auto f_e = std::get<1>(data);
-                f_e(*this, e);
+                std::get<1>(data)(*this, e);
             }
         }
 
         template <class Component>
         sparse_array<Component> &register_component() {
             erase_access f_e = [] (registery & reg, entity const & entity) {
-                reg.get_components<Component>()[entity] = std::nullopt;
+                auto &cmpnts = reg.get_components<Component>();
+                if (entity < cmpnts.size())
+                    cmpnts[entity] = std::nullopt;
             };
             std::any a = std::make_any<sparse_array<Component>>();
 

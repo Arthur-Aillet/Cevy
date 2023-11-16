@@ -50,14 +50,14 @@ class sparse_array {
         void resize (size_type len) { _data.resize(len, std::nullopt); };
 
         reference_type insert_at(size_type pos, Type const &val) {
-            if (pos > _data.size())
+            if (pos >= _data.size())
                 _data.resize(pos + 1, std::nullopt);
             _data[pos] = std::optional(val);
             return _data[pos];
         }
 
         reference_type insert_at(size_type pos, Type &&val) {
-            if (pos > _data.size())
+            if (pos >= _data.size())
                 _data.resize(pos + 1, std::nullopt);
             _data[pos] = std::optional(val);
             return _data[pos];
