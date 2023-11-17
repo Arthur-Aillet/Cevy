@@ -12,11 +12,11 @@ add_subdirectory(src)
 option(TESTS "Build tests" OFF)
 if(TESTS)
     add_custom_target(tests-run-cevy
-                      COMMENT "Executing data generation app"
-                      COMMAND test-cevy
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      SOURCES ${ToolsSources}
-                      )
+                        COMMENT "Executing tests"
+                        COMMAND test-cevy
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        SOURCES ${ToolsSources}
+                    )
 
     add_subdirectory(test)
 endif()
