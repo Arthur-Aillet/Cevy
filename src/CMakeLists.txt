@@ -10,13 +10,15 @@ add_library(sparse_array
   sparse_array.cpp
   )
 
-add_library(registery
+add_library(registry
   STATIC
-  registery.cpp
-  registery.hpp
+  registry.cpp
+  registry.hpp
   )
+
+add_subdirectory(game_engine)
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../public/*")
 add_library(cevy SHARED ${CEVY_HEADERS})
-target_link_libraries(cevy entity registery sparse_array)
+target_link_libraries(cevy entity registry sparse_array game_engine)
 set_target_properties(cevy PROPERTIES LINKER_LANGUAGE CXX)

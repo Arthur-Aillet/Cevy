@@ -10,9 +10,9 @@
 #include <tuple>
 #include <functional>
 
-class registery {
+class registry {
     public:
-        using erase_access = std::function<void (registery &, entity const &)>;
+        using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
 
     private:
@@ -61,7 +61,7 @@ class registery {
 
         template <class Component>
         sparse_array<Component> &register_component() {
-            erase_access f_e = [] (registery & reg, entity const & entity) {
+            erase_access f_e = [] (registry & reg, entity const & entity) {
                 auto &cmpnts = reg.get_components<Component>();
                 if (entity < cmpnts.size())
                     cmpnts[entity] = std::nullopt;
