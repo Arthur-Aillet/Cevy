@@ -10,7 +10,7 @@ class sparse_array {
         using value_type = std::optional<Type>;
         using reference_type = value_type&;
         using const_reference_type = value_type const &;
-        using container_t = std::vector<value_type, Alloc>;
+        using container_t = std::vector<value_type>;
         using size_type = typename container_t::size_type;
         using iterator = typename container_t::iterator;
         using const_iterator = typename container_t::const_iterator;

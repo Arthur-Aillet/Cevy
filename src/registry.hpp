@@ -14,6 +14,8 @@ class registry {
     public:
         using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
+        using system_function = std::function<void (registry &)>;
+        std::vector<system_function> _systems;
 
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
@@ -79,5 +81,27 @@ class registry {
         template <class Component>
         sparse_array<Component> const &get_components() const {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+        }
+
+        template <class... Components, typename Function>
+        void add_system(Function const &f) {
+            system_function sys = [&f] (registry & reg) {
+                f(reg, reg.get_components<Components>()...);
+            };
+            _systems.push_back(sys);
+        }
+
+        template <class... Components, typename Function>
+        void add_system(Function &&f) {
+            system_function sys = [&f] (registry & reg) {
+                f(reg, reg.get_components<Components>()...);
+            };
+            _systems.push_back(sys);
+        }
+
+        void run_systems() {
+            for (auto &sys : _systems) {
+                sys(*this);
+            }
         }
 };
