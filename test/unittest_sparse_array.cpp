@@ -28,6 +28,11 @@ Test(sparse_array, insert_at) {
     cr_assert(test[2] == 3);
     cr_assert(test[1] == std::nullopt);
     cr_assert(test[0] == std::nullopt);
+    int initial = 8;
+    test.insert_at(5, initial);
+    test[5] = 7;
+    cr_assert(test[5] == 7);
+    cr_assert(initial == 8);
 }
 
 Test(sparse_array, erase) {
