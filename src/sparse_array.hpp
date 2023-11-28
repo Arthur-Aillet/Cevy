@@ -72,17 +72,6 @@ class sparse_array {
             _data[pos] = std::nullopt;
         }
 
-        reference_type insert(Type &&val) {
-            for (auto& element : _data) {
-                if (!element) {
-                    element = std::optional(val);
-                    return element;
-                }
-            }
-            _data.push_back(std::optional(val));
-            return _data.back();
-        }
-
         size_t first_free() {
             for (size_t i = 0; i != _data.size(); i++) {
                 if (!_data[i]) {
@@ -90,6 +79,10 @@ class sparse_array {
                 }
             }
             return _data.size();
+        }
+
+        reference_type insert(Type &&val) {
+            return insert_at(first_free(), val);
         }
 
         std::optional<size_type> get_index(value_type const &elem) const {
