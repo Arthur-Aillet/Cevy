@@ -23,12 +23,14 @@ class sparse_array {
         ~sparse_array() {};
         sparse_array(sparse_array const &other) : _data(other._data) {}; //copy constructor
         sparse_array(sparse_array && other) noexcept : _data(std::move(other._data)) {}; //move constructor
+
         sparse_array &operator = (sparse_array const &other) { //copy assignment operator
             _data = other._data;
             return *this;
         };
+
         sparse_array &operator = (sparse_array &&other) noexcept { // move assignment operator
-            _data = std::move(other._data);
+            _data = other._data;
             return *this;
         };
 

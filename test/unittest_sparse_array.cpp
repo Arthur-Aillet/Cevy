@@ -72,6 +72,19 @@ Test(sparse_array, insert) {
     cr_assert(6 == test.get_index(fst).value());
 }
 
+Test(sparse_array, assignation_op) {
+    sparse_array<int> test;
+    test.insert(1);
+    test.insert(2);
+    test.insert(3);
+    test.insert(4);
+    sparse_array<int> test2 = test;
+    cr_assert(test[2] == 3);
+    test[2] = 8;
+    cr_assert(test[2] == 8);
+    cr_assert(test2[2] == 3);
+}
+
 /*
 Test(sparse_array, get) {
     sparse_array<int> test;
