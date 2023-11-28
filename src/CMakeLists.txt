@@ -14,6 +14,7 @@ add_library(registry
   STATIC
   registry.cpp
   registry.hpp
+  queries.hpp
   )
 
 add_subdirectory(game_engine)

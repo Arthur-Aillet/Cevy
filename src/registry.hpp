@@ -10,14 +10,30 @@
 #include <tuple>
 #include <functional>
 
+template<class T>
+typename std::enable_if<std::is_trivially_default_constructible<T>::value>::type
+    void construct()
+{
+    std::cout << "default constructing trivially default constructible T\n";
+}
+
+template<class T>
+    void construct()
+{
+    std::cout << "not default constructing non-trivially default constructible T\n";
+}
+
 class registry {
     public:
+        registry() {
+            construct<std::optional>();
+        }
         using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
         using system_function = std::function<void (registry &)>;
-        std::vector<system_function> _systems;
 
     private:
+        std::vector<system_function> _systems;
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<entity> _entities;
     public:
@@ -81,6 +97,39 @@ class registry {
         template <class Component>
         sparse_array<Component> const &get_components() const {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+        }
+
+
+        template<typename>
+        struct is_sparse : std::true_type {};
+
+        template<typename T, typename A>
+        struct is_sparse<sparse_array<T,A> const &> : std::true_type {};
+
+        template<typename>
+        struct isnt_sparse : std::true_type {};
+
+        template<typename T, typename A>
+        struct isnt_sparse<sparse_array<T,A> const &> : std::false_type {};
+
+        template<typename SparseType, std::enable_if_t<is_sparse<SparseType>::value, bool>>
+        void print_arg() {
+            std::cout << "v1" << std::endl;
+        }
+
+        template<typename AnyType>
+        void print_arg() {
+            std::cout << "v2" << std::endl;
+        }
+
+        template<typename Sparse>
+        void print_sparse() {
+            std::cout << " --- "<< typeid(Sparse::value_type::value_type).name() << std::endl;
+        }
+
+        template<class R, class ...Args>
+        void add_super_system(R(&&func)(Args...)) {
+            (print_arg<Args>(), ...);
         }
 
         template <class... Components, typename Function>
