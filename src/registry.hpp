@@ -9,10 +9,33 @@
 #include <iostream>
 #include <tuple>
 #include <functional>
+#include <type_traits>
 
+
+template<class T>
+struct is_super : public std::false_type {};
+
+
+class registry;
+template<>
+struct is_super<registry&> : std::true_type {};
+template<>
+struct is_super<const registry&> : std::true_type {};
+
+
+template<typename T, typename A>
+struct is_super<const sparse_array<T, A>&> : std::true_type {};
+
+template<typename T, typename A>
+struct is_super<sparse_array<T, A>&> : std::true_type {};
+
+template<typename... Args>
+constexpr bool all(Args... args) { return (... && args); }
 
 class registry {
     public:
+        using value_type = registry;
+        // struct is_super : std::true_type {};
         using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
         using system_function = std::function<void (registry &)>;
@@ -24,11 +47,10 @@ class registry {
     public:
 
 
-        template<typename>
-        struct is_sparse : std::false_type {};
+        // template<typename>
+        // struct is_super : std::false_type {};
 
-        template<typename T, typename A>
-        struct is_sparse<sparse_array<T,A> const &> : std::true_type {};
+
 
         entity spawn_entity() {
             size_t pos = _entities.first_free();
@@ -92,36 +114,23 @@ class registry {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        // template <class Component>
-        //     // ,typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
-        // sparse_array<Component> &get() {
-        //     return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
-        // }
-        // template <class Component>
-        //     // ,typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
-        // sparse_array<Component> const &get() const {
-        //     return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
-        // }
-
         template <typename Super>
-        Super get_super() {
-                std::cout << "is:" << typeid(Super).name() << std::endl;
+        const Super get_super() {
             if (typeid(registry&) == typeid(Super)) {
-                std::cout << "1" << std::endl;
-                auto p = std::any_cast<std::remove_reference_t<Super>*>(this);
+                auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
                 if (p) {
                     return *p;
                 } else {
                     throw std::bad_any_cast();
                 }
             } else {
-                std::cout << "3" << std::endl;
                 return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
             }
         }
 
         template<class R, class ...Args>
         void add_super_system(R(&&func)(Args...)) {
+            static_assert(all(is_super<Args>()...), "type must be reference to super");
             system_function sys = [&func] (registry & reg) {
                 func(reg.get_super<Args>()...);
             };
