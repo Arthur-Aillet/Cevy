@@ -78,6 +78,17 @@ fn debug_player_hp(
 ```cpp
 
 
+void hello_world()
+{
+    std::cout << "hello world!" << std::endl;
+}
+
+.add_systems<?>(hello_world)
+
+void debug_player_hp(
+        Query<Health, Option<PlayerName>&, With<Player>, Without<Enemy>>& query
+    )
+
 ```
 *Features*
 
@@ -114,8 +125,14 @@ fn main() {
 **Exemple C++:**
 ```cpp
 
-int main() {
-    // ...
+int main()
+{
+    App app;
+    app.add_plugin<CameraPlugin>();
+    app.add_system(Stage::start, spawn_player);
+    ?app.init_ressource<Clock>(/* initializer-list */);
+    ?app.init_ressource(Clock());
+    app.run();
 }
 
 ```
@@ -139,6 +156,15 @@ fn greet_people(time: Res<Time>, query: Query<&Name, With<Person>>) {
 **Exemple C++:**
 ```cpp
 
+.init_ressources<Clock>(/* initializer-list */);
+
+void greet_people(Resource<Time> time, Query<Name, With<Person>>& query)
+{
+    for (data : query) {
+        std::cout << "hello " << std::get<0>(data) << "!" << std::endl;
+    }
+}
+
 
 ```
 # **`<<Command>>`**
@@ -155,8 +181,8 @@ fn spawn_things( // System
     // manage resources
     commands.insert_resource(MyResource);
     commands.remove_resource::<MyResource>()
-    commands.spawn(Myentity);
-    let id = commands.spawn(Myentity);
+    commands.spawn(Velocity, Position::default());
+    let id = commands.spawn(Velocity::new(0.0, -1.0));
 
     commands.entity(id)
       .insert(ComponentB::default())
@@ -167,6 +193,16 @@ fn spawn_things( // System
 **Exemple C++:**
 ```cpp
 
+void spawn_things(Commands commands)
+{
+    commands.insert_resource<MyResource>();
+    commands.remove_resouce<MyResource>();
+    commands.spawn(Position(), Velocity());
+
+    let id = commands.spawn<ComponentA>(/* initializer-list */);
+
+    commands.entity(id).insert(ComponentB()).remove<ComponentA>();
+}
 
 ```
 # **`<<Plugins>>`**
@@ -191,6 +227,8 @@ impl Plugin for HelloPlugin {
 ```
 **Exemple C++:**
 ```cpp
+
+class HelloPluging : public Plugin
 
 
 ```
