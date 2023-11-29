@@ -10,24 +10,9 @@
 #include <tuple>
 #include <functional>
 
-template<class T>
-typename std::enable_if<std::is_trivially_default_constructible<T>::value>::type
-    void construct()
-{
-    std::cout << "default constructing trivially default constructible T\n";
-}
-
-template<class T>
-    void construct()
-{
-    std::cout << "not default constructing non-trivially default constructible T\n";
-}
 
 class registry {
     public:
-        registry() {
-            construct<std::optional>();
-        }
         using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
         using system_function = std::function<void (registry &)>;
@@ -37,6 +22,14 @@ class registry {
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<entity> _entities;
     public:
+
+
+        template<typename>
+        struct is_sparse : std::false_type {};
+
+        template<typename T, typename A>
+        struct is_sparse<sparse_array<T,A> const &> : std::true_type {};
+
         entity spawn_entity() {
             size_t pos = _entities.first_free();
             entity new_e = entity(pos);
@@ -99,38 +92,53 @@ class registry {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
+        template <class Component,
+            typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
+        sparse_array<Component> &get() {
+            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
+        }
+        template <class Component,
+            typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
+        sparse_array<Component> const &get() const {
+            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+        }
 
-        template<typename>
-        struct is_sparse : std::true_type {};
+        template <typename Sparse,
+            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
+        Sparse &get() {
+            std::cout << typeid(typename std::remove_reference<Sparse>::type::value_type::value_type).name() << std::endl;
+            return std::any_cast<Sparse&>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Sparse>::type::value_type::value_type))]));
+        }
+        template <typename Sparse,
+            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
+        Sparse const &get() const {
+            return std::any_cast<Sparse&>(std::get<0>(_components_arrays.at(std::type_index(typeid(typename std::remove_reference<Sparse>::type::value_type::value_type)))));
+        }
 
-        template<typename T, typename A>
-        struct is_sparse<sparse_array<T,A> const &> : std::true_type {};
-
-        template<typename>
-        struct isnt_sparse : std::true_type {};
-
-        template<typename T, typename A>
-        struct isnt_sparse<sparse_array<T,A> const &> : std::false_type {};
 
         template<typename SparseType, std::enable_if_t<is_sparse<SparseType>::value, bool>>
         void print_arg() {
             std::cout << "v1" << std::endl;
         }
 
-        template<typename AnyType>
-        void print_arg() {
-            std::cout << "v2" << std::endl;
-        }
+        // template<typename SparsentType, std::enable_if_t<!is_sparse<SparsentType>::value, bool>>
+        // void print_arg() {
+        //     std::cout << "v1" << std::endl;
+        // }
 
-        template<typename Sparse>
+        template<typename Sparse,
+            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
         void print_sparse() {
-            std::cout << " --- "<< typeid(Sparse::value_type::value_type).name() << std::endl;
+            std::cout << " --- "<< typeid(typename Sparse::value_type::value_type).name() << std::endl;
         }
 
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            (print_arg<Args>(), ...);
-        }
+        void add_super_system(R(&&func)(registry&, Args...)) {
+            system_function sys = [&func] (registry & reg) {
+                func(reg, reg.get_components<Args>()...);
+            };
+            _systems.push_back(sys);
+}
 
         template <class... Components, typename Function>
         void add_system(Function const &f) {
