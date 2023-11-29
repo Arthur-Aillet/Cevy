@@ -92,27 +92,27 @@ class registry {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        template <class Component,
-            typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
-        sparse_array<Component> &get() {
-            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
-        }
-        template <class Component,
-            typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
-        sparse_array<Component> const &get() const {
-            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
-        }
+        // template <class Component>
+        //     // ,typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
+        // sparse_array<Component> &get() {
+        //     return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
+        // }
+        // template <class Component>
+        //     // ,typename = std::enable_if_t<!is_sparse<Component>::value, bool>>
+        // sparse_array<Component> const &get() const {
+        //     return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+        // }
 
-        template <typename Sparse,
-            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
-        Sparse &get() {
-            std::cout << typeid(typename std::remove_reference<Sparse>::type::value_type::value_type).name() << std::endl;
-            return std::any_cast<Sparse&>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Sparse>::type::value_type::value_type))]));
+        template <typename Super>
+            // ,typename = std::enable_if_t<is_sparse<Super>::value, bool>>
+        Super &get_super() {
+            std::cout << typeid(typename std::remove_reference<Super>::type::value_type::value_type).name() << std::endl;
+            return std::any_cast<Super&>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
         }
-        template <typename Sparse,
-            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
-        Sparse const &get() const {
-            return std::any_cast<Sparse&>(std::get<0>(_components_arrays.at(std::type_index(typeid(typename std::remove_reference<Sparse>::type::value_type::value_type)))));
+        template <typename Super>
+            // ,typename = std::enable_if_t<is_sparse<Super>::value, bool>>
+        Super const &get_super() const {
+            return std::any_cast<Super&>(std::get<0>(_components_arrays.at(std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type)))));
         }
 
 
@@ -135,7 +135,7 @@ class registry {
         template<class R, class ...Args>
         void add_super_system(R(&&func)(registry&, Args...)) {
             system_function sys = [&func] (registry & reg) {
-                func(reg, reg.get_components<Args>()...);
+                func(reg, reg.get_super<Args>()...);
             };
             _systems.push_back(sys);
 }
