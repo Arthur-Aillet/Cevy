@@ -104,41 +104,29 @@ class registry {
         // }
 
         template <typename Super>
-            // ,typename = std::enable_if_t<is_sparse<Super>::value, bool>>
-        Super &get_super() {
-            std::cout << typeid(typename std::remove_reference<Super>::type::value_type::value_type).name() << std::endl;
-            return std::any_cast<Super&>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
-        }
-        template <typename Super>
-            // ,typename = std::enable_if_t<is_sparse<Super>::value, bool>>
-        Super const &get_super() const {
-            return std::any_cast<Super&>(std::get<0>(_components_arrays.at(std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type)))));
-        }
-
-
-        template<typename SparseType, std::enable_if_t<is_sparse<SparseType>::value, bool>>
-        void print_arg() {
-            std::cout << "v1" << std::endl;
-        }
-
-        // template<typename SparsentType, std::enable_if_t<!is_sparse<SparsentType>::value, bool>>
-        // void print_arg() {
-        //     std::cout << "v1" << std::endl;
-        // }
-
-        template<typename Sparse,
-            typename = std::enable_if_t<is_sparse<Sparse>::value, bool>>
-        void print_sparse() {
-            std::cout << " --- "<< typeid(typename Sparse::value_type::value_type).name() << std::endl;
+        Super get_super() {
+                std::cout << "is:" << typeid(Super).name() << std::endl;
+            if (typeid(registry&) == typeid(Super)) {
+                std::cout << "1" << std::endl;
+                auto p = std::any_cast<std::remove_reference_t<Super>*>(this);
+                if (p) {
+                    return *p;
+                } else {
+                    throw std::bad_any_cast();
+                }
+            } else {
+                std::cout << "3" << std::endl;
+                return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
+            }
         }
 
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(registry&, Args...)) {
+        void add_super_system(R(&&func)(Args...)) {
             system_function sys = [&func] (registry & reg) {
-                func(reg, reg.get_super<Args>()...);
+                func(reg.get_super<Args>()...);
             };
             _systems.push_back(sys);
-}
+        }
 
         template <class... Components, typename Function>
         void add_system(Function const &f) {
