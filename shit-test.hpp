@@ -34,7 +34,7 @@ constexpr size_t const_hash2(const char* s) {
     return hash;
 }
 
-#define ENUM_FROM(x) (inline static const size_t x = const_hash(std::array(#x)))
+#define ENUM_FROM(x) inline static const size_t x = const_hash(std::array(#x));
 
 #define hash_name(x) (const_hash(#x))
 
@@ -53,4 +53,20 @@ protected:
     // template<T = Args...>
     // ENUM_FROM(T)...;
 
+};
+
+// template<typename... Args>
+struct Enum2 {
+public:
+    size_t dbg() {return value;};
+    Enum2(size_t v) : value(v) {};
+    template<typename T>
+    static Enum2 create() { T a; Enum2 e = Enum2(const_hash2(typeid(T).name())); return e;};
+    Enum2(const Enum2& e) : value(e.value) {};
+    template<typename T>
+    Enum2() : value(const_hash2(typeid(T).name())) {};
+protected:
+    size_t value = 666;
+    // template<T = Args...>
+    // (Args)...;
 };
