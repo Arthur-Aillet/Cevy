@@ -34,7 +34,7 @@ constexpr size_t const_hash2(const char* s) {
     return hash;
 }
 
-#define ENUM_FROM(x) inline static const size_t x = const_hash(std::array(#x));
+#define ENUM_FROM(t, x) inline static const t x = const_hash2(#x);
 
 #define hash_name(x) (const_hash(#x))
 
