@@ -228,7 +228,15 @@ impl Plugin for HelloPlugin {
 **Exemple C++:**
 ```cpp
 
-class HelloPluging : public Plugin
+class HelloPluging : public Plugin {
+    void build(App& app) override
+    {
+        app.add_system(Stage::start, spawn_camera);
+        app.add_system(Stage::update, move_camera);
+        app.add_system(Stage::postUpdate, destroy_camera);
+        app.add_event(CameraDestroyed());
+    }
+}
 
 
 ```
@@ -253,6 +261,15 @@ fn event_trigger(
 **Exemple C++:**
 ```cpp
 
+void event_trigger(EventWriter<MyEvent>& event)
+{
+    event.send(MyEvent {
+        .message = "Behold! a message..."
+    })
+}
+
+// this `.member = value` syntax is equivalent to rusts' `member: value` syntax
+// it is for initalizing a struct's public members
 
 ```
 # **`<<EventReader>>`**
@@ -273,6 +290,12 @@ fn event_listener(mut events: EventReader<MyEvent>) {
 **Exemple C++:**
 ```cpp
 
+void event_listener(EvenReader<MyEvent>& events)
+{
+    for (my_event: events.read()) {
+        std::cerr << my_event.message << std::endl;
+    }
+}
 
 ```
 # **`<<State>>`**
@@ -308,6 +331,29 @@ fn menu(mut next_state: ResMut<NextState<AppState>>) {
 **Exemple C++:**
 ```cpp
 
+constexpr size_t const_hash(const std::string& s) {
+    static_assert(s.len() < 64)
+    size_t hash = 0;
+    for (c : s)
+        hash = hash * 256 + int(c);
+    return hash
+}
+
+#define ENUM_FROM(x) (inline static const size_t x = const_hash(#x))
+
+class State {
+    public:
+
+}
+
+
+class MyState : public State {
+    public:
+        inline static const size_t menu = const_hash(s"menu");
+        ENUM_FROM(inGame);
+        // inline static const size_t inGame = const_hash(s"inGame");
+    // use a macro for these ?
+}
 
 ```
 
