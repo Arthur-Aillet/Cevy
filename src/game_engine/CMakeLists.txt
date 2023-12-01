@@ -13,8 +13,6 @@ add_library(game_engine
 
 target_link_libraries(game_engine PUBLIC raylib imgui rlImGui)
 
-message("message [${RLIMGUI_FOLDER}] [${IMGUI_FOLDER}]")
-
 target_include_directories(rlImGui PUBLIC
   ${RLIMGUI_FOLDER}
   ${IMGUI_FOLDER}
