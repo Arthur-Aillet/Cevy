@@ -331,29 +331,24 @@ fn menu(mut next_state: ResMut<NextState<AppState>>) {
 **Exemple C++:**
 ```cpp
 
-constexpr size_t const_hash(const std::string& s) {
-    static_assert(s.len() < 64)
-    size_t hash = 0;
-    for (c : s)
-        hash = hash * 256 + int(c);
-    return hash
+enum AppState {
+    Menu,
+    InGame,
+};
+
+App app;
+app.add_state(AppState::Menu);
+app.add_systems(OnExit(AppState::Menu), ...);
+app.add_systems(OnEnter(AppState::Menu), ...);
+app.add_systems(Update, ..., run_if(?in_state(AppState::InGame)));
+
+void menu(Ressource<NextState<AppState>>& next_state)
+{
+    if (...) {
+        next_state.set(AppState::InGame);
+    }
 }
 
-#define ENUM_FROM(x) (inline static const size_t x = const_hash(#x))
-
-class State {
-    public:
-
-}
-
-
-class MyState : public State {
-    public:
-        inline static const size_t menu = const_hash(s"menu");
-        ENUM_FROM(inGame);
-        // inline static const size_t inGame = const_hash(s"inGame");
-    // use a macro for these ?
-}
 
 ```
 
