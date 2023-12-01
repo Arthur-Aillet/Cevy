@@ -1,7 +1,7 @@
 #include "camera.hpp"
 #include <iostream>
 
-CevyCamera::CevyCamera()
+Cevy::Camera::Camera()
 {
     this->camera = { 0 };
     this->camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
@@ -11,18 +11,18 @@ CevyCamera::CevyCamera()
     this->camera.projection = CAMERA_PERSPECTIVE;
 }
 
-CevyCamera::~CevyCamera()
+Cevy::Camera::~Camera()
 {
 }
 
-CevyCamera::operator Camera3D&() {
+Cevy::Camera::operator Camera3D&() {
     return this->camera;
 }
 
-CevyCamera::operator Camera3D*() {
+Cevy::Camera::operator Camera3D*() {
     return &this->camera;
 }
 
-CevyCamera::operator Camera3D() const {
+Cevy::Camera::operator Camera3D() const {
     return this->camera;
 }

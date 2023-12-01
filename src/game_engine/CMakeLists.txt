@@ -8,4 +8,15 @@ add_library(game_engine
   camera.cpp
   )
 
-target_link_libraries(game_engine PUBLIC raylib)
+  set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)
+  set(IMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/imgui)
+
+target_link_libraries(game_engine PUBLIC raylib imgui rlImGui)
+
+message("message [${RLIMGUI_FOLDER}] [${IMGUI_FOLDER}]")
+
+target_include_directories(rlImGui PUBLIC
+  ${RLIMGUI_FOLDER}
+  ${IMGUI_FOLDER}
+  ${IMGUI_FOLDER}/backends
+)

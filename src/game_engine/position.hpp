@@ -1,6 +1,7 @@
 #pragma once
-
-typedef struct position_s {
-    float x;
-    float y;
-} position;
+namespace Cevy {
+    typedef struct position_s {
+        float x;
+        float y;
+    } position;
+}
