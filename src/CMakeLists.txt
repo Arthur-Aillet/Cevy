@@ -8,6 +8,8 @@ add_library(entity
 add_library(sparse_array
   STATIC
   sparse_array.cpp
+  zipper_iterator.hpp
+  zipper_iterator.cpp
   )
 
 add_library(registry
