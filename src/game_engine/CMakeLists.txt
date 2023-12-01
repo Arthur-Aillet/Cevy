@@ -4,6 +4,8 @@ add_library(game_engine
   velocity.hpp
   game_engine.hpp
   game_engine.cpp
+  camera.hpp
+  camera.cpp
   )
 
 target_link_libraries(game_engine PUBLIC raylib)
