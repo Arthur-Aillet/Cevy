@@ -36,3 +36,6 @@
 bin/*
 build/*
 lib/*
+build
+lib
+bin

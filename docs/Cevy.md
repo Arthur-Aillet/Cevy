@@ -39,13 +39,13 @@ commands.spawn((Camera, Position(3., 3.)));
 **Exemple C++:**
 ```cpp
 
-Enity camera = new Entity(new Camera, new Position(3, 3));
+Enity camera = new entity(new Camera, new Position(3, 3));
 
 //Implementation:
 
-class Entity {
+class entity {
     public:
-    Entity(Component* ...) { // Vargs
+    entity(Component* ...) { // Vargs
     }
 }
 
@@ -155,8 +155,8 @@ fn spawn_things( // System
     // manage resources
     commands.insert_resource(MyResource);
     commands.remove_resource::<MyResource>()
-    commands.spawn(MyEntity);
-    let id = commands.spawn(MyEntity);
+    commands.spawn(Myentity);
+    let id = commands.spawn(Myentity);
 
     commands.entity(id)
       .insert(ComponentB::default())
@@ -284,6 +284,10 @@ plugins to control bases, holding utilities for all games
  - Asset Manager
  - Global Timer
  - Font Manager
+
+**Components**
+
+ - Position
 
 **Default Stages:**
 
