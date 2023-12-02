@@ -1,23 +1,26 @@
 //std::unordered_map<std::type_index, component_data> _components_arrays;
 #include <vector>
+#include <cstddef>
+
+#include <utility>
 
 template <class... Containers>
 class zipper_iterator {
     template <class Container>
-    using iterator_t = typename Container::iterator;
+    using iterator_t = decltype(Container::begin());
 
     template <class Container>
     using it_reference_t = typename iterator_t<Container>::reference;
 
     public:
-        // using value_type = std::tuple<Container::value_type&...>;
-        // using reference = value_type;
+        using value_type = std::tuple<typename Containers::value_type&...>;
+        using reference = value_type;
         using pointer = void;
         using difference_type = size_t;
         using iterator_category = std::bidirectional_iterator_tag;
-        using iterator_tuple = std::tuple<iterator_t<Container>...>;
+        using iterator_tuple = std::tuple<iterator_t<Containers>...>;
 
-        friend containers::zipper<Containers...>;
+        // friend containers::zipper<Containers...>; // FIXME - reactivate
         zipper_iterator(iterator_tuple const &it_tuple, size_t max);
     public:
         zipper_iterator(zipper_iterator const &z);
