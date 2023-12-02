@@ -17,8 +17,9 @@ add_library(registry
   )
 
 add_subdirectory(game_engine)
+add_subdirectory(network)
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../public/*")
 add_library(cevy SHARED ${CEVY_HEADERS})
-target_link_libraries(cevy entity registry sparse_array game_engine)
+target_link_libraries(cevy entity registry sparse_array game_engine network)
 set_target_properties(cevy PROPERTIES LINKER_LANGUAGE CXX)
