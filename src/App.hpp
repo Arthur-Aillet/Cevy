@@ -16,11 +16,11 @@ template<class T>
 struct is_super : public std::false_type {};
 
 
-class registry;
+class App;
 template<>
-struct is_super<registry&> : std::true_type {};
+struct is_super<App&> : std::true_type {};
 template<>
-struct is_super<const registry&> : std::true_type {};
+struct is_super<const App&> : std::true_type {};
 
 
 template<typename T, typename A>
@@ -37,12 +37,12 @@ class App {
         enum class STAGE {
             First,
             PreUpdate,
+            StateTransition,
+            RunFixedUpdateLoop,
             Update,
             PostUpdate,
             Last,
             RESET,
-            StateTransition,
-            RunFixedUpdateLoop,
         };
         using erase_access = std::function<void (App &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
@@ -51,7 +51,6 @@ class App {
         std::vector<system> _systems;
 
     private:
-        std::vector<system_function> _systems;
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<entity> _entities;
     public:
@@ -126,7 +125,7 @@ class App {
 
         template <typename Super>
         const Super get_super() {
-            if (typeid(registry&) == typeid(Super)) {
+            if (typeid(App&) == typeid(Super)) {
                 auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
                 if (p) {
                     return *p;
@@ -140,11 +139,16 @@ class App {
 
         template<class R, class ...Args>
         void add_super_system(R(&&func)(Args...)) {
+            add_super_system<R, Args...>(STAGE::Update, func);
+        }
+
+        template<class R, class ...Args>
+        void add_super_system(STAGE stage, R(&&func)(Args...)) {
             static_assert(all(is_super<Args>()...), "type must be reference to super");
-            system_function sys = [&func] (registry & reg) {
+            system_function sys = [&func] (App & reg) {
                 func(reg.get_super<Args>()...);
             };
-            _systems.push_back(sys);
+            _systems.push_back(std::make_tuple(sys, stage));
         }
 
         template <class... Components, typename Function>
