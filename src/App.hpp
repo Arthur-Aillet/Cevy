@@ -95,19 +95,29 @@ class App {
         }
 
         template <class... Components, typename Function>
-        void add_system(Function const &f) {
+        void add_system(STAGE stage, Function const &f) {
             system_function sys = [&f] (App & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(std::make_tuple(sys, STAGE::Update));
+            _systems.push_back(std::make_tuple(sys, stage));
+        }
+
+        template <class... Components, typename Function>
+        void add_system(STAGE stage, Function &&f) {
+            system_function sys = [&f] (App & reg) {
+                f(reg, reg.get_components<Components>()...);
+            };
+            _systems.push_back(std::make_tuple(sys, stage));
+        }
+
+        template <class... Components, typename Function>
+        void add_system(Function const &f) {
+            add_system(STAGE::Update, f);
         }
 
         template <class... Components, typename Function>
         void add_system(Function &&f) {
-            system_function sys = [&f] (App & reg) {
-                f(reg, reg.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, STAGE::Update));
+            add_system(STAGE::Update, f);
         }
 
         void runStages() {
