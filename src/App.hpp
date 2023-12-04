@@ -112,12 +112,12 @@ class App {
 
         template <class... Components, typename Function>
         void add_system(Function const &f) {
-            add_system(STAGE::Update, f);
+            add_system<Components...>(STAGE::Update, f);
         }
 
         template <class... Components, typename Function>
         void add_system(Function &&f) {
-            add_system(STAGE::Update, f);
+            add_system<Components...>(STAGE::Update, f);
         }
 
         void runStages() {
