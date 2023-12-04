@@ -10,7 +10,7 @@
 #include <tuple>
 #include <functional>
 
-class registry {
+class App {
     public:
         enum class STAGE {
             First,
@@ -22,9 +22,9 @@ class registry {
             StateTransition,
             RunFixedUpdateLoop,
         };
-        using erase_access = std::function<void (registry &, entity const &)>;
+        using erase_access = std::function<void (App &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
-        using system_function = std::function<void (registry &)>;
+        using system_function = std::function<void (App &)>;
         using system = std::tuple<system_function, STAGE>;
         std::vector<system> _systems;
 
@@ -74,7 +74,7 @@ class registry {
 
         template <class Component>
         sparse_array<Component> &register_component() {
-            erase_access f_e = [] (registry & reg, entity const & entity) {
+            erase_access f_e = [] (App & reg, entity const & entity) {
                 auto &cmpnts = reg.get_components<Component>();
                 if (entity < cmpnts.size())
                     cmpnts[entity] = std::nullopt;
@@ -96,7 +96,7 @@ class registry {
 
         template <class... Components, typename Function>
         void add_system(Function const &f) {
-            system_function sys = [&f] (registry & reg) {
+            system_function sys = [&f] (App & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
             _systems.push_back(std::make_tuple(sys, STAGE::Update));
@@ -104,7 +104,7 @@ class registry {
 
         template <class... Components, typename Function>
         void add_system(Function &&f) {
-            system_function sys = [&f] (registry & reg) {
+            system_function sys = [&f] (App & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
             _systems.push_back(std::make_tuple(sys, STAGE::Update));

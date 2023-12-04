@@ -7,7 +7,7 @@ class entity {
         std::size_t _id;
         explicit entity(std::size_t new_id);
     public:
-        friend class registry;
+        friend class App;
         operator std::size_t&();
         operator std::size_t() const;
 };
