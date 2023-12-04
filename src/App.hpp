@@ -43,6 +43,7 @@ class App {
             PostUpdate,
             Last,
             RESET,
+            ABORT,
         };
         using erase_access = std::function<void (App &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
@@ -54,13 +55,6 @@ class App {
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<entity> _entities;
     public:
-
-
-        // template<typename>
-        // struct is_super : std::false_type {};
-
-
-
         entity spawn_entity() {
             size_t pos = _entities.first_free();
             entity new_e = entity(pos);
@@ -177,16 +171,32 @@ class App {
             add_system<Components...>(STAGE::Update, f);
         }
 
+        void run() {
+            while (!_stop) {
+                runStages();
+            }
+        }
+
+        void quit() const {
+            _stop = true;
+        }
+
+        void abort() {
+            _stage = STAGE::ABORT;
+            _stop = true;
+        }
+
+    protected:
+        mutable bool _stop = false;
+        STAGE _stage = STAGE::RESET;
+
         void runStages() {
             _stage = STAGE::First;
             do {
                 runStage();
             }
-            while (_stage != STAGE::RESET);
+            while (_stage != STAGE::RESET && _stage != STAGE::ABORT);
         }
-
-    protected:
-        STAGE _stage = STAGE::RESET;
 
         public: void runStage() {
             std::vector<std::reference_wrapper<system>> curr_sys;
@@ -196,7 +206,6 @@ class App {
                 _systems.end(),
                 std::back_inserter(curr_sys),
                 [this](const system& sys) { return std::get<1>(sys) == _stage;});
-
 
             /* this part could be multi-threaded */
             for (auto sys : curr_sys) {
