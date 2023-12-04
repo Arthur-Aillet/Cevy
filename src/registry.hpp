@@ -12,10 +12,21 @@
 
 class registry {
     public:
+        enum class STAGE {
+            First,
+            PreUpdate,
+            Update,
+            PostUpdate,
+            Last,
+            RESET,
+            StateTransition,
+            RunFixedUpdateLoop,
+        };
         using erase_access = std::function<void (registry &, entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
         using system_function = std::function<void (registry &)>;
-        std::vector<system_function> _systems;
+        using system = std::tuple<system_function, STAGE>;
+        std::vector<system> _systems;
 
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
@@ -88,7 +99,7 @@ class registry {
             system_function sys = [&f] (registry & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(sys);
+            _systems.push_back(std::make_tuple(sys, STAGE::Update));
         }
 
         template <class... Components, typename Function>
@@ -96,12 +107,35 @@ class registry {
             system_function sys = [&f] (registry & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(sys);
+            _systems.push_back(std::make_tuple(sys, STAGE::Update));
         }
 
-        void run_systems() {
-            for (auto &sys : _systems) {
-                sys(*this);
+        void runStages() {
+            _stage = STAGE::First;
+            do {
+                runStage();
             }
+            while (_stage != STAGE::RESET);
+        }
+
+    protected:
+        STAGE _stage = STAGE::RESET;
+
+        public: void runStage() {
+            std::vector<std::reference_wrapper<system>> curr_sys;
+
+            std::copy_if(
+                _systems.begin(),
+                _systems.end(),
+                std::back_inserter(curr_sys),
+                [this](const system& sys) { return std::get<1>(sys) == _stage;});
+
+
+            /* this part could be multi-threaded */
+            for (auto sys : curr_sys) {
+                std::get<0>(sys.get())(*this);
+            }
+
+            _stage = static_cast<STAGE>(1 + static_cast<int>(_stage) );
         }
 };
