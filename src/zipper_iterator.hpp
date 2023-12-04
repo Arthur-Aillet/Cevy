@@ -4,6 +4,9 @@
 
 #include <utility>
 
+// template <class... Containers>
+// class zipper;
+
 template <class... Containers>
 class zipper_iterator {
     template <class Container>
@@ -20,8 +23,8 @@ class zipper_iterator {
         using iterator_category = std::bidirectional_iterator_tag;
         using iterator_tuple = std::tuple<iterator_t<Containers>...>;
 
-        // friend containers::zipper<Containers...>; // FIXME - reactivate
-        zipper_iterator(iterator_tuple const &it_tuple, size_t max);
+        // friend typename Containers::zipper<Containers...>; // FIXME - reactivate
+        zipper_iterator(iterator_tuple const &it_tuple, size_t max) : iterator_tuple(it_tuple), _max(max) {};
     public:
         zipper_iterator(zipper_iterator const &z);
 
@@ -42,7 +45,9 @@ class zipper_iterator {
         bool all_set(std::index_sequence<Is...>);
 
         template <size_t... Is>
-        value_type to_value(std::index_sequence<Is...>);
+        value_type to_value(std::index_sequence<Is...>) {
+            return {(*std::get<Is>(current))...};
+        }
     private:
         iterator_tuple current;
         size_t _max;
@@ -50,4 +55,25 @@ class zipper_iterator {
 
         static constexpr std::index_sequence_for<Containers...> _seq();
 
+};
+
+template <class... Containers>
+class zipper {
+    public:
+        using iterator = zipper_iterator<Containers...>;
+        using iterator_tuple = typename iterator::iterator_tuple;
+
+        zipper(Containers &...cs);
+
+        iterator begin();
+        iterator end();
+
+    private:
+        static size_t _compute_size(Containers &... containers);
+
+        static iterator_tuple _compute_end(Containers &... containers);
+    private:
+        iterator_tuple _begin;
+        iterator_tuple _end;
+        size_t _size;
 };
