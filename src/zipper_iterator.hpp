@@ -40,9 +40,11 @@ class zipper_iterator {
     private:
         template <size_t... Is>
         void incr_all(std::index_sequence<Is...>) {
-            ([&] {
-                (std::get<Is>(current)++);
-            } (), ...);
+            while (!all_set()) {
+                ([&] {
+                    (std::get<Is>(current)++);
+                } (), ...);
+            }
         }
 
         template <size_t... Is>
