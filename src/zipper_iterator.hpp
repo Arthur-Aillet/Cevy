@@ -1,7 +1,7 @@
 //std::unordered_map<std::type_index, component_data> _components_arrays;
 #include <vector>
 #include <cstddef>
-
+#include <optional>
 #include <utility>
 
 // template <class... Containers>
@@ -9,11 +9,11 @@
 
 template <class... Containers>
 class zipper_iterator {
-    template <class Container>
-    using iterator_t = decltype(Container::begin());
+        template <class Container>
+        using iterator_t = decltype(Container::begin());
 
-    template <class Container>
-    using it_reference_t = typename iterator_t<Container>::reference;
+        template <class Container>
+        using it_reference_t = typename iterator_t<Container>::reference;
 
     public:
         using value_type = std::tuple<typename Containers::value_type&...>;
@@ -28,10 +28,10 @@ class zipper_iterator {
     public:
         zipper_iterator(zipper_iterator const &z);
 
-        zipper_iterator operator++();
+        zipper_iterator operator++() {incr_all();};
         zipper_iterator &operator++(int);
 
-        value_type operator*();
+        value_type operator*() {return to_value();};
         value_type operator->();
 
         friend bool operator==(zipper_iterator const &lhs, zipper_iterator const &rhs);
@@ -46,7 +46,12 @@ class zipper_iterator {
         }
 
         template <size_t... Is>
-        bool all_set(std::index_sequence<Is...>);
+        bool all_set(std::index_sequence<Is...>) {
+            if (((std::nullopt != (*std::get<Is>(current))) && ...)) {
+                return true;
+            }
+            return false;
+        }
 
         template <size_t... Is>
         value_type to_value(std::index_sequence<Is...>) {
