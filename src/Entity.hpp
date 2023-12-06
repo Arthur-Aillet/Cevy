@@ -2,12 +2,12 @@
 
 #include <cstddef>
 
-class entity {
+class Entity {
     private:
         std::size_t _id;
-        explicit entity(std::size_t new_id);
+        explicit Entity(std::size_t new_id);
     public:
-        friend class App;
+        friend class World;
         operator std::size_t&();
         operator std::size_t() const;
 };
