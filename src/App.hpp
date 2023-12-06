@@ -172,9 +172,13 @@ class App {
             add_system<Components...>(STAGE::Update, f);
         }
 
-        template<typename Plugin>
+        template<typename GivenPlugin>
         void add_plugin() {
-            Plugin plugin;
+            static_assert(
+                std::is_base_of_v<Plugin, GivenPlugin>,
+                "Given plugin does not derive from Cevy Plugin class"
+            );
+            GivenPlugin plugin;
             plugin.build(*this);
         }
 
