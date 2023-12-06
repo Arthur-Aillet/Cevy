@@ -23,19 +23,30 @@ class zipper_iterator {
         using iterator_category = std::bidirectional_iterator_tag;
         using iterator_tuple = std::tuple<iterator_t<Containers>...>;
 
-        // friend typename Containers::zipper<Containers...>; // FIXME - reactivate
+        //friend typename Containers::zipper<Containers...>; // FIXME - reactivate
         zipper_iterator(iterator_tuple const &it_tuple, size_t max) : iterator_tuple(it_tuple), _max(max) {};
     public:
         zipper_iterator(zipper_iterator const &z);
 
-        zipper_iterator operator++() {incr_all();};
-        zipper_iterator &operator++(int);
+        zipper_iterator operator++() {
+            incr_all();
+            return this;
+        };
+        zipper_iterator &operator++(int) {
+            auto old = *this;
+            incr_all();
+            return old;
+        };
 
         value_type operator*() {return to_value();};
-        value_type operator->();
+        value_type operator->() {return to_value();};
 
-        friend bool operator==(zipper_iterator const &lhs, zipper_iterator const &rhs);
-        friend bool operator!=(zipper_iterator const &lhs, zipper_iterator const &rhs);
+        friend bool operator==(zipper_iterator const &lhs, zipper_iterator const &rhs) {
+            return lhs.to_value() == rhs.to_value();
+        };
+        friend bool operator!=(zipper_iterator const &lhs, zipper_iterator const &rhs) {
+            return lhs.to_value() != rhs.to_value();
+        };
 
     private:
         template <size_t... Is>
