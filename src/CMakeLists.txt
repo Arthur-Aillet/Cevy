@@ -14,6 +14,7 @@ add_library(app
   STATIC
   App.cpp
   App.hpp
+  Plugin.hpp
   )
 
 add_subdirectory(game_engine)

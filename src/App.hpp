@@ -2,6 +2,7 @@
 
 #include "./sparse_array.hpp"
 #include "./entity.hpp"
+#include "Plugin.hpp"
 
 #include <unordered_map>
 #include <any>
@@ -169,6 +170,12 @@ class App {
         template <class... Components, typename Function>
         void add_system(Function &&f) {
             add_system<Components...>(STAGE::Update, f);
+        }
+
+        template<typename Plugin>
+        void add_plugin() {
+            Plugin plugin;
+            plugin.build(*this);
         }
 
         void run() {
