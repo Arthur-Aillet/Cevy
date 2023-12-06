@@ -226,6 +226,10 @@ Connect systems without Ecs management
 **Exemple Rust:**
 ```rust
 
+.add_plugins(HelloPlugin)
+.add_plugins((HelloPlugin, GoodbyePlugin))
+.add_plugins(HelloPluginGroup)
+
 impl Plugin for HelloPlugin {
   fn build(&self, app: &mut App) {
     app.add_system(Start, spawn_camera)
@@ -238,6 +242,11 @@ impl Plugin for HelloPlugin {
 ```
 **Exemple C++:**
 ```cpp
+
+app.add_plugins<HelloPlugin>();
+app.add_plugins<HelloPlugin, GoodbyePlugin>();
+// app.add_plugins<HelloPluginGroup>()
+/* -> not planned */
 
 class HelloPlugin : public Plugin {
     void build(App& app) override
