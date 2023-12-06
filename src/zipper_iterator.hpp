@@ -24,9 +24,9 @@ class zipper_iterator {
         using iterator_tuple = std::tuple<iterator_t<Containers>...>;
 
         //friend typename Containers::zipper<Containers...>; // FIXME - reactivate
-        zipper_iterator(iterator_tuple const &it_tuple, size_t max) : iterator_tuple(it_tuple), _max(max) {};
+        zipper_iterator(iterator_tuple const &it_tuple, size_t max) : current(it_tuple), _max(max), _idx(0) {};
     public:
-        zipper_iterator(zipper_iterator const &z);
+        zipper_iterator(zipper_iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
 
         zipper_iterator operator++() {
             incr_all();
@@ -51,7 +51,8 @@ class zipper_iterator {
     private:
         template <size_t... Is>
         void incr_all(std::index_sequence<Is...>) {
-            while (!all_set()) {
+            while (!all_set() && _idx <= _max) { // NOTE - check to choose <= or <
+                _idx++;
                 ([&] {
                     (std::get<Is>(current)++);
                 } (), ...);
@@ -75,7 +76,9 @@ class zipper_iterator {
         size_t _max;
         size_t _idx;
 
-        static constexpr std::index_sequence_for<Containers...> _seq();
+        static constexpr std::index_sequence_for<Containers...> _seq() {
+            return std::index_sequence_for<Containers...>();
+        };
 
 };
 
