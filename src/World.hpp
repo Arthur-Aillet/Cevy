@@ -11,9 +11,13 @@
 #include <functional>
 #include <type_traits>
 
+template<typename T>
+using ref = std::reference_wrapper<T>;
 
 template<class T>
 struct is_super : public std::false_type {};
+
+class Bundle;
 
 
 class World;
@@ -31,6 +35,19 @@ struct is_super<sparse_array<T, A>&> : std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
+
+class EntityWorldRef {
+    World& world;
+    Entity& entity;
+
+
+    EntityWorldRef insert(Bundle& b);
+
+    template<typename... Ts>
+    EntityWorldRef insert(Ts... args) {
+        world.add_component(enitity, args...);
+    }
+};
 
 class World {
     public:
@@ -51,30 +68,124 @@ class World {
         using system = std::tuple<system_function, STAGE>;
         std::vector<system> _systems;
 
+    /* Bevy-compliant */
+    public:
+        using ComponentId = std::type_index;
+
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
         sparse_array<Entity> _entities;
+
+    /* Bevy-compliant */
     public:
-        Entity spawn_entity() {
-            size_t pos = _entities.first_free();
-            Entity new_e = Entity(pos);
+        void run();
 
-            _entities.insert_at(pos, new_e);
-            return new_e;
+        sparse_array<Entity>& entities();
+
+        const sparse_array<Entity>& entities() const;
+
+        EntityWorldRef spawn_empty();
+
+        bool despawn(Entity entity);
+
+        void clear_all();
+
+        void clear_entities();
+
+        void clear_resources();
+
+        template<typename... Ts>
+        EntityWorldRef spawn(Ts... a) {
+            auto e = spawn_empty().insert(a...);
         }
 
-        Entity entity_from_index(std::size_t idx) {
-            Entity new_e = Entity(idx);
+        template<typename T>
+        std::optional<ref<T>> get(Entity entity) {
+            sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
+            std::optional<T> optional = v[entity];
 
-            _entities.insert_at(idx, new_e);
-            return new_e;
+            if (optional)
+                return std::optional<ref<T>>(ref(optional.value()));
+            else
+                return std::optional<ref<T>>(ref(std::nullopt()));
         }
 
-        void kill_entity(Entity const &e) {
-            for (auto const& [type, data] : _components_arrays) {
-                std::get<1>(data)(*this, e);
-            }
+        template<typename T>
+        std::optional<ref<const T>> get(Entity entity) const {
+            sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
+            std::optional<const T> optional = v[entity];
+
+            if (optional)
+                return std::optional<ref<const T>>(ref(optional.value()));
+            else
+                return std::optional<ref<const T>>(ref(std::nullopt()));
         }
+
+        template<typename T>
+        ComponentId init_component() {
+            erase_access f_e = [] (World & reg, Entity const & Entity) {
+                auto &cmpnts = reg.get_components<T>();
+                if (Entity < cmpnts.size())
+                    cmpnts[Entity] = std::nullopt;
+            };
+            std::any a = std::make_any<sparse_array<T>>();
+
+            _components_arrays.insert({std::type_index(typeid(T)), std::make_tuple(a, f_e)});
+
+            return std::type_index(typeid(T));
+        };
+
+        template<typename R>
+        ComponentId init_resource() {
+
+        }
+
+        template<typename R>
+        void insert_resource(const R& r) {
+
+        }
+
+        template<typename R>
+        std::optional<R> remove_resource() {
+
+        }
+
+        template<typename R>
+        bool contains_resource() {
+
+        }
+
+        template<typename R>
+        R& resource() {
+
+        }
+
+        template<typename R>
+        const R& resource() const {
+
+        }
+
+        template<typename R>
+        std::optional<ref<R>> get_resource() {
+
+        }
+
+        template<typename R>
+        std::optional<ref<const R>> get_resource() const {
+
+        }
+
+        template<typename E>
+        void send_event(const E& event) {
+
+        }
+
+    public:
+        Entity spawn_entity();
+
+        Entity entity_from_index(std::size_t idx);
+
+        void kill_entity(Entity const &e);
 
         template <typename Component>
         typename sparse_array<Component>::reference_type add_component(Entity const &to, Component &&c) {
@@ -171,47 +282,15 @@ class World {
             add_system<Components...>(STAGE::Update, f);
         }
 
-        void run() {
-            while (!_stop) {
-                runStages();
-            }
-        }
+        void quit() const;
 
-        void quit() const {
-            _stop = true;
-        }
-
-        void abort() {
-            _stage = STAGE::ABORT;
-            _stop = true;
-        }
+        void abort();
 
     protected:
         mutable bool _stop = false;
         STAGE _stage = STAGE::RESET;
 
-        void runStages() {
-            _stage = STAGE::First;
-            do {
-                runStage();
-            }
-            while (_stage != STAGE::RESET && _stage != STAGE::ABORT);
-        }
+        void runStages();
 
-        public: void runStage() {
-            std::vector<std::reference_wrapper<system>> curr_sys;
-
-            std::copy_if(
-                _systems.begin(),
-                _systems.end(),
-                std::back_inserter(curr_sys),
-                [this](const system& sys) { return std::get<1>(sys) == _stage;});
-
-            /* this part could be multi-threaded */
-            for (auto sys : curr_sys) {
-                std::get<0>(sys.get())(*this);
-            }
-
-            _stage = static_cast<STAGE>(1 + static_cast<int>(_stage) );
-        }
+        void runStage();
 };
