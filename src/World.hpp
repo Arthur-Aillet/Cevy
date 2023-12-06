@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2023
+** rtype
+** File description:
+** World
+*/
+
 #pragma once
 
 #include "./sparse_array.hpp"
@@ -51,22 +58,8 @@ class EntityWorldRef {
 
 class World {
     public:
-        enum class STAGE {
-            First,
-            PreUpdate,
-            StateTransition,
-            RunFixedUpdateLoop,
-            Update,
-            PostUpdate,
-            Last,
-            RESET,
-            ABORT,
-        };
         using erase_access = std::function<void (World &, Entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
-        using system_function = std::function<void (World &)>;
-        using system = std::tuple<system_function, STAGE>;
-        std::vector<system> _systems;
 
     /* Bevy-compliant */
     public:
@@ -78,8 +71,6 @@ class World {
 
     /* Bevy-compliant */
     public:
-        void run();
-
         sparse_array<Entity>& entities();
 
         const sparse_array<Entity>& entities() const;
@@ -228,69 +219,31 @@ class World {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        template <typename Super>
-        const Super get_super() {
-            if (typeid(World&) == typeid(Super)) {
-                auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
-                if (p) {
-                    return *p;
-                } else {
-                    throw std::bad_any_cast();
-                }
-            } else {
-                return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
-            }
-        }
+        // template <typename Super>
+        // const Super get_super() {
+        //     if (typeid(World&) == typeid(Super)) {
+        //         auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
+        //         if (p) {
+        //             return *p;
+        //         } else {
+        //             throw std::bad_any_cast();
+        //         }
+        //     } else {
+        //         return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
+        //     }
+        // }
 
-        template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            add_super_system<R, Args...>(STAGE::Update, func);
-        }
+        // template<class R, class ...Args>
+        // void add_super_system(R(&&func)(Args...)) {
+        //     add_super_system<R, Args...>(STAGE::Update, func);
+        // }
 
-        template<class R, class ...Args>
-        void add_super_system(STAGE stage, R(&&func)(Args...)) {
-            static_assert(all(is_super<Args>()...), "type must be reference to super");
-            system_function sys = [&func] (World & reg) {
-                func(reg.get_super<Args>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, stage));
-        }
-
-        template <class... Components, typename Function>
-        void add_system(STAGE stage, Function const &f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, stage));
-        }
-
-        template <class... Components, typename Function>
-        void add_system(STAGE stage, Function &&f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, stage));
-        }
-
-        template <class... Components, typename Function>
-        void add_system(Function const &f) {
-            add_system<Components...>(STAGE::Update, f);
-        }
-
-        template <class... Components, typename Function>
-        void add_system(Function &&f) {
-            add_system<Components...>(STAGE::Update, f);
-        }
-
-        void quit() const;
-
-        void abort();
-
-    protected:
-        mutable bool _stop = false;
-        STAGE _stage = STAGE::RESET;
-
-        void runStages();
-
-        void runStage();
+        // template<class R, class ...Args>
+        // void add_super_system(STAGE stage, R(&&func)(Args...)) {
+        //     static_assert(all(is_super<Args>()...), "type must be reference to super");
+        //     system_function sys = [&func] (World & reg) {
+        //         func(reg.get_super<Args>()...);
+        //     };
+        //     _systems.push_back(std::make_tuple(sys, stage));
+        // }
 };
