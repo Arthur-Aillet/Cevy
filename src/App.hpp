@@ -172,6 +172,7 @@ class App {
             add_system<Components...>(STAGE::Update, f);
         }
 
+    private:
         template<typename GivenPlugin>
         void add_plugin() {
             static_assert(
@@ -180,6 +181,12 @@ class App {
             );
             GivenPlugin plugin;
             plugin.build(*this);
+        }
+
+    public:
+        template<typename ...GivenPlugin>
+        void add_plugins() {
+            ((add_plugin<GivenPlugin>()),...);
         }
 
         void run() {
