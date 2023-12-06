@@ -20,7 +20,7 @@ EntityWorldRef World::spawn_empty()
     return ref;
 }
 
-Entity World::entity_from_index(std::size_t idx)
+Entity World::spawn_at(std::size_t idx)
 {
     Entity new_e = Entity(idx);
 

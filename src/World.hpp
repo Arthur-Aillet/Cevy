@@ -7,6 +7,14 @@
 
 #pragma once
 
+/**
+ * @file
+ * @author several
+ *
+ * @section DESCRIPTION
+ * World. Holds the actual components and entities
+ */
+
 #include "./sparse_array.hpp"
 #include "./Entity.hpp"
 
@@ -56,6 +64,12 @@ struct EntityWorldRef {
     }
 };
 
+/**
+ * Stores Entities, Components (and ressources), and exposes operations
+ *
+ * Each entity has Components, which must first each be registered to the World
+ * An Entity can only have one instance of a Component
+*/
 class World {
     public:
         using erase_access = std::function<void (World &, Entity const &)>;
@@ -63,6 +77,7 @@ class World {
 
     /* Bevy-compliant */
     public:
+        /// @brief Id refering to a specific component
         using ComponentId = std::type_index;
 
     private:
@@ -71,25 +86,34 @@ class World {
 
     /* Bevy-compliant */
     public:
+        /// get all entities
         sparse_array<Entity>& entities();
 
+        /// get all entities
         const sparse_array<Entity>& entities() const;
 
+        /// create a new empty entity
         EntityWorldRef spawn_empty();
 
+        /// delete an entity and all its components
         bool despawn(const Entity& entity);
 
+        /// clears all resources and entities
         void clear_all();
 
+        /// clears all entities and their components
         void clear_entities();
 
+        /// clears all resources registered to the world
         void clear_resources();
 
+        /// spawn an entity with defined components
         template<typename... Ts>
         EntityWorldRef spawn(Ts... a) {
             auto e = spawn_empty().insert(a...);
         }
 
+        /// get a Component T associated with a given Entity, or Nothing if no such Component
         template<typename T>
         std::optional<ref<T>> get(Entity entity) {
             sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
@@ -101,6 +125,7 @@ class World {
                 return std::optional<ref<T>>(ref(std::nullopt()));
         }
 
+        /// get a Component T associated with a given Entity, or Nothing if no such Component
         template<typename T>
         std::optional<ref<const T>> get(Entity entity) const {
             sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
@@ -112,6 +137,7 @@ class World {
                 return std::optional<ref<const T>>(ref(std::nullopt()));
         }
 
+        /// register a component to the world
         template<typename T>
         ComponentId init_component() {
             erase_access f_e = [] (World & reg, Entity const & Entity) {
@@ -126,53 +152,62 @@ class World {
             return std::type_index(typeid(T));
         };
 
+        /// register a resource to the world; TODO: DO
         template<typename R>
         ComponentId init_resource() {
 
         }
 
+        /// replace a resource to the world; TODO: DO
         template<typename R>
         void insert_resource(const R& r) {
 
         }
 
+        /// rempve a resource from this world; TODO: DO
         template<typename R>
         std::optional<R> remove_resource() {
 
         }
 
+        /// true if the world holds this Resource TODO: DO
         template<typename R>
         bool contains_resource() {
 
         }
 
+        /// access a given Resource TODO: DO
         template<typename R>
         R& resource() {
 
         }
 
+        /// access a given Resource TODO: DO
         template<typename R>
         const R& resource() const {
 
         }
 
+        /// access a given Resource, or None if it not in this world TODO: DO
         template<typename R>
         std::optional<ref<R>> get_resource() {
 
         }
 
+        /// access a given Resource, or None if it not in this world TODO: DO
         template<typename R>
         std::optional<ref<const R>> get_resource() const {
 
         }
 
+        /// send an event TODO: DO
         template<typename E>
         void send_event(const E& event) {
 
         }
 
     public:
-        Entity entity_from_index(std::size_t idx);
+        Entity spawn_at(std::size_t idx);
 
         template <typename Component>
         typename sparse_array<Component>::reference_type add_component(Entity const &to, Component &&c) {
