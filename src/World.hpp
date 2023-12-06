@@ -21,11 +21,10 @@
 template<typename T>
 using ref = std::reference_wrapper<T>;
 
+
+/**
 template<class T>
 struct is_super : public std::false_type {};
-
-class Bundle;
-
 
 class World;
 template<>
@@ -42,13 +41,14 @@ struct is_super<sparse_array<T, A>&> : std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
+*/
 
 struct EntityWorldRef {
     World& world;
     Entity entity;
 
 
-    EntityWorldRef insert(Bundle& b);
+    // EntityWorldRef insert(Bundle& b);
 
     template<typename... Ts>
     EntityWorldRef insert(Ts... args) {
@@ -172,11 +172,7 @@ class World {
         }
 
     public:
-        Entity spawn_entity();
-
         Entity entity_from_index(std::size_t idx);
-
-        void kill_entity(Entity const &e);
 
         template <typename Component>
         typename sparse_array<Component>::reference_type add_component(Entity const &to, Component &&c) {
