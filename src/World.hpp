@@ -43,9 +43,9 @@ struct is_super<sparse_array<T, A>&> : std::true_type {};
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
 
-class EntityWorldRef {
+struct EntityWorldRef {
     World& world;
-    Entity& entity;
+    Entity entity;
 
 
     EntityWorldRef insert(Bundle& b);
@@ -77,7 +77,7 @@ class World {
 
         EntityWorldRef spawn_empty();
 
-        bool despawn(Entity entity);
+        bool despawn(const Entity& entity);
 
         void clear_all();
 
