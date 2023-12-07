@@ -1,6 +1,7 @@
-<h1 style="font-size:60px;">C++evy</h1>
+(compare)=
+# Bevy vs C++evy
 
-# **`<<Component>>`**
+## **Component**
 
 Basic structure holding data, Ecs main building bloc
 
@@ -25,7 +26,7 @@ class Position {
 
 ```
 
-# **`<<Entity>>`**
+## **Entity**
 
 Group of Components
 
@@ -54,7 +55,7 @@ class bundle {
 }
 
 ```
-# **`<<System>>`**
+## **System**
 
 Function accessing one or
 multiple component group
@@ -109,7 +110,7 @@ void debug_player_hp(
     - Or
 - Extract Schedule as Depedencie graph
 
-# **`<<App>>`**
+## **App**
 
 Setup and manage Ecs,
 Connect systems
@@ -141,7 +142,7 @@ int main()
 }
 
 ```
-# **`<<Resource>>`**
+## **Resource**
 Global and Unique
 data of some kind
 
@@ -178,7 +179,7 @@ class Resource;
 template<typename T>
 using Res<T> = Resource<T>;
 ```
-# **`<<Command>>`**
+## **Command**
 
 Interract with entity pool
 
@@ -216,7 +217,7 @@ void spawn_things(Commands commands)
 }
 
 ```
-# **`<<Plugins>>`**
+## **Plugins**
 
 Connect systems without Ecs management
 
@@ -258,7 +259,7 @@ class HelloPlugin : public Plugin {
     }
 }
 ```
-# **`<<EventWriter>>`**
+## **EventWriter**
 
 Send a message holding components
 
@@ -290,7 +291,7 @@ void event_trigger(EventWriter<MyEvent>& event)
 // it is for initalizing a struct's public members
 
 ```
-# **`<<EventReader>>`**
+## **EventReader**
 
 System executed on ressources and given component groups when signal is sent
 
@@ -318,7 +319,7 @@ void event_listener(EvenReader<MyEvent>& events)
 }
 
 ```
-# **`<<State>>`**
+## **State**
 
 Define state of app
 
@@ -373,7 +374,7 @@ void menu(Ressource<NextState<AppState>>& next_state)
 
 ```
 
-# **`<<GameEngine>>`**
+## **GameEngine**
 
 App superset creating the default ECS App and adding
 plugins to control bases, holding utilities for all games

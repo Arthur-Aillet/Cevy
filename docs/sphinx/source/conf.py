@@ -28,6 +28,6 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 
-extensions = ['breathe']
+extensions = ['breathe', 'myst_parser']
 breathe_projects = {'cevy': '../../doxygen/xml'}
 breathe_default_project = 'cevy'
