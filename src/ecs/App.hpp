@@ -12,7 +12,9 @@
 #include <functional>
 #include <type_traits>
 
-class App : public World {
+#include "ecs.hpp"
+
+class cevy::ecs::App : public cevy::ecs::World {
     public:
         using World::ComponentId;
         using system = Schedule::system;

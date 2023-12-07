@@ -1,6 +1,15 @@
-#include "Entity.hpp"
+/*
+** EPITECH PROJECT, 2023
+** rtype
+** File description:
+** Entity
+*/
+
 #include <string>
 #include <iostream>
+#include "Entity.hpp"
+
+using cevy::ecs::Entity;
 
 Entity::Entity(std::size_t new_id) : _id(new_id)
 {

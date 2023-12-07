@@ -26,11 +26,8 @@
 #include <functional>
 #include <type_traits>
 
-template<typename T>
-using ref = std::reference_wrapper<T>;
+#include "ecs.hpp"
 
-
-class World;
 /**
 template<class T>
 struct is_super : public std::false_type {};
@@ -51,17 +48,6 @@ template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
 */
 
-struct EntityWorldRef {
-    World& world;
-    Entity entity;
-
-
-    // EntityWorldRef insert(Bundle& b);
-
-    template<typename... Ts>
-    EntityWorldRef insert(Ts... args);
-};
-
 
 /**
  * Stores Entities, Components (and ressources), and exposes operations
@@ -69,8 +55,19 @@ struct EntityWorldRef {
  * Each entity has Components, which must first each be registered to the World
  * An Entity can only have one instance of a Component
 */
-class World {
+class cevy::ecs::World {
     public:
+        struct EntityWorldRef {
+            World& world;
+            Entity entity;
+
+
+            // EntityWorldRef insert(Bundle& b);
+
+            template<typename... Ts>
+            EntityWorldRef insert(Ts... args);
+        };
+
         using erase_access = std::function<void (World &, Entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
 
@@ -279,7 +276,7 @@ class World {
 };
 
 template<typename... Ts>
-EntityWorldRef EntityWorldRef::insert(Ts... args) {
+cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... args) {
     world.add_component(entity, args...);
     return *this;
 }
