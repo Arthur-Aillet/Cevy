@@ -62,13 +62,13 @@ class cevy::ecs::Schedule {
 
         template<typename T, typename T::before>
         void insert_schedule() {
-            auto& it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::before)));
+            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::before)));
             _schedule.insert(it, std::type_index(typeid(T)));
         }
 
         template<typename T, typename T::after>
         void insert_schedule() {
-            auto& it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
+            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
             _schedule.insert(it, std::type_index(typeid(T)));
         }
 
@@ -80,37 +80,40 @@ class cevy::ecs::Schedule {
         using system_function = std::function<void (World &)>;
         using system = std::tuple<system_function, std::type_index>;
         std::vector<system> _systems;
-        Schedule() = default;
+        Schedule() {
+            init_default_schedule();
+        }
         ~Schedule() = default;
 
         void quit() const;
         void abort();
 
-        template <typename Stage, class... Components, typename Function>
+        template <typename S, class... Components, typename Function>
         void add_system(Function const &f) {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(Stage))));
+            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+
         }
 
-        template <typename Stage, class... Components, typename Function>
+        template <typename S, class... Components, typename Function>
         void add_system(Function &&f) {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(Stage))));
+            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
         }
 
-        template <class... Components, typename Function>
-        void add_system(Function const &f) {
-            add_system<Update, Components...>(f);
-        }
+        // template <class... Components, typename Function>
+        // void add_system(Function const &f) {
+        //     add_system<Update, Components...>(f);
+        // }
 
-        template <class... Components, typename Function>
-        void add_system(Function &&f) {
-            add_system<Update, Components...>(f);
-        }
+        // template <class... Components, typename Function>
+        // void add_system(Function &&f) {
+        //     add_system<Update, Components...>(f);
+        // }
 
     protected:
         mutable bool _stop = false;

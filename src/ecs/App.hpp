@@ -44,4 +44,40 @@ class cevy::ecs::App : public cevy::ecs::World {
         void run() {
             _schedule.run(*this);
         }
+
+        void quit() const {
+            _schedule.quit();
+        }
+        void abort() {
+            _schedule.abort();
+        }
+
+        template <typename S, class... Components, typename Function>
+            // , std::enable_if_t<std::is_base_of_v<Schedule::Stage<>, S>>>
+        void add_system(Function const &f) {
+            _schedule.add_system<S, Components...>(f);
+        }
+
+        template <typename S, class... Components, typename Function>
+            // , std::enable_if_t<std::is_base_of_v<Schedule::Stage<>, S>>>
+        void add_system(Function &&f) {
+            _schedule.add_system<S, Components...>(f);
+        }
+
+        template <class... Components, typename Function>
+        void add_system(Function const &f) {
+            _schedule.add_system<Schedule::Update, Components...>(f);
+        }
+
+        template <class... Components, typename Function>
+        void add_system(Function &&f) {
+            _schedule.add_system<Schedule::Update, Components...>(f);
+        }
+
+        template<typename T>
+        void add_stage() {
+            _schedule.insert_schedule<T>();
+        }
+
+
 };
