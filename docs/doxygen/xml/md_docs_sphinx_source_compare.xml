@@ -1,0 +1,324 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="md_docs_sphinx_source_compare" kind="page">
+    <compoundname>md_docs_sphinx_source_compare</compoundname>
+    <title>compare</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>(compare)= </para>
+<sect1 id="md_docs_sphinx_source_compare_1autotoc_md41">
+<title>Bevy vs C++evy</title>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md42">
+<title>&lt;strong&gt;Component&lt;/strong&gt;</title>
+<para>Basic structure holding data, Ecs main building bloc</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">#[derive(Component)]</highlight></codeline>
+<codeline><highlight class="normal">struct<sp/>Position {</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>f64<sp/>x;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>f64<sp/>y;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Position<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y;</highlight></codeline>
+<codeline><highlight class="normal">};</highlight></codeline>
+</programlisting></para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md44">
+<title>&lt;strong&gt;Entity&lt;/strong&gt;</title>
+<para>Group of Components</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">commands.spawn((Camera,<sp/>Position(3.,<sp/>3.)));</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="normal">commands.spawn(Camera(),<sp/>Position(3.,<sp/>3.));</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal">bundle<sp/>camera<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>bundle(</highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Camera,<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Position(3,<sp/>3));</highlight></codeline>
+<codeline><highlight class="normal">commands.spawn(camera);</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//Implementation:</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;tyepname<sp/>...Args&gt;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">bundle<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>bundle(Args...)<sp/>{<sp/></highlight><highlight class="comment">//<sp/>Vargs</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md46">
+<title>&lt;strong&gt;System&lt;/strong&gt;</title>
+<para>Function accessing one or multiple component group</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">fn<sp/>hello_world()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>println!(&quot;hello<sp/>world!&quot;);</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">.add_systems(Update,<sp/>hello_world)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//Advanced<sp/>querys</highlight></codeline>
+<codeline><highlight class="normal">fn<sp/>debug_player_hp(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>query:<sp/>Query&lt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>(&amp;Health,<sp/>Option&lt;&amp;PlayerName&gt;),</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>(With&lt;Player&gt;,<sp/>Without&lt;Enemy&gt;)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&gt;,</highlight></codeline>
+<codeline><highlight class="normal">)</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>hello_world()</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;hello<sp/>world!&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal">app.add_systems(hello_world)</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>debug_player_hp(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Query&lt;Ref&lt;Health&gt;,<sp/>Optional&lt;Ref&lt;const<sp/>PlayerName&gt;&gt;,<sp/>With&lt;Player&gt;,<sp/>Without&lt;Enemy&gt;&gt;&amp;<sp/><ref refid="classquery" kindref="compound">query</ref></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>)</highlight></codeline>
+</programlisting> <emphasis>Features</emphasis></para>
+<para><itemizedlist>
+<listitem><para>Scheduler:<itemizedlist>
+<listitem><para>Custom set of steps</para>
+</listitem><listitem><para>Custom ordering</para>
+</listitem></itemizedlist>
+</para>
+</listitem><listitem><para>Conditional running</para>
+</listitem><listitem><para>Optional Querys</para>
+</listitem><listitem><para>Multithreaded</para>
+</listitem><listitem><para>Querys filters<itemizedlist>
+<listitem><para>With</para>
+</listitem><listitem><para>Without</para>
+</listitem><listitem><para>Or</para>
+</listitem></itemizedlist>
+</para>
+</listitem><listitem><para>Extract Schedule as Depedencie graph</para>
+</listitem></itemizedlist>
+</para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md48">
+<title>&lt;strong&gt;App&lt;/strong&gt;</title>
+<para>Setup and manage Ecs, Connect systems</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">fn<sp/>main()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>app::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_plugin(CameraPlugin)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_system(First,<sp/>spawn_player)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.init_ressource(clock::new())</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.run();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>main()</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classApp" kindref="compound">App</ref><sp/>app;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_plugin&lt;CameraPlugin&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.<ref refid="classApp_1aca65514162392d443344825d5c0cb033" kindref="member">add_system</ref>(STAGE::First,<sp/>spawn_player);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.init_ressource&lt;Clock&gt;(</highlight><highlight class="comment">/*<sp/>initializer-list<sp/>*/</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>for<sp/>emplace-ctor</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.init_ressource(Clock());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.<ref refid="classApp_1ae09dc71078b64c56c673b1ad1d25b5d1" kindref="member">run</ref>();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md50">
+<title>&lt;strong&gt;Resource&lt;/strong&gt;</title>
+<para>Global and Unique data of some kind</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">.init_ressource(clock::new())</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>greet_people(time:<sp/>Res&lt;Time&gt;,<sp/>query:<sp/>Query&lt;&amp;Name,<sp/>With&lt;Person&gt;&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>name<sp/>in<sp/>&amp;query<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>println!(&quot;hello<sp/>{}!&quot;,<sp/>name.0);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="normal">.init_ressources&lt;Clock&gt;(</highlight><highlight class="comment">/*<sp/>initializer-list<sp/>*/</highlight><highlight class="normal">);</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>greet_people(Resource&lt;Time&gt;<sp/>time,<sp/>Query&lt;Name,<sp/>With&lt;Person&gt;&gt;&amp;<sp/><ref refid="classquery" kindref="compound">query</ref>)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(data<sp/>:<sp/><ref refid="classquery" kindref="compound">query</ref>)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;hello<sp/>&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>std::get&lt;0&gt;(data)<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;!&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//Implementation:</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Resource;</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">using<sp/></highlight><highlight class="normal">Res&lt;T&gt;<sp/>=<sp/>Resource&lt;T&gt;;</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md52">
+<title>&lt;strong&gt;Command&lt;/strong&gt;</title>
+<para>Interract with entity pool</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">fn<sp/>spawn_things(<sp/>//<sp/>System</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>mut<sp/>commands:<sp/>Commands,</highlight></codeline>
+<codeline><highlight class="normal">)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>//<sp/>manage<sp/>resources</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.insert_resource(MyResource);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.remove_resource::&lt;MyResource&gt;()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.spawn(Velocity,<sp/>Position::default());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>let<sp/>id<sp/>=<sp/>commands.spawn(Velocity::new(0.0,<sp/>-1.0));</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.entity(id)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.insert(Position::default())</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.remove::&lt;Velocity&gt;();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>spawn_things(Commands<sp/>commands)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.insert_resource&lt;MyResource&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.remove_resource&lt;MyResource&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.spawn(Position(),<sp/>Velocity());</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Entity<sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal"><sp/>=<sp/>commands.spawn(Velocity(0.,<sp/>-1.));</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.entity(</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">).insert(Position()).remove&lt;Velocity&gt;();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md54">
+<title>&lt;strong&gt;Plugins&lt;/strong&gt;</title>
+<para>Connect systems without Ecs management</para>
+<para>Create an abstraction layer</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">impl<sp/>Plugin<sp/>for<sp/>HelloPlugin<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>fn<sp/>build(&amp;self,<sp/>app:<sp/>&amp;mut<sp/>App)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_system(Start,<sp/>spawn_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_system(Update,<sp/>move_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_system(PostUpdate,<sp/>destroy_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_event&lt;CameraDestroyed&gt;::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">HelloPlugin<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Plugin<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>build(<ref refid="classApp" kindref="compound">App</ref>&amp;<sp/>app)</highlight><highlight class="keyword"><sp/>override</highlight></codeline>
+<codeline><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.<ref refid="classApp_1aca65514162392d443344825d5c0cb033" kindref="member">add_system</ref>(STAGE::start,<sp/>spawn_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.<ref refid="classApp_1aca65514162392d443344825d5c0cb033" kindref="member">add_system</ref>(STAGE::update,<sp/>move_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.<ref refid="classApp_1aca65514162392d443344825d5c0cb033" kindref="member">add_system</ref>(STAGE::postUpdate,<sp/>destroy_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.add_event(CameraDestroyed());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md56">
+<title>&lt;strong&gt;EventWriter&lt;/strong&gt;</title>
+<para>Send a message holding components</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">fn<sp/>event_trigger(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>mut<sp/>cam_event:<sp/>EventWriter&lt;MyEvent&gt;)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>cam_event.send(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>MyEvent{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>message:<sp/>&quot;Behold!<sp/>a<sp/>message...&quot;;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>})</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>event_trigger(EventWriter&lt;MyEvent&gt;&amp;<sp/>event)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">event</highlight><highlight class="normal">.send(MyEvent<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.message<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;Behold!<sp/>a<sp/>message...&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>})</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>this<sp/>`.member<sp/>=<sp/>value`<sp/>syntax<sp/>is<sp/>equivalent<sp/>to<sp/>rusts&apos;<sp/>`member:<sp/>value`<sp/>syntax</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>it<sp/>is<sp/>for<sp/>initalizing<sp/>a<sp/>struct&apos;s<sp/>public<sp/>members</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md58">
+<title>&lt;strong&gt;EventReader&lt;/strong&gt;</title>
+<para>System executed on ressources and given component groups when signal is sent</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">fn<sp/>event_listener(mut<sp/>events:<sp/>EventReader&lt;MyEvent&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>my_event<sp/>in<sp/>events.read()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>info!(&quot;{}&quot;,<sp/>my_event.message);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>event_listener(EvenReader&lt;MyEvent&gt;&amp;<sp/>events)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>it<sp/>=<sp/>events.read();</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>my_event:<sp/>events)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cerr<sp/>&lt;&lt;<sp/>my_event.message<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md60">
+<title>&lt;strong&gt;State&lt;/strong&gt;</title>
+<para>Define state of app</para>
+<para><hruler/>
+ <bold>Exemple Rust:</bold> <programlisting filename=".rust"><codeline><highlight class="normal">#[derive(...,<sp/>States)]</highlight></codeline>
+<codeline><highlight class="normal">enum<sp/>AppState<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>#[default]</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Menu,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>InGame,</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">App::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_state::&lt;AppState&gt;()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(OnExit(AppState::Menu),<sp/>...)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(OnEnter(AppState::InGame),<sp/>...)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Update,<sp/>(...).run_if(in_state(AppState::InGame)),</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>menu(mut<sp/>next_state:<sp/>ResMut&lt;NextState&lt;AppState&gt;&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>if<sp/>... {</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>next_state.set(AppState::InGame);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <bold>Exemple C++:</bold> <programlisting filename=".cpp"><codeline><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>AppState<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Menu,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>InGame,</highlight></codeline>
+<codeline><highlight class="normal">};</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><ref refid="classApp" kindref="compound">App</ref><sp/>app;</highlight></codeline>
+<codeline><highlight class="normal">app.add_state(AppState::Menu);</highlight></codeline>
+<codeline><highlight class="normal">app.add_systems(OnExit(AppState::Menu),<sp/>...);</highlight></codeline>
+<codeline><highlight class="normal">app.add_systems(OnEnter(AppState::Menu),<sp/>...);</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>app.add_systems(Update,<sp/>...,<sp/>run_if(?in_state(AppState::InGame)));</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">/*<sp/>-&gt;<sp/>not<sp/>planned<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>menu(Ressource&lt;NextState&lt;AppState&gt;&gt;&amp;<sp/>next_state)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(...)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>next_state.set(AppState::InGame);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+</sect2>
+<sect2 id="md_docs_sphinx_source_compare_1autotoc_md62">
+<title>&lt;strong&gt;GameEngine&lt;/strong&gt;</title>
+<para><ref refid="classApp" kindref="compound">App</ref> superset creating the default ECS <ref refid="classApp" kindref="compound">App</ref> and adding plugins to control bases, holding utilities for all games</para>
+<para><hruler/>
+ <bold>Ressources:</bold></para>
+<para><itemizedlist>
+<listitem><para>Asset Manager</para>
+</listitem><listitem><para>Global Timer</para>
+</listitem><listitem><para>Font Manager</para>
+</listitem></itemizedlist>
+</para>
+<para><bold>Components</bold></para>
+<para><itemizedlist>
+<listitem><para>Position</para>
+</listitem></itemizedlist>
+</para>
+<para><bold>Default Stages:</bold></para>
+<para><emphasis>At Start:</emphasis></para>
+<para><itemizedlist>
+<listitem><para>PreStartup</para>
+</listitem><listitem><para>Startup</para>
+</listitem><listitem><para>PostStartup</para>
+</listitem></itemizedlist>
+</para>
+<para><emphasis>Each time possible:</emphasis></para>
+<para><itemizedlist>
+<listitem><para>First</para>
+</listitem><listitem><para>PreUpdate</para>
+</listitem><listitem><para>StateTransition <computeroutput>// Run between each states transition</computeroutput></para>
+</listitem><listitem><para>RunFixedUpdateLoop <computeroutput>//This will run FixedUpdate zero to many times, based on how much time has elapsed.</computeroutput></para>
+</listitem><listitem><para>Update <computeroutput>// Default Stage when adding system</computeroutput></para>
+</listitem><listitem><para>PostUpdate</para>
+</listitem><listitem><para>Last </para>
+</listitem></itemizedlist>
+</para>
+</sect2>
+</sect1>
+    </detaileddescription>
+    <location file="docs/sphinx/source/compare.md"/>
+  </compounddef>
+</doxygen>

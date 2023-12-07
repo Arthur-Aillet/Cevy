@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir">
+    <compoundname>src</compoundname>
+    <innerdir refid="dir_8a63a06b97ec1e69eb6b2537b1056ef4">src/game_engine</innerdir>
+    <innerfile refid="App_8cpp">App.cpp</innerfile>
+    <innerfile refid="App_8hpp">App.hpp</innerfile>
+    <innerfile refid="entity_8cpp">entity.cpp</innerfile>
+    <innerfile refid="entity_8hpp">entity.hpp</innerfile>
+    <innerfile refid="queries_8hpp">queries.hpp</innerfile>
+    <innerfile refid="sparse__array_8cpp">sparse_array.cpp</innerfile>
+    <innerfile refid="sparse__array_8hpp">sparse_array.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/"/>
+  </compounddef>
+</doxygen>

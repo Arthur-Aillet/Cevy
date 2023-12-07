@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="dir_fa80e219cf4f418d6a928600b3ec0668" kind="dir">
+    <compoundname>docs/doxygen/doxygen-awesome-css/include/MyLibrary</compoundname>
+    <innerfile refid="example_8hpp">example.hpp</innerfile>
+    <innerfile refid="subclass-example_8hpp">subclass-example.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/"/>
+  </compounddef>
+</doxygen>

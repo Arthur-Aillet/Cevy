@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="md_docs_doxygen_doxygen_awesome_css_docs_customization" kind="page">
+    <compoundname>md_docs_doxygen_doxygen_awesome_css_docs_customization</compoundname>
+    <title>Customization</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_docs_customization_1autotoc_md1">
+<title>CSS-Variables</title>
+<para>This theme is highly customizable because a lot of things are parameterized with CSS variables.</para>
+<para>Just to give you an idea of how flexible the styling is, click this button:</para>
+<para>Alter theme</para>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_docs_customization_1autotoc_md2">
+<title>Setup</title>
+<para>It is recommended to add your own <computeroutput>custom.css</computeroutput> and overwrite the variables there: <programlisting><codeline><highlight class="normal">HTML_EXTRA_STYLESHEET<sp/><sp/>=<sp/>doxygen-awesome.css<sp/>custom.css</highlight></codeline>
+</programlisting></para>
+<para>Make sure to override the variables in the correct spot. All variables should be customized where they have been defined, in the <computeroutput>html</computeroutput> tag selector:</para>
+<para><programlisting filename=".css"><codeline><highlight class="normal">html<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>/*<sp/>override<sp/>light-mode<sp/>variables<sp/>here<sp/>*/</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+<para>For dark-mode overrides, you have to choose where to put them, depending on whether the dark-mode toggle extension is installed or not:</para>
+<para></para>
+<para><itemizedlist>
+<listitem><para><bold>dark-mode toggle is installed</bold> <programlisting filename=".css"><codeline><highlight class="normal">html.dark-mode<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>/*<sp/>define<sp/>dark-mode<sp/>variable<sp/>overrides<sp/>here<sp/>if<sp/>you<sp/>DO<sp/>use<sp/>doxygen-awesome-darkmode-toggle.js<sp/>*/</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+</listitem><listitem><para><bold>dark-mode toggle is <bold>NOT</bold> installed</bold> The dark-mode is enabled automatically depending on the system preference: <programlisting filename=".css"><codeline><highlight class="normal">@media<sp/>(prefers-color-scheme:<sp/>dark)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>html:not(.light-mode)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>/*<sp/>define<sp/>dark-mode<sp/>variable<sp/>overrides<sp/>here<sp/>if<sp/>you<sp/>DON&apos;T<sp/>use<sp/>doxygen-awesome-darkmode-toggle.js<sp/>*/</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+</listitem></itemizedlist>
+</para>
+<para></para>
+</sect2>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_docs_customization_1autotoc_md3">
+<title>Available variables</title>
+<para>The following list gives an overview of the variables defined in <ulink url="https://github.com/jothepro/doxygen-awesome-css/blob/main/doxygen-awesome.css"><computeroutput>doxygen-awesome.css</computeroutput></ulink>.</para>
+<para>The list is not complete. To explore all available variables, have a look at the CSS starting from <ulink url="https://github.com/jothepro/doxygen-awesome-css/blob/main/doxygen-awesome.css#L30">here</ulink>. All variables are defined at the beginning of the stylesheet.</para>
+<para><table rows="26" cols="3"><row>
+<entry thead="yes" align='left'><para>Parameter   </para>
+</entry><entry thead="yes" align='left'><para>Default (Light)   </para>
+</entry><entry thead="yes" align='left'><para>Default (Dark)    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Color Scheme</bold>:<linebreak/>
+primary theme colors. This will affect the entire websites color scheme: links, arrows, labels, ...    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--primary-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#1779c4</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#1982d2</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--primary-dark-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#335c80</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#5ca8e2</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--primary-light-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#70b1e9</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#4779ac</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Page Colors</bold>:<linebreak/>
+background and foreground (text-color) of the documentation.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--page-background-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#ffffff</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#1C1D1F</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--page-foreground-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#2f4153</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#d2dbde</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--page-secondary-foreground-color</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#6f7e8e</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#859399</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Spacing:</bold><linebreak/>
+default spacings. Most ui components reference these values for spacing, to provide uniform spacing on the page.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--spacing-small</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>5px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--spacing-medium</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>10px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--spacing-large</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>16px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Border Radius</bold>:<linebreak/>
+border radius for all rounded ui components. Will affect many components, like dropdowns, memitems, codeblocks, ...    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--border-radius-small</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>4px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--border-radius-medium</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>6px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--border-radius-large</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>8px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Content Width</bold>:<linebreak/>
+The content is centered and constrained in its width. To make the content fill the whole page, set the following variable to <computeroutput>auto</computeroutput>.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--content-maxwidth</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>1000px</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Code Fragment Colors</bold>:<linebreak/>
+Color-Scheme of multiline codeblocks    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--fragment-background</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#F8F9FA</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#282c34</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--fragment-foreground</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#37474F</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>#dbe4eb</computeroutput>    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para><bold>Arrow Opacity</bold>:<linebreak/>
+By default the arrows in the sidebar are only visible on hover. You can override this behavior so they are visible all the time.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--side-nav-arrow-opacity</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>0</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><computeroutput>--side-nav-arrow-hover-opacity</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para><computeroutput>0.9</computeroutput>   </para>
+</entry><entry thead="no" align='left'><para></para>
+</entry></row>
+<row>
+<entry thead="no" align='left' colspan="3"><para>...and many more   </para>
+</entry></row>
+</table>
+</para>
+<para>If you miss a configuration option or find a bug, please consider <ulink url="https://github.com/jothepro/doxygen-awesome-css/issues">opening an issue</ulink>!</para>
+</sect2>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_docs_customization_1autotoc_md4">
+<title>Doxygen generator</title>
+<para>The theme overrides most colors with the <computeroutput>--primary-color-*</computeroutput> variables.</para>
+<para>But there are a few small images and graphics that the theme cannot adjust or replace. To make these blend in better with the rest, it is recommended to adjust the <ulink url="https://www.doxygen.nl/manual/customize.html#minor_tweaks_colors">doxygen color settings</ulink> to something that matches the chosen color scheme.</para>
+<para>For the default color scheme, these values work out quite well:</para>
+<para><programlisting><codeline><highlight class="normal">#<sp/>Doxyfile</highlight></codeline>
+<codeline><highlight class="normal">HTML_COLORSTYLE_HUE<sp/><sp/><sp/><sp/>=<sp/>209</highlight></codeline>
+<codeline><highlight class="normal">HTML_COLORSTYLE_SAT<sp/><sp/><sp/><sp/>=<sp/>255</highlight></codeline>
+<codeline><highlight class="normal">HTML_COLORSTYLE_GAMMA<sp/><sp/>=<sp/>113</highlight></codeline>
+</programlisting></para>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_docs_customization_1autotoc_md5">
+<title>Share your customizations</title>
+<para>If you have customized the theme with custom colors, spacings, font-sizes, etc. and you want to share your creation with others, you can do this <ulink url="https://github.com/jothepro/doxygen-awesome-css/discussions/13">here</ulink>.</para>
+<para>I am always curious to learn about how you made the theme look even better!</para>
+<para></para>
+<para><table rows="2" cols="2"><row>
+<entry thead="yes" align='left'><para>Previous   </para>
+</entry><entry thead="yes" align='right'><para>Next    </para>
+</entry></row>
+<row>
+<entry thead="no" align='left'><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_extensions" kindref="compound">Extensions</ref>   </para>
+</entry><entry thead="no" align='right'><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_tricks" kindref="compound">Tips &amp; Tricks</ref>   </para>
+</entry></row>
+</table>
+</para>
+<para> </para>
+</sect1>
+    </detaileddescription>
+    <location file="docs/doxygen/doxygen-awesome-css/docs/customization.md"/>
+  </compounddef>
+</doxygen>

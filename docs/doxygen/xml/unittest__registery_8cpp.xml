@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="unittest__registery_8cpp" kind="file" language="C++">
+    <compoundname>unittest_registery.cpp</compoundname>
+    <includes local="no">criterion/criterion.h</includes>
+    <includes local="yes">../src/registry.hpp</includes>
+    <includes refid="sparse__array_8hpp" local="yes">../src/sparse_array.hpp</includes>
+    <incdepgraph>
+      <node id="3">
+        <label>../src/registry.hpp</label>
+      </node>
+      <node id="4">
+        <label>../src/sparse_array.hpp</label>
+        <link refid="sparse__array_8hpp"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>test/unittest_registery.cpp</label>
+        <link refid="unittest__registery_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>criterion/criterion.h</label>
+      </node>
+      <node id="7">
+        <label>iostream</label>
+      </node>
+      <node id="6">
+        <label>optional</label>
+      </node>
+      <node id="5">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="unittest__registery_8cpp_1a42cad5f541328ff35d52ae29e8734262" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(registering, constructors)</argsstring>
+        <name>Test</name>
+        <param>
+          <type>registering</type>
+        </param>
+        <param>
+          <type>constructors</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_registery.cpp" line="6" column="1" bodyfile="test/unittest_registery.cpp" bodystart="6" bodyend="8"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__registery_8cpp_1a81e3b5c7c375dfbb8433d49fe425beb2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(registering, register_comp)</argsstring>
+        <name>Test</name>
+        <param>
+          <type>registering</type>
+        </param>
+        <param>
+          <type>register_comp</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_registery.cpp" line="10" column="1" bodyfile="test/unittest_registery.cpp" bodystart="10" bodyend="14"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__registery_8cpp_1ac25c7c1b727c38621891acf810179a57" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(registering, add_component)</argsstring>
+        <name>Test</name>
+        <param>
+          <type>registering</type>
+        </param>
+        <param>
+          <type>add_component</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_registery.cpp" line="16" column="1" bodyfile="test/unittest_registery.cpp" bodystart="16" bodyend="22"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;criterion/criterion.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;../src/registry.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;../src/sparse_array.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><ref refid="unittest__registery_8cpp_1a42cad5f541328ff35d52ae29e8734262" kindref="member">Test</ref>(registering,<sp/>constructors)<sp/>{</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/>registry<sp/>app;</highlight></codeline>
+<codeline lineno="8"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><ref refid="unittest__registery_8cpp_1a42cad5f541328ff35d52ae29e8734262" kindref="member">Test</ref>(registering,<sp/>register_comp)<sp/>{</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/>registry<sp/>app;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/>app.register_component&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;();</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/>app.get_components&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;();</highlight></codeline>
+<codeline lineno="14"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><ref refid="unittest__registery_8cpp_1a42cad5f541328ff35d52ae29e8734262" kindref="member">Test</ref>(registering,<sp/>add_component)<sp/>{</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/>registry<sp/>app;</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/>app.register_component&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;();</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>player<sp/>=<sp/>app.spawn_entity();</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_component(player,<sp/>32);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_component(player,<sp/>32);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="test/unittest_registery.cpp"/>
+  </compounddef>
+</doxygen>

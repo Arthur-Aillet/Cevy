@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="classentity" kind="class" language="C++" prot="public">
+    <compoundname>entity</compoundname>
+    <includes refid="entity_8hpp" local="no">entity.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classentity_1a06e409e0dd98f9fbbfec5f4b891e1760" prot="private" static="no" mutable="no">
+        <type>std::size_t</type>
+        <definition>std::size_t entity::_id</definition>
+        <argsstring></argsstring>
+        <name>_id</name>
+        <qualifiedname>entity::_id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/entity.hpp" line="7" column="21" bodyfile="src/entity.hpp" bodystart="7" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="friend">
+      <memberdef kind="friend" id="classentity_1a4097b3e04a4f8ece21f5abe1b10e6323" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>class</type>
+        <definition>friend class App</definition>
+        <argsstring></argsstring>
+        <name>App</name>
+        <qualifiedname>entity::App</qualifiedname>
+        <param>
+          <type><ref refid="classApp" kindref="compound">App</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/entity.hpp" line="10" column="22" bodyfile="src/entity.hpp" bodystart="10" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classentity_1ab9045d9ebd515e20248a0ae328897a78" prot="private" static="no" const="no" explicit="yes" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>entity::entity</definition>
+        <argsstring>(std::size_t new_id)</argsstring>
+        <name>entity</name>
+        <qualifiedname>entity::entity</qualifiedname>
+        <param>
+          <type>std::size_t</type>
+          <declname>new_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/entity.hpp" line="8" column="18" bodyfile="src/entity.cpp" bodystart="5" bodyend="7"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classentity_1a7041cb0948b75fa2d0c6de811bc40791" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>entity::operator std::size_t &amp;</definition>
+        <argsstring>()</argsstring>
+        <name>operator std::size_t &amp;</name>
+        <qualifiedname>entity::size_t &amp;</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/entity.hpp" line="11" column="9" bodyfile="src/entity.cpp" bodystart="9" bodyend="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classentity_1a9034d2529b4a35eb88dae2f51fc628a3" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>entity::operator std::size_t</definition>
+        <argsstring>() const</argsstring>
+        <name>operator std::size_t</name>
+        <qualifiedname>entity::size_t</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/entity.hpp" line="12" column="9" bodyfile="src/entity.cpp" bodystart="14" bodyend="17"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/entity.hpp" line="5" column="1" bodyfile="src/entity.hpp" bodystart="5" bodyend="13"/>
+    <listofallmembers>
+      <member refid="classentity_1a06e409e0dd98f9fbbfec5f4b891e1760" prot="private" virt="non-virtual"><scope>entity</scope><name>_id</name></member>
+      <member refid="classentity_1a4097b3e04a4f8ece21f5abe1b10e6323" prot="public" virt="non-virtual"><scope>entity</scope><name>App</name></member>
+      <member refid="classentity_1ab9045d9ebd515e20248a0ae328897a78" prot="private" virt="non-virtual"><scope>entity</scope><name>entity</name></member>
+      <member refid="classentity_1a9034d2529b4a35eb88dae2f51fc628a3" prot="public" virt="non-virtual"><scope>entity</scope><name>operator std::size_t</name></member>
+      <member refid="classentity_1a7041cb0948b75fa2d0c6de811bc40791" prot="public" virt="non-virtual"><scope>entity</scope><name>operator std::size_t &amp;</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

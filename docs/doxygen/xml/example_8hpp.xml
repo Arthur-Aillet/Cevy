@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="example_8hpp" kind="file" language="C++">
+    <compoundname>example.hpp</compoundname>
+    <includes local="no">string</includes>
+    <includedby refid="subclass-example_8hpp" local="yes">docs/doxygen/doxygen-awesome-css/include/MyLibrary/subclass-example.hpp</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp</label>
+        <link refid="example_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>string</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp</label>
+        <link refid="example_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>docs/doxygen/doxygen-awesome-css/include/MyLibrary/subclass-example.hpp</label>
+        <link refid="subclass-example_8hpp"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classMyLibrary_1_1Example" prot="public">MyLibrary::Example</innerclass>
+    <innerclass refid="classMyLibrary_1_1SecondExample" prot="public">MyLibrary::SecondExample</innerclass>
+    <innernamespace refid="namespaceMyLibrary">MyLibrary</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4" refid="namespaceMyLibrary" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceMyLibrary" kindref="compound">MyLibrary</ref><sp/>{</highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6" refid="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda3d4a113e58853e5d81725d92fbfceb4d" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/><ref refid="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ced" kindref="member">Color</ref><sp/>{<sp/><ref refid="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda82b4a54f6fbf39698c2a6982d75f4f0c" kindref="member">red</ref>,<sp/><ref refid="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e" kindref="member">green</ref>,<sp/><ref refid="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda3d4a113e58853e5d81725d92fbfceb4d" kindref="member">blue</ref><sp/>};</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14" refid="classMyLibrary_1_1Example" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classMyLibrary_1_1Example" kindref="compound">Example</ref><sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="155" refid="classMyLibrary_1_1Example_1a1c0046b0674eb4cad09c5d3e943912b8" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/><ref refid="classMyLibrary_1_1Example_1a1c0046b0674eb4cad09c5d3e943912b8" kindref="member">test</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/><ref refid="classMyLibrary_1_1Example_1a1c0046b0674eb4cad09c5d3e943912b8" kindref="member">test</ref>);</highlight></codeline>
+<codeline lineno="156"><highlight class="normal"></highlight></codeline>
+<codeline lineno="157" refid="classMyLibrary_1_1Example_1a8431ef1c10c4e2a36302b8e8556514f6" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="classMyLibrary_1_1Example_1a8431ef1c10c4e2a36302b8e8556514f6" kindref="member">virtualfunc</ref>()<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"></highlight></codeline>
+<codeline lineno="159" refid="classMyLibrary_1_1Example_1a8c3ea5ce33b9e1fada7ff46eab0956a7" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classMyLibrary_1_1Example_1a8c3ea5ce33b9e1fada7ff46eab0956a7" kindref="member">staticfunc</ref>();</highlight></codeline>
+<codeline lineno="160"><highlight class="normal"></highlight></codeline>
+<codeline lineno="161"><highlight class="normal"></highlight></codeline>
+<codeline lineno="162"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"></highlight></codeline>
+<codeline lineno="164" refid="classMyLibrary_1_1SecondExample" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classMyLibrary_1_1SecondExample" kindref="compound">SecondExample</ref><sp/>{</highlight></codeline>
+<codeline lineno="165"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>foo();</highlight></codeline>
+<codeline lineno="166"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"></highlight></codeline>
+<codeline lineno="168"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp"/>
+  </compounddef>
+</doxygen>

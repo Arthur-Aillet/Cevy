@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="docs_2doxygen_2doxygen-awesome-css_2README_8md" kind="file" language="Markdown">
+    <compoundname>README.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/><sp/>Doxygen<sp/>Awesome</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">[![GitHub<sp/>release<sp/>(latest<sp/>by<sp/>date)](https://img.shields.io/github/v/release/jothepro/doxygen-awesome-css)](https://github.com/jothepro/doxygen-awesome-css/releases/latest)</highlight></codeline>
+<codeline><highlight class="normal">[![GitHub](https://img.shields.io/github/license/jothepro/doxygen-awesome-css)](https://github.com/jothepro/doxygen-awesome-css/blob/main/LICENSE)</highlight></codeline>
+<codeline><highlight class="normal">![GitHub<sp/>Repo<sp/>stars](https://img.shields.io/github/stars/jothepro/doxygen-awesome-css)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;title_screenshot&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">![Screenshot<sp/>of<sp/>Doxygen<sp/>Awesome<sp/>CSS](img/screenshot.png)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">**Doxygen<sp/>Awesome**<sp/>is<sp/>a<sp/>custom<sp/>CSS<sp/>theme<sp/>for<sp/>Doxygen<sp/>HTML<sp/>documentation<sp/>with<sp/>lots<sp/>of<sp/>customization<sp/>parameters.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Motivation</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">I<sp/>really<sp/>like<sp/>how<sp/>the<sp/>Doxygen<sp/>HTML<sp/>documentation<sp/>is<sp/>structured!<sp/>But<sp/>IMHO<sp/>it<sp/>looks<sp/>a<sp/>bit<sp/>outdated.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">This<sp/>theme<sp/>is<sp/>an<sp/>attempt<sp/>to<sp/>update<sp/>the<sp/>visuals<sp/>of<sp/>Doxygen<sp/>without<sp/>changing<sp/>its<sp/>overall<sp/>layout<sp/>too<sp/>much.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Features</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>🌈<sp/>Clean,<sp/>modern<sp/>design</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>🚀<sp/>Heavily<sp/>customizable<sp/>by<sp/>adjusting<sp/>CSS<sp/>variables</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>🧩<sp/>No<sp/>changes<sp/>to<sp/>the<sp/>HTML<sp/>structure<sp/>of<sp/>Doxygen<sp/>are<sp/>required</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>📱<sp/>Improved<sp/>mobile<sp/>usability</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>🌘<sp/>Dark<sp/>mode<sp/>support!</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>🥇<sp/>Works<sp/>best<sp/>with<sp/>**doxygen<sp/>1.9.1**<sp/>-<sp/>**1.9.4**<sp/>and<sp/>**1.9.6**<sp/>-<sp/>**1.9.8**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Examples</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Some<sp/>websites<sp/>using<sp/>this<sp/>theme:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>[Documentation<sp/>of<sp/>this<sp/>repository](https://jothepro.github.io/doxygen-awesome-css/)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[wxWidgets](https://docs.wxwidgets.org/3.2/)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[OpenCV<sp/>5.x](https://docs.opencv.org/5.x/)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Zephyr](https://docs.zephyrproject.org/latest/doxygen/html/index.html)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[FELTOR](https://mwiesenberger.github.io/feltor/dg/html/modules.html)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Spatial<sp/>Audio<sp/>Framework<sp/>(SAF)](https://leomccormack.github.io/Spatial_Audio_Framework/index.html)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[libCloudSync](https://jothepro.github.io/libCloudSync/)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[libsl3](https://a4z.github.io/libsl3/)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Installation</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">To<sp/>use<sp/>the<sp/>theme<sp/>when<sp/>generating<sp/>your<sp/>documentation,<sp/>bring<sp/>the<sp/>required<sp/>CSS<sp/>and<sp/>JS<sp/>files<sp/>from<sp/>this<sp/>repository<sp/>into<sp/>your<sp/>project.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">This<sp/>can<sp/>be<sp/>done<sp/>in<sp/>several<sp/>ways:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>manually<sp/>copying<sp/>the<sp/>files</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>adding<sp/>the<sp/>project<sp/>as<sp/>a<sp/>Git<sp/>submodule</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>adding<sp/>the<sp/>project<sp/>as<sp/>a<sp/>npm/xpm<sp/>dependency</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>installing<sp/>the<sp/>theme<sp/>system-wide</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">All<sp/>theme<sp/>files<sp/>are<sp/>located<sp/>in<sp/>the<sp/>root<sp/>of<sp/>this<sp/>repository<sp/>and<sp/>start<sp/>with<sp/>the<sp/>prefix<sp/>`doxygen-awesome-`.<sp/>You<sp/>may<sp/>not<sp/>need<sp/>all<sp/>of<sp/>them.<sp/>Follow<sp/>the<sp/>install<sp/>instructions<sp/>to<sp/>figure<sp/>out<sp/>what<sp/>files<sp/>are<sp/>required<sp/>for<sp/>your<sp/>setup.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Git<sp/>submodule</highlight></codeline>
+<codeline><highlight class="normal">For<sp/>projects<sp/>that<sp/>use<sp/>git,<sp/>add<sp/>the<sp/>repository<sp/>as<sp/>a<sp/>submodule<sp/>and<sp/>check<sp/>out<sp/>the<sp/>desired<sp/>release:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```sh</highlight></codeline>
+<codeline><highlight class="normal">git<sp/>submodule<sp/>add<sp/>https://github.com/jothepro/doxygen-awesome-css.git</highlight></codeline>
+<codeline><highlight class="normal">cd<sp/>doxygen-awesome-css</highlight></codeline>
+<codeline><highlight class="normal">git<sp/>checkout<sp/>v2.3.1</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>npm/xpm<sp/>dependency</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">In<sp/>the<sp/>npm<sp/>ecosystem,<sp/>this<sp/>project<sp/>can<sp/>be<sp/>added<sp/>as<sp/>a<sp/>development<sp/>dependency</highlight></codeline>
+<codeline><highlight class="normal">to<sp/>your<sp/>project:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```sh</highlight></codeline>
+<codeline><highlight class="normal">cd<sp/>your-project</highlight></codeline>
+<codeline><highlight class="normal">npm<sp/>install<sp/>https://github.com/jothepro/doxygen-awesome-css#v2.3.1<sp/>--save-dev</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">ls<sp/>-l<sp/>node_module/@jothepro/doxygen-awesome-css</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Similarly,<sp/>in<sp/>the<sp/>[xPack](https://xpack.github.io)<sp/>ecosystem,<sp/>this<sp/>project<sp/>can<sp/>be<sp/>added</highlight></codeline>
+<codeline><highlight class="normal">as<sp/>a<sp/>development<sp/>dependency<sp/>to<sp/>an<sp/>[`xpm`](https://xpack.github.io/xpm/)</highlight></codeline>
+<codeline><highlight class="normal">managed<sp/>project.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>System-wide</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">You<sp/>can<sp/>even<sp/>install<sp/>the<sp/>theme<sp/>system-wide<sp/>by<sp/>running<sp/>`make<sp/>install`.<sp/></highlight></codeline>
+<codeline><highlight class="normal">The<sp/>files<sp/>will<sp/>be<sp/>installed<sp/>to<sp/>`/usr/local/share/`<sp/>by<sp/>default,<sp/></highlight></codeline>
+<codeline><highlight class="normal">but<sp/>you<sp/>can<sp/>customize<sp/>the<sp/>install<sp/>location<sp/>with<sp/>`make<sp/>PREFIX=/my/custom/path<sp/>install`.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Choosing<sp/>a<sp/>layout</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">There<sp/>are<sp/>two<sp/>layout<sp/>options.<sp/>Choose<sp/>one<sp/>of<sp/>them<sp/>and<sp/>configure<sp/>Doxygen<sp/>accordingly:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;tabbed&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;b<sp/>class=&quot;tab-title&quot;&gt;Base<sp/>Theme&lt;/b&gt;&lt;div<sp/>class=&quot;darkmode_inverted_image&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>![](img/theme-variants-base.drawio.svg)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/div&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Comes<sp/>with<sp/>the<sp/>typical<sp/>Doxygen<sp/>titlebar.<sp/>Optionally<sp/>the<sp/>treeview<sp/>in<sp/>the<sp/>sidebar<sp/>can<sp/>be<sp/>enabled.<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Required<sp/>files:<sp/>`doxygen-awesome.css`</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Required<sp/>`Doxyfile`<sp/>configuration:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>GENERATE_TREEVIEW<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>YES<sp/>#<sp/>optional.<sp/>Also<sp/>works<sp/>without<sp/>treeview</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>DISABLE_INDEX<sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>FULL_SIDEBAR<sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>HTML_EXTRA_STYLESHEET<sp/><sp/>=<sp/>doxygen-awesome-css/doxygen-awesome.css</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>HTML_COLORSTYLE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>LIGHT<sp/>#<sp/>required<sp/>with<sp/>Doxygen<sp/>&gt;=<sp/>1.9.5</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;b<sp/>class=&quot;tab-title&quot;&gt;Sidebar-Only<sp/>Theme&lt;/b&gt;&lt;div<sp/>class=&quot;darkmode_inverted_image&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>![](img/theme-variants-sidebar-only.drawio.svg)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/div&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Hides<sp/>the<sp/>top<sp/>titlebar<sp/>to<sp/>give<sp/>more<sp/>space<sp/>to<sp/>the<sp/>content.<sp/>The<sp/>treeview<sp/>must<sp/>be<sp/>enabled<sp/>in<sp/>order<sp/>for<sp/>this<sp/>theme<sp/>to<sp/>work.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Required<sp/>files:<sp/>`doxygen-awesome.css`,<sp/>`doxygen-awesome-sidebar-only.css`</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Required<sp/>`Doxyfile`<sp/>configuration:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>GENERATE_TREEVIEW<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>YES<sp/>#<sp/>required!</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>DISABLE_INDEX<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>FULL_SIDEBAR<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>HTML_EXTRA_STYLESHEET<sp/><sp/>=<sp/>doxygen-awesome-css/doxygen-awesome.css<sp/>\</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>doxygen-awesome-css/doxygen-awesome-sidebar-only.css</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>HTML_COLORSTYLE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>LIGHT<sp/>#<sp/>required<sp/>with<sp/>Doxygen<sp/>&gt;=<sp/>1.9.5</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;br&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">@warning</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>This<sp/>theme<sp/>is<sp/>not<sp/>compatible<sp/>with<sp/>the<sp/>`FULL_SIDEBAR<sp/>=<sp/>YES`<sp/>option<sp/>provided<sp/>by<sp/>Doxygen!</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>`HTML_COLORSTYLE`<sp/>must<sp/>be<sp/>set<sp/>to<sp/>`LIGHT`<sp/>since<sp/>Doxygen<sp/>1.9.5!</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Further<sp/>installation<sp/>instructions</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>[Installing<sp/>extensions](docs/extensions.md)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Customizing<sp/>the<sp/>theme<sp/>(colors,<sp/>spacing,<sp/>border-radius,<sp/>...)](docs/customization.md)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Tips<sp/>and<sp/>Tricks<sp/>for<sp/>further<sp/>configuration](docs/tricks.md)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Browser<sp/>support</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Tested<sp/>with</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>Chrome<sp/>119,<sp/>Chrome<sp/>119<sp/>for<sp/>Android,<sp/>Chrome<sp/>119<sp/>for<sp/>iOS</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Safari<sp/>17,<sp/>Safari<sp/>for<sp/>iOS<sp/>16</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Firefox<sp/>118,<sp/>Firefox<sp/>120<sp/>for<sp/>Android,<sp/>Firefox<sp/>119<sp/>for<sp/>iOS</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Edge<sp/>119</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">The<sp/>theme<sp/>does<sp/>not<sp/>strive<sp/>to<sp/>be<sp/>backward<sp/>compatible<sp/>with<sp/>(significantly)<sp/>older<sp/>browser<sp/>versions.</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Credits</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Thanks<sp/>for<sp/>all<sp/>the<sp/>bug<sp/>reports<sp/>and<sp/>inspiring<sp/>feedback<sp/>on<sp/>GitHub!</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Special<sp/>thanks<sp/>to<sp/>all<sp/>the<sp/>contributors:</highlight></codeline>
+<codeline><highlight class="normal">&lt;br&gt;&lt;br&gt;</highlight></codeline>
+<codeline><highlight class="normal">&lt;a<sp/>href=&quot;https://github.com/jothepro/doxygen-awesome-css/graphs/contributors&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;img<sp/>src=&quot;https://contrib.rocks/image?repo=jothepro/doxygen-awesome-css&quot;<sp/>/&gt;</highlight></codeline>
+<codeline><highlight class="normal">&lt;/a&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;section_buttons&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">|<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Read<sp/>Next<sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|---------------------------------:|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>[Extensions](docs/extensions.md)<sp/>|</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+    </programlisting>
+    <location file="docs/doxygen/doxygen-awesome-css/README.md"/>
+  </compounddef>
+</doxygen>
