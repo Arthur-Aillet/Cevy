@@ -1,3 +1,10 @@
+##
+## Agartha-Software, 2023
+## Cevy
+## File description:
+## cevy-cmake
+##
+
 include_directories(".")
 
 add_subdirectory(game_engine)

@@ -1,8 +1,8 @@
 /*
-** EPITECH PROJECT, 2023
-** rtype
+** Agartha-Software, 2023
+** Cevy
 ** File description:
-** ecs
+** ecs namespace
 */
 
 #pragma once

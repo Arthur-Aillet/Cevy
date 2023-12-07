@@ -1,3 +1,10 @@
+##
+## Agartha-Software, 2023
+## Cevy
+## File description:
+## ecs-cmake
+##
+
 
 add_library(sparse_array
   STATIC

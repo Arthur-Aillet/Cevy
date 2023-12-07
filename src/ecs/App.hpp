@@ -1,3 +1,10 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** App
+*/
+
 #pragma once
 
 #include "Plugin.hpp"
