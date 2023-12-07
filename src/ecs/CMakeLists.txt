@@ -32,5 +32,5 @@ add_library(app
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
 add_library(ecs SHARED ${CEVY_HEADERS})
-target_link_libraries(ecs sparse_array entity world schedule)
+target_link_libraries(ecs sparse_array entity world schedule app)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
