@@ -24,7 +24,6 @@ void Schedule::runStage(World &world)
     }
 
     _stage++;
-    // _stage = static_cast<STAGE>(1 + static_cast<int>(_stage) );
 }
 
 void Schedule::runStages(World& world) {

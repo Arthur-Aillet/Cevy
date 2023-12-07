@@ -77,17 +77,6 @@ class Schedule {
             }
 
         }
-        enum class STAGE {
-            First,
-            PreUpdate,
-            StateTransition,
-            RunFixedUpdateLoop,
-            Update,
-            PostUpdate,
-            Last,
-            RESET,
-            ABORT,
-        };
 
         using system_function = std::function<void (World &)>;
         using system = std::tuple<system_function, std::type_index>;
@@ -127,7 +116,6 @@ class Schedule {
     protected:
         mutable bool _stop = false;
         mutable bool _abort = false;
-        STAGE _stageOLD = STAGE::RESET;
         std::list<std::type_index>::iterator _stage;
 
 
