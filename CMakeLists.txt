@@ -1,3 +1,10 @@
+##
+## Agartha-Software, 2023
+## Cevy
+## File description:
+## Cevy project cmake
+##
+
 cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -25,7 +32,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   endif()
 endif()
 
-#set(CMAKE_CXX_CLANG_TIDY clang-tidy -header-filter=. -checks=*,-llvmlibc-*)
+add_compile_options(-Wall -Wextra)
 
 add_subdirectory(src)
 
