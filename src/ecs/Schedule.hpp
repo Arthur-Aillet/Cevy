@@ -105,15 +105,19 @@ class cevy::ecs::Schedule {
             _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
         }
 
-        // template <class... Components, typename Function>
-        // void add_system(Function const &f) {
-        //     add_system<Update, Components...>(f);
-        // }
+        template<class R, class ...Args>
+        void add_super_system(R(&&func)(Args...)) {
+            add_super_system<Update>(func);
+        }
 
-        // template <class... Components, typename Function>
-        // void add_system(Function &&f) {
-        //     add_system<Update, Components...>(f);
-        // }
+        template<class S, class R, class ...Args>
+        void add_super_system(R(&&func)(Args...)) {
+            static_assert(all(is_super<Args>()...), "type must be reference to super");
+            system_function sys = [&func] (World & reg) {
+                func(reg.get_super<Args>()...);
+            };
+            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+        }
 
     protected:
         mutable bool _stop = false;
