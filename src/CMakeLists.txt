@@ -1,24 +1,7 @@
-add_library(entity
-    STATIC
-    sparse_array.cpp
-    sparse_array.hpp
-    Entity.cpp
-  )
-
-add_library(sparse_array
-  STATIC
-  sparse_array.cpp
-  )
-
-add_library(world
-  STATIC
-  World.cpp
-  World.hpp
-  )
-
 add_subdirectory(game_engine)
+add_subdirectory(ecs)
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../public/*")
 add_library(cevy SHARED ${CEVY_HEADERS})
-target_link_libraries(cevy entity world sparse_array game_engine)
+target_link_libraries(cevy ecs game_engine)
 set_target_properties(cevy PROPERTIES LINKER_LANGUAGE CXX)
