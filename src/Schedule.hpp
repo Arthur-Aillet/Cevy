@@ -10,6 +10,7 @@
 #include <list>
 #include <tuple>
 #include <optional>
+#include <algorithm>
 
 #include "World.hpp"
 
@@ -27,6 +28,7 @@ class Schedule {
 
                 template<typename T>
                 using after = Stage<std::nullopt_t, T>;
+            constexpr operator bool() { return true; };
         };
         template<typename T>
         using before = Stage<>::before<T>;
@@ -47,9 +49,32 @@ class Schedule {
 
     private:
         using type_tuple = std::tuple<std::type_index, std::any>;
-        std::list<type_tuple> _schedule;
+        std::list<std::type_index> _schedule;
 
         void init_default_schedule() {
+            insert_schedule<First>();
+            insert_schedule<Update>();
+            insert_schedule<PreUpdate>();
+            insert_schedule<StateTransition>();
+            insert_schedule<RunFixedUpdateLoop>();
+
+            // add systems relating to the automatic parts of
+            //StateTransitions and RunFixedUpdateLoop ?
+        }
+
+
+        template<typename T>
+        void insert_schedule() {
+            if (T::before()) {
+                auto it = std::find(_schedule, std::type_index(typeid(T)));
+                _schedule.insert(it, std::type_index(typeid(T)));
+            } else if (T::after()) {
+                auto it = std::find(_schedule, std::type_index(typeid(T)));
+                ++it;
+                _schedule.insert(it, std::type_index(typeid(T)));
+            } else {
+                _schedule.push_back(std::type_index(typeid(T)));
+            }
 
         }
         enum class STAGE {
@@ -111,5 +136,5 @@ class Schedule {
     public:
         void run(World& world);
 
-        Schedule& add_systems();
+        // Schedule& add_systems();
 };
