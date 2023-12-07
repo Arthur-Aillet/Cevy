@@ -2,7 +2,7 @@ add_library(entity
     STATIC
     sparse_array.cpp
     sparse_array.hpp
-    entity.cpp
+    Entity.cpp
   )
 
 add_library(sparse_array

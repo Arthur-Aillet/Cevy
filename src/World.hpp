@@ -30,11 +30,11 @@ template<typename T>
 using ref = std::reference_wrapper<T>;
 
 
+class World;
 /**
 template<class T>
 struct is_super : public std::false_type {};
 
-class World;
 template<>
 struct is_super<World&> : std::true_type {};
 template<>
@@ -59,10 +59,9 @@ struct EntityWorldRef {
     // EntityWorldRef insert(Bundle& b);
 
     template<typename... Ts>
-    EntityWorldRef insert(Ts... args) {
-        world.add_component(enitity, args...);
-    }
+    EntityWorldRef insert(Ts... args);
 };
+
 
 /**
  * Stores Entities, Components (and ressources), and exposes operations
@@ -120,21 +119,21 @@ class World {
             std::optional<T> optional = v[entity];
 
             if (optional)
-                return std::optional<ref<T>>(ref(optional.value()));
+                return std::optional<ref<T>>(std::ref(optional.value()));
             else
-                return std::optional<ref<T>>(ref(std::nullopt()));
+                return std::optional<ref<T>>(std::ref(std::nullopt));
         }
 
         /// get a Component T associated with a given Entity, or Nothing if no such Component
         template<typename T>
         std::optional<ref<const T>> get(Entity entity) const {
-            sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
+            const sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(T)))));
             std::optional<const T> optional = v[entity];
 
             if (optional)
-                return std::optional<ref<const T>>(ref(optional.value()));
+                return std::optional<ref<const T>>(std::ref(optional.value()));
             else
-                return std::optional<ref<const T>>(ref(std::nullopt()));
+                return std::optional<ref<const T>>(std::ref(std::nullopt));
         }
 
         /// register a component to the world
@@ -278,3 +277,9 @@ class World {
         //     _systems.push_back(std::make_tuple(sys, stage));
         // }
 };
+
+template<typename... Ts>
+EntityWorldRef EntityWorldRef::insert(Ts... args) {
+    world.add_component(entity, args...);
+    return *this;
+}
