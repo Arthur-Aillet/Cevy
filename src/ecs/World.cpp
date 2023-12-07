@@ -7,7 +7,10 @@
 
 #include "World.hpp"
 
-EntityWorldRef World::spawn_empty()
+using cevy::ecs::World;
+using cevy::ecs::Entity;
+
+World::EntityWorldRef World::spawn_empty()
 {
     size_t pos = _entities.first_free();
     Entity new_e = Entity(pos);

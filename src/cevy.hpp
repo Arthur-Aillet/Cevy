@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <functional>
+
 template<typename T>
 using ref = std::reference_wrapper<T>;
 

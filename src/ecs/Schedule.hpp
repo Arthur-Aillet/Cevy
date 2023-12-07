@@ -13,12 +13,10 @@
 #include <algorithm>
 
 #include "World.hpp"
-
-template<typename T>
-using ref = std::reference_wrapper<T>;
+#include "ecs.hpp"
 
 
-class Schedule {
+class cevy::ecs::Schedule {
     public:
         template<typename Before = std::nullopt_t, typename After = std::nullopt_t>
         class Stage {

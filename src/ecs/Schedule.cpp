@@ -7,6 +7,8 @@
 
 #include "Schedule.hpp"
 
+using cevy::ecs::Schedule;
+
 
 void Schedule::runStage(World &world)
 {

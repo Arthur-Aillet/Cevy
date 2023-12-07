@@ -1,3 +1,5 @@
+include_directories(".")
+
 add_subdirectory(game_engine)
 add_subdirectory(ecs)
 
