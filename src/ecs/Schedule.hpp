@@ -53,8 +53,10 @@ class cevy::ecs::Schedule {
             insert_schedule<First>();
             insert_schedule<Update>();
             insert_schedule<PreUpdate>();
-            insert_schedule<StateTransition>();
-            insert_schedule<RunFixedUpdateLoop>();
+            insert_schedule<PostUpdate>();
+            // insert_schedule<StateTransition>();
+            // insert_schedule<RunFixedUpdateLoop>();
+            insert_schedule<Last>();
 
             // add systems relating to the automatic parts of
             //StateTransitions and RunFixedUpdateLoop ?
@@ -70,6 +72,7 @@ class cevy::ecs::Schedule {
         template<typename T, typename T::after>
         void insert_schedule() {
             auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
+            ++it;
             _schedule.insert(it, std::type_index(typeid(T)));
         }
 
