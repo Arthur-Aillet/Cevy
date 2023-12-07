@@ -11,8 +11,9 @@
 #include <tuple>
 #include <optional>
 #include <algorithm>
+#include <typeindex>
+#include <any>
 
-#include "World.hpp"
 #include "ecs.hpp"
 
 
