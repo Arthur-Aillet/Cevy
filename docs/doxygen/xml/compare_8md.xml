@@ -1,0 +1,414 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="compare_8md" kind="file" language="Markdown">
+    <compoundname>compare.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">(compare)=</highlight></codeline>
+<codeline><highlight class="normal">#<sp/>Bevy<sp/>vs<sp/>C++evy</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>**Component**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Basic<sp/>structure<sp/>holding<sp/>data,<sp/>Ecs<sp/>main<sp/>building<sp/>bloc</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#[derive(Component)]</highlight></codeline>
+<codeline><highlight class="normal">struct<sp/>Position {</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>f64<sp/>x;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>f64<sp/>y;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">class<sp/>Position<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>float<sp/>x;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>float<sp/>y;</highlight></codeline>
+<codeline><highlight class="normal">};</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>**Entity**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Group<sp/>of<sp/>Components</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">commands.spawn((Camera,<sp/>Position(3.,<sp/>3.)));</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">commands.spawn(Camera(),<sp/>Position(3.,<sp/>3.));</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">bundle<sp/>camera<sp/>=<sp/>new<sp/>bundle(new<sp/>Camera,<sp/>new<sp/>Position(3,<sp/>3));</highlight></codeline>
+<codeline><highlight class="normal">commands.spawn(camera);</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//Implementation:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">template&lt;tyepname<sp/>...Args&gt;</highlight></codeline>
+<codeline><highlight class="normal">class<sp/>bundle<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>public:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>bundle(Args...)<sp/>{<sp/>//<sp/>Vargs</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**System**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Function<sp/>accessing<sp/>one<sp/>or</highlight></codeline>
+<codeline><highlight class="normal">multiple<sp/>component<sp/>group</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">----</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>hello_world()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>println!(&quot;hello<sp/>world!&quot;);</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">.add_systems(Update,<sp/>hello_world)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//Advanced<sp/>querys</highlight></codeline>
+<codeline><highlight class="normal">fn<sp/>debug_player_hp(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>query:<sp/>Query&lt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>(&amp;Health,<sp/>Option&lt;&amp;PlayerName&gt;),</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>(With&lt;Player&gt;,<sp/>Without&lt;Enemy&gt;)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&gt;,</highlight></codeline>
+<codeline><highlight class="normal">)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>hello_world()</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>&quot;hello<sp/>world!&quot;<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">app.add_systems(hello_world)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>debug_player_hp(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Query&lt;Ref&lt;Health&gt;,<sp/>Optional&lt;Ref&lt;const<sp/>PlayerName&gt;&gt;,<sp/>With&lt;Player&gt;,<sp/>Without&lt;Enemy&gt;&gt;&amp;<sp/>query</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>)</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">*Features*</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>Scheduler:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>Custom<sp/>set<sp/>of<sp/>steps</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>Custom<sp/>ordering</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Conditional<sp/>running</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Optional<sp/>Querys</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Multithreaded</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Querys<sp/>filters</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>With</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>Without</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>Or</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Extract<sp/>Schedule<sp/>as<sp/>Depedencie<sp/>graph</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>**App**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Setup<sp/>and<sp/>manage<sp/>Ecs,</highlight></codeline>
+<codeline><highlight class="normal">Connect<sp/>systems</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>main()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>app::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_plugin(CameraPlugin)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_system(First,<sp/>spawn_player)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.init_ressource(clock::new())</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.run();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">int<sp/>main()</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>App<sp/>app;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_plugin&lt;CameraPlugin&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_system(STAGE::First,<sp/>spawn_player);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.init_ressource&lt;Clock&gt;(/*<sp/>initializer-list<sp/>*/);<sp/>//<sp/>for<sp/>emplace-ctor</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.init_ressource(Clock());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.run();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**Resource**</highlight></codeline>
+<codeline><highlight class="normal">Global<sp/>and<sp/>Unique</highlight></codeline>
+<codeline><highlight class="normal">data<sp/>of<sp/>some<sp/>kind</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">.init_ressource(clock::new())</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>greet_people(time:<sp/>Res&lt;Time&gt;,<sp/>query:<sp/>Query&lt;&amp;Name,<sp/>With&lt;Person&gt;&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>name<sp/>in<sp/>&amp;query<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>println!(&quot;hello<sp/>{}!&quot;,<sp/>name.0);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">.init_ressources&lt;Clock&gt;(/*<sp/>initializer-list<sp/>*/);</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>greet_people(Resource&lt;Time&gt;<sp/>time,<sp/>Query&lt;Name,<sp/>With&lt;Person&gt;&gt;&amp;<sp/>query)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>(data<sp/>:<sp/>query)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>&quot;hello<sp/>&quot;<sp/>&lt;&lt;<sp/>std::get&lt;0&gt;(data)<sp/>&lt;&lt;<sp/>&quot;!&quot;<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//Implementation:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">template&lt;typename<sp/>T&gt;</highlight></codeline>
+<codeline><highlight class="normal">class<sp/>Resource;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">template&lt;typename<sp/>T&gt;</highlight></codeline>
+<codeline><highlight class="normal">using<sp/>Res&lt;T&gt;<sp/>=<sp/>Resource&lt;T&gt;;</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**Command**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Interract<sp/>with<sp/>entity<sp/>pool</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>spawn_things(<sp/>//<sp/>System</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>mut<sp/>commands:<sp/>Commands,</highlight></codeline>
+<codeline><highlight class="normal">)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>//<sp/>manage<sp/>resources</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.insert_resource(MyResource);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.remove_resource::&lt;MyResource&gt;()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.spawn(Velocity,<sp/>Position::default());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>let<sp/>id<sp/>=<sp/>commands.spawn(Velocity::new(0.0,<sp/>-1.0));</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.entity(id)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.insert(Position::default())</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.remove::&lt;Velocity&gt;();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>spawn_things(Commands<sp/>commands)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.insert_resource&lt;MyResource&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.remove_resource&lt;MyResource&gt;();</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.spawn(Position(),<sp/>Velocity());</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Entity<sp/>id<sp/>=<sp/>commands.spawn(Velocity(0.,<sp/>-1.));</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>commands.entity(id).insert(Position()).remove&lt;Velocity&gt;();</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**Plugins**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Connect<sp/>systems<sp/>without<sp/>Ecs<sp/>management</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Create<sp/>an<sp/>abstraction<sp/>layer</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">impl<sp/>Plugin<sp/>for<sp/>HelloPlugin<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>fn<sp/>build(&amp;self,<sp/>app:<sp/>&amp;mut<sp/>App)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>app.add_system(Start,<sp/>spawn_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_system(Update,<sp/>move_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_system(PostUpdate,<sp/>destroy_camera)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>.add_event&lt;CameraDestroyed&gt;::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">class<sp/>HelloPlugin<sp/>:<sp/>public<sp/>Plugin<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>void<sp/>build(App&amp;<sp/>app)<sp/>override</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.add_system(STAGE::start,<sp/>spawn_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.add_system(STAGE::update,<sp/>move_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.add_system(STAGE::postUpdate,<sp/>destroy_camera);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>app.add_event(CameraDestroyed());</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**EventWriter**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Send<sp/>a<sp/>message<sp/>holding<sp/>components</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>event_trigger(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>mut<sp/>cam_event:<sp/>EventWriter&lt;MyEvent&gt;)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>cam_event.send(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>MyEvent{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>message:<sp/>&quot;Behold!<sp/>a<sp/>message...&quot;;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>})</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>event_trigger(EventWriter&lt;MyEvent&gt;&amp;<sp/>event)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>event.send(MyEvent<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.message<sp/>=<sp/>&quot;Behold!<sp/>a<sp/>message...&quot;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>})</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//<sp/>this<sp/>`.member<sp/>=<sp/>value`<sp/>syntax<sp/>is<sp/>equivalent<sp/>to<sp/>rusts&apos;<sp/>`member:<sp/>value`<sp/>syntax</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>it<sp/>is<sp/>for<sp/>initalizing<sp/>a<sp/>struct&apos;s<sp/>public<sp/>members</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**EventReader**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">System<sp/>executed<sp/>on<sp/>ressources<sp/>and<sp/>given<sp/>component<sp/>groups<sp/>when<sp/>signal<sp/>is<sp/>sent</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>event_listener(mut<sp/>events:<sp/>EventReader&lt;MyEvent&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>my_event<sp/>in<sp/>events.read()<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>info!(&quot;{}&quot;,<sp/>my_event.message);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>event_listener(EvenReader&lt;MyEvent&gt;&amp;<sp/>events)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>auto<sp/>it<sp/>=<sp/>events.read();</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>(auto<sp/>my_event:<sp/>events)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cerr<sp/>&lt;&lt;<sp/>my_event.message<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>**State**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Define<sp/>state<sp/>of<sp/>app</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>Rust:**</highlight></codeline>
+<codeline><highlight class="normal">```rust</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#[derive(...,<sp/>States)]</highlight></codeline>
+<codeline><highlight class="normal">enum<sp/>AppState<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>#[default]</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Menu,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>InGame,</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">App::new()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_state::&lt;AppState&gt;()</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(OnExit(AppState::Menu),<sp/>...)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(OnEnter(AppState::InGame),<sp/>...)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>.add_systems(</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Update,<sp/>(...).run_if(in_state(AppState::InGame)),</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">fn<sp/>menu(mut<sp/>next_state:<sp/>ResMut&lt;NextState&lt;AppState&gt;&gt;)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>if<sp/>... {</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>next_state.set(AppState::InGame);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">**Exemple<sp/>C++:**</highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">enum<sp/>AppState<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>Menu,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>InGame,</highlight></codeline>
+<codeline><highlight class="normal">};</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">App<sp/>app;</highlight></codeline>
+<codeline><highlight class="normal">app.add_state(AppState::Menu);</highlight></codeline>
+<codeline><highlight class="normal">app.add_systems(OnExit(AppState::Menu),<sp/>...);</highlight></codeline>
+<codeline><highlight class="normal">app.add_systems(OnEnter(AppState::Menu),<sp/>...);</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>app.add_systems(Update,<sp/>...,<sp/>run_if(?in_state(AppState::InGame)));</highlight></codeline>
+<codeline><highlight class="normal">/*<sp/>-&gt;<sp/>not<sp/>planned<sp/>*/</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">void<sp/>menu(Ressource&lt;NextState&lt;AppState&gt;&gt;&amp;<sp/>next_state)</highlight></codeline>
+<codeline><highlight class="normal">{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>if<sp/>(...)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>next_state.set(AppState::InGame);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>**GameEngine**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">App<sp/>superset<sp/>creating<sp/>the<sp/>default<sp/>ECS<sp/>App<sp/>and<sp/>adding</highlight></codeline>
+<codeline><highlight class="normal">plugins<sp/>to<sp/>control<sp/>bases,<sp/>holding<sp/>utilities<sp/>for<sp/>all<sp/>games</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">---</highlight></codeline>
+<codeline><highlight class="normal">**Ressources:**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Asset<sp/>Manager</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Global<sp/>Timer</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Font<sp/>Manager</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">**Components**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Position</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">**Default<sp/>Stages:**</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*At<sp/>Start:*</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>PreStartup</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Startup</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>PostStartup</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*Each<sp/>time<sp/>possible:*</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>First</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>PreUpdate</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>StateTransition<sp/>`//<sp/>Run<sp/>between<sp/>each<sp/>states<sp/>transition`</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>RunFixedUpdateLoop<sp/>`//This<sp/>will<sp/>run<sp/>FixedUpdate<sp/>zero<sp/>to<sp/>many<sp/>times,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>based<sp/>on<sp/>how<sp/>much<sp/>time<sp/>has<sp/>elapsed.`</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Update<sp/>`//<sp/>Default<sp/>Stage<sp/>when<sp/>adding<sp/>system`</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>PostUpdate</highlight></codeline>
+<codeline><highlight class="normal"><sp/>-<sp/>Last</highlight></codeline>
+    </programlisting>
+    <location file="docs/sphinx/source/compare.md"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="unittest__sparse__array_8cpp" kind="file" language="C++">
+    <compoundname>unittest_sparse_array.cpp</compoundname>
+    <includes local="no">criterion/criterion.h</includes>
+    <includes refid="sparse__array_8hpp" local="yes">../src/sparse_array.hpp</includes>
+    <incdepgraph>
+      <node id="3">
+        <label>../src/sparse_array.hpp</label>
+        <link refid="sparse__array_8hpp"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>test/unittest_sparse_array.cpp</label>
+        <link refid="unittest__sparse__array_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>criterion/criterion.h</label>
+      </node>
+      <node id="6">
+        <label>iostream</label>
+      </node>
+      <node id="5">
+        <label>optional</label>
+      </node>
+      <node id="4">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, constructors)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>constructors</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="5" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="5" bodyend="13"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a8079633c67cc2bbd1d8ad62c462979d3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, size)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>size</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="15" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="15" bodyend="20"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a90e0ff53e97383b91d15053d1cf533bb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, insert_at)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>insert_at</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="22" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="22" bodyend="36"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a41244786662c86ec53605e7da5c966b1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, erase)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>erase</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="38" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="38" bodyend="44"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a0bb27a03abc53c61807fac486d0d6443" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, get_index)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>get_index</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="46" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="46" bodyend="53"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1aa3c0dc4da61b3f629828f9cd691d9342" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void print_sparse</definition>
+        <argsstring>(sparse_array&lt; int &gt; arr)</argsstring>
+        <name>print_sparse</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref>&lt; int &gt;</type>
+          <declname>arr</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="55" column="6" bodyfile="test/unittest_sparse_array.cpp" bodystart="55" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a0df1bfe5f5c9e85241f9f06b7a3391d2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, insert)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>insert</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="62" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="62" bodyend="73"/>
+      </memberdef>
+      <memberdef kind="function" id="unittest__sparse__array_8cpp_1a7f113092617b5450b55971d76d6aff26" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>Test</definition>
+        <argsstring>(sparse_array, assignation_op)</argsstring>
+        <name>Test</name>
+        <param>
+          <type><ref refid="classsparse__array" kindref="compound">sparse_array</ref></type>
+        </param>
+        <param>
+          <type>assignation_op</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="test/unittest_sparse_array.cpp" line="75" column="1" bodyfile="test/unittest_sparse_array.cpp" bodystart="75" bodyend="86"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;criterion/criterion.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;../src/sparse_array.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>constructors)<sp/>{</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test<sp/>=<sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref>();</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>copy(test);</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>snd<sp/>=<sp/>std::move(test);</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>third;</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>fourth;</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/>third<sp/>=<sp/>test;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/>fourth<sp/>=<sp/>std::move(test);</highlight></codeline>
+<codeline lineno="13"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>size)<sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test.<ref refid="classsparse__array_1a5bbcaa7d68b3daf3d1cd6ebaa38c49c8" kindref="member">size</ref>()<sp/>==<sp/>0);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a7f6c1eb2166019cc32ee73e41e3b0560" kindref="member">resize</ref>(4);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test.<ref refid="classsparse__array_1a5bbcaa7d68b3daf3d1cd6ebaa38c49c8" kindref="member">size</ref>()<sp/>==<sp/>4);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>insert_at)<sp/>{</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(3,<sp/>4);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[3]<sp/>==<sp/>4);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[2]<sp/>==<sp/>std::nullopt);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/>test[2]<sp/>=<sp/>3;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[2]<sp/>==<sp/>3);</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[1]<sp/>==<sp/>std::nullopt);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[0]<sp/>==<sp/>std::nullopt);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>initial<sp/>=<sp/>8;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(5,<sp/>initial);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/>test[5]<sp/>=<sp/>7;</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[5]<sp/>==<sp/>7);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(initial<sp/>==<sp/>8);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>erase)<sp/>{</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(3,<sp/>4);</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[3]<sp/>==<sp/>4);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a805a005b32bd9e3006935f6137643ffb" kindref="member">erase</ref>(3);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[3]<sp/>==<sp/>std::nullopt);</highlight></codeline>
+<codeline lineno="44"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>get_index)<sp/>{</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>var<sp/>=<sp/>3;</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(2,<sp/>var);</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[2]<sp/>==<sp/>3);</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test.<ref refid="classsparse__array_1a16f536c4d613461e6dcc16a6bc668301" kindref="member">get_index</ref>(var).has_value()<sp/>==<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test.<ref refid="classsparse__array_1a16f536c4d613461e6dcc16a6bc668301" kindref="member">get_index</ref>(*(test.<ref refid="classsparse__array_1a4bc6c7de1804d3baf4b50c283cb8d9ef" kindref="member">begin</ref>()<sp/>+<sp/>1)).value()<sp/>==<sp/>1);</highlight></codeline>
+<codeline lineno="53"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="unittest__sparse__array_8cpp_1aa3c0dc4da61b3f629828f9cd691d9342" kindref="member">print_sparse</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>arr)<sp/>{</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">auto</highlight><highlight class="normal">&amp;<sp/>elm<sp/>:<sp/>arr)<sp/>{</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>elm.value_or(-1)<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;,<sp/>&quot;</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>insert)<sp/>{</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(2,<sp/>3);</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(4,<sp/>2);</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1a4a51887e0990fe78855505815f0a61d9" kindref="member">insert_at</ref>(3,<sp/>5);</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(1<sp/>==<sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(1));</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(4<sp/>==<sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(4));</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pr<sp/>=<sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(6).value_or(100);</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(6<sp/>==<sp/>pr);</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>&amp;fst<sp/>=<sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(7);</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(6<sp/>==<sp/>test.<ref refid="classsparse__array_1a16f536c4d613461e6dcc16a6bc668301" kindref="member">get_index</ref>(fst).value());</highlight></codeline>
+<codeline lineno="73"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><ref refid="unittest__sparse__array_8cpp_1a9cae774b75cc66f6adabdcdab303398d" kindref="member">Test</ref>(<ref refid="classsparse__array" kindref="compound">sparse_array</ref>,<sp/>assignation_op)<sp/>{</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(1);</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(2);</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(3);</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/>test.<ref refid="classsparse__array_1aa58d33a6f467121a202cf1d912b17dc2" kindref="member">insert</ref>(4);</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classsparse__array" kindref="compound">sparse_array&lt;int&gt;</ref><sp/>test2<sp/>=<sp/>test;</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[2]<sp/>==<sp/>3);</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/>test[2]<sp/>=<sp/>8;</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test[2]<sp/>==<sp/>8);</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/>cr_assert(test2[2]<sp/>==<sp/>3);</highlight></codeline>
+<codeline lineno="86"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"></highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="89"><highlight class="comment">Test(sparse_array,<sp/>get)<sp/>{</highlight></codeline>
+<codeline lineno="90"><highlight class="comment"><sp/><sp/><sp/><sp/>sparse_array&lt;int&gt;<sp/>test;</highlight></codeline>
+<codeline lineno="91"><highlight class="comment"><sp/><sp/><sp/><sp/>test[1]<sp/>=<sp/>3;</highlight></codeline>
+<codeline lineno="92"><highlight class="comment"><sp/><sp/><sp/><sp/>cr_assert(test[1]<sp/>==<sp/>3);</highlight></codeline>
+<codeline lineno="93"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="94"><highlight class="comment"></highlight></codeline>
+<codeline lineno="95"><highlight class="comment">Test(sparse_array,<sp/>begin)<sp/>{</highlight></codeline>
+<codeline lineno="96"><highlight class="comment"><sp/><sp/><sp/><sp/>sparse_array&lt;int&gt;<sp/>test;</highlight></codeline>
+<codeline lineno="97"><highlight class="comment"><sp/><sp/><sp/><sp/>test.begin();</highlight></codeline>
+<codeline lineno="98"><highlight class="comment"><sp/><sp/><sp/><sp/>test.cbegin();</highlight></codeline>
+<codeline lineno="99"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="100"><highlight class="comment"></highlight></codeline>
+<codeline lineno="101"><highlight class="comment">Test(sparse_array,<sp/>end)<sp/>{</highlight></codeline>
+<codeline lineno="102"><highlight class="comment"><sp/><sp/><sp/><sp/>sparse_array&lt;int&gt;<sp/>test;</highlight></codeline>
+<codeline lineno="103"><highlight class="comment"><sp/><sp/><sp/><sp/>test.end();</highlight></codeline>
+<codeline lineno="104"><highlight class="comment"><sp/><sp/><sp/><sp/>test.cend();</highlight></codeline>
+<codeline lineno="105"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="106"><highlight class="comment"></highlight></codeline>
+<codeline lineno="107"><highlight class="comment">*/</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="test/unittest_sparse_array.cpp"/>
+  </compounddef>
+</doxygen>

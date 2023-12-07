@@ -1,0 +1,316 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="classMyLibrary_1_1Example" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>MyLibrary::Example</compoundname>
+    <derivedcompoundref refid="classMyLibrary_1_1SubclassExample" prot="public" virt="non-virtual">MyLibrary::SubclassExample&lt; TemplatedClass &gt;</derivedcompoundref>
+    <includes refid="example_8hpp" local="no">example.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classMyLibrary_1_1Example_1a1c0046b0674eb4cad09c5d3e943912b8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string MyLibrary::Example::test</definition>
+        <argsstring>(const std::string &amp;test)</argsstring>
+        <name>test</name>
+        <qualifiedname>MyLibrary::Example::test</qualifiedname>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>test</declname>
+        </param>
+        <briefdescription>
+<para>brief summary </para>
+        </briefdescription>
+        <detaileddescription>
+<para>doxygen test documentation</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>test</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>this is the only parameter of this test function. It does nothing!</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+<sect1 id="classMyLibrary_1_1Example_1autotoc_md22">
+<title>Supported elements</title>
+<para>These elements have been tested with the custom CSS.</para>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md23">
+<title>Tables</title>
+<para></para>
+<para><itemizedlist>
+<listitem><para><bold>Basic</bold> This theme supports normal markdown tables:<linebreak/>
+ <table rows="4" cols="4"><row>
+<entry thead="yes" align='right'><para>Item   </para>
+</entry><entry thead="yes"><para>Title   </para>
+</entry><entry thead="yes"><para>Description   </para>
+</entry><entry thead="yes"><para>More    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>1   </para>
+</entry><entry thead="no"><para>Foo   </para>
+</entry><entry thead="no"><para>A placeholder   </para>
+</entry><entry thead="no"><para>Some lorem ipsum to make this table wider.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>2   </para>
+</entry><entry thead="no"><para>Bar   </para>
+</entry><entry thead="no"><para>Also a placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>3   </para>
+</entry><entry thead="no"><para>Baz   </para>
+</entry><entry thead="no"><para>The third placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.   </para>
+</entry></row>
+</table>
+</para>
+</listitem><listitem><para><bold>Centered</bold> <center> A table can be centered with the <computeroutput>&lt;center&gt;</computeroutput> html tag:<linebreak/>
+ <table rows="4" cols="4"><row>
+<entry thead="yes" align='right'><para>Item   </para>
+</entry><entry thead="yes"><para>Title   </para>
+</entry><entry thead="yes"><para>Description   </para>
+</entry><entry thead="yes"><para>More    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>1   </para>
+</entry><entry thead="no"><para>Foo   </para>
+</entry><entry thead="no"><para>A placeholder   </para>
+</entry><entry thead="no"><para>Some lorem ipsum to make this table wider.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>2   </para>
+</entry><entry thead="no"><para>Bar   </para>
+</entry><entry thead="no"><para>Also a placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>3   </para>
+</entry><entry thead="no"><para>Baz   </para>
+</entry><entry thead="no"><para>The third placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.   </para>
+</entry></row>
+</table>
+</center></para>
+</listitem><listitem><para><bold>Stretched</bold> A table wrapped in <computeroutput>&lt;div class=&quot;full_width_table&quot;&gt;</computeroutput> fills the full page width.  <table rows="4" cols="4"><row>
+<entry thead="yes" align='right'><para>Item   </para>
+</entry><entry thead="yes"><para>Title   </para>
+</entry><entry thead="yes"><para>Description   </para>
+</entry><entry thead="yes"><para>More    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>1   </para>
+</entry><entry thead="no"><para>Foo   </para>
+</entry><entry thead="no"><para>A placeholder   </para>
+</entry><entry thead="no"><para>Some lorem ipsum to make this table wider.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>2   </para>
+</entry><entry thead="no"><para>Bar   </para>
+</entry><entry thead="no"><para>Also a placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>3   </para>
+</entry><entry thead="no"><para>Baz   </para>
+</entry><entry thead="no"><para>The third placeholder   </para>
+</entry><entry thead="no"><para>More lorem ipsum.   </para>
+</entry></row>
+</table>
+ <bold>Caution</bold>: This will break the overflow scrolling support!</para>
+</listitem><listitem><para><bold>Complex</bold> Complex <ulink url="https://www.doxygen.nl/manual/tables.html">Doxygen tables</ulink> are also supported as seen in <ref refid="classMyLibrary_1_1Example_1multi_row" kindref="member">this example</ref>:<linebreak/>
+ <table rows="4" cols="3"><caption id="classMyLibrary_1_1Example_1multi_row">Complex table</caption>
+<row>
+<entry thead="yes"><para>Column 1 </para>
+</entry><entry thead="yes"><para>Column 2 </para>
+</entry><entry thead="yes"><para>Column 3 </para>
+</entry></row>
+<row>
+<entry thead="no" rowspan="2"><para>cell row=1+2,col=1</para>
+</entry><entry thead="no"><para>cell row=1,col=2</para>
+</entry><entry thead="no"><para>cell row=1,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no" rowspan="2"><para>cell row=2+3,col=2 </para>
+</entry><entry thead="no"><para>cell row=2,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=3,col=1 </para>
+</entry><entry thead="no"><para>cell row=3,col=3 </para>
+</entry></row>
+</table>
+</para>
+</listitem><listitem><para><bold>Overflow Scrolling</bold> The table content is scrollable if the table gets too wide.<linebreak/>
+ <table rows="2" cols="9"><row>
+<entry thead="yes"><para>first_column   </para>
+</entry><entry thead="yes"><para>second_column   </para>
+</entry><entry thead="yes"><para>third_column   </para>
+</entry><entry thead="yes"><para>fourth_column   </para>
+</entry><entry thead="yes"><para>fifth_column   </para>
+</entry><entry thead="yes"><para>sixth_column   </para>
+</entry><entry thead="yes"><para>seventh_column   </para>
+</entry><entry thead="yes"><para>eighth_column   </para>
+</entry><entry thead="yes"><para>ninth_column    </para>
+</entry></row>
+<row>
+<entry thead="no"><para>1   </para>
+</entry><entry thead="no"><para>2   </para>
+</entry><entry thead="no"><para>3   </para>
+</entry><entry thead="no"><para>4   </para>
+</entry><entry thead="no"><para>5   </para>
+</entry><entry thead="no"><para>6   </para>
+</entry><entry thead="no"><para>7   </para>
+</entry><entry thead="no"><para>8   </para>
+</entry><entry thead="no"><para>9   </para>
+</entry></row>
+</table>
+</para>
+</listitem><listitem><para><bold>Images</bold>A table can contain images:<linebreak/>
+ <table rows="2" cols="2"><row>
+<entry thead="yes"><para>Column 1   </para>
+</entry><entry thead="yes"><para>Column 2    </para>
+</entry></row>
+<row>
+<entry thead="no"><para><image type="html" name="testimage.png" alt="doxygen" inline="yes"></image>
+   </para>
+</entry><entry thead="no"><para>← the image should not be inverted in dark-mode   </para>
+</entry></row>
+</table>
+</para>
+</listitem></itemizedlist>
+</para>
+<para></para>
+</sect2>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md24">
+<title>Diagrams</title>
+<para>Graphviz diagrams support dark mode and can be scrolled once they get too wide:</para>
+<para><dot caption="Graphviz with a caption">
+ digraph example {
+     node [fontsize=&quot;12&quot;];
+     rankdir=&quot;LR&quot;
+     a -&gt; b -&gt; c -&gt; d -&gt; e -&gt; f -&gt; g -&gt; h -&gt; i -&gt; j -&gt; k;
+ }
+ </dot>
+</para>
+</sect2>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md25">
+<title>Lists</title>
+<para><itemizedlist>
+<listitem><para>element 1</para>
+</listitem><listitem><para>element 2</para>
+</listitem></itemizedlist>
+<orderedlist>
+<listitem><para>element 1 <programlisting><codeline><highlight class="normal">code<sp/>in<sp/>lists</highlight></codeline>
+</programlisting></para>
+</listitem><listitem><para>element 2</para>
+</listitem></orderedlist>
+</para>
+</sect2>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md26">
+<title>Quotes</title>
+<para><blockquote><para><zwj/>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque viverra. Velit sed ullamcorper morbi tincidunt ornare.</para>
+<para>Lorem ipsum dolor sit amet consectetur adipiscing elit duis. </para>
+</blockquote><emphasis>- jothepro</emphasis></para>
+</sect2>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md27">
+<title>Code block</title>
+<para><programlisting filename=".cpp"><codeline><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>x<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;code<sp/>within<sp/>md<sp/>fences&quot;</highlight><highlight class="normal">;</highlight></codeline>
+</programlisting></para>
+<para><programlisting filename=".cpp"><codeline><highlight class="comment">//<sp/>code<sp/>within<sp/>@code<sp/>block</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordflow">while</highlight><highlight class="normal">(</highlight><highlight class="keyword">true</highlight><highlight class="normal">)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>example<sp/>=<sp/>std::make_shared&lt;Example&gt;(5);</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/>example-&gt;test(</highlight><highlight class="stringliteral">&quot;test&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <verbatim>// code within indented code block
+auto test = std::shared_ptr&lt;Example(5);
+</verbatim></para>
+<para>Inline <computeroutput>code</computeroutput> elements in a text. <emphasis>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</emphasis> This also works within multiline text and does not break the <computeroutput>layout</computeroutput>.</para>
+</sect2>
+<sect2 id="classMyLibrary_1_1Example_1autotoc_md28">
+<title>Special hints</title>
+<para><simplesect kind="warning"><para>this is a warning only for demonstration purposes</para>
+</simplesect>
+<simplesect kind="note"><para>this is a note to show that notes work. They can also include <computeroutput>code</computeroutput>: <programlisting filename=".c"><codeline><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>this_looks_awesome();</highlight></codeline>
+</programlisting></para>
+</simplesect>
+<xrefsect id="bug_1_bug000001"><xreftitle>Bug</xreftitle><xrefdescription><para>example bug</para>
+</xrefdescription></xrefsect></para>
+<para><xrefsect id="deprecated_1_deprecated000001"><xreftitle>Deprecated</xreftitle><xrefdescription><para>None of this will be deprecated, because it&apos;s beautiful!</para>
+</xrefdescription></xrefsect></para>
+<para><simplesect kind="invariant"><para>This is an invariant</para>
+</simplesect>
+<simplesect kind="pre"><para>This is a precondition</para>
+</simplesect>
+<simplesect kind="post"><para>This is a postcondition</para>
+</simplesect>
+<xrefsect id="todo_1_todo000001"><xreftitle>Todo</xreftitle><xrefdescription><para>This theme is never finished!</para>
+</xrefdescription></xrefsect></para>
+<para><simplesect kind="remark"><para>This is awesome! </para>
+</simplesect>
+</para>
+</sect2>
+</sect1>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="155" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classMyLibrary_1_1Example_1a8431ef1c10c4e2a36302b8e8556514f6" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>int</type>
+        <definition>virtual int MyLibrary::Example::virtualfunc</definition>
+        <argsstring>()=0</argsstring>
+        <name>virtualfunc</name>
+        <qualifiedname>MyLibrary::Example::virtualfunc</qualifiedname>
+        <reimplementedby refid="classMyLibrary_1_1SubclassExample_1a08668a9f16511ad37fb547c985d62764">virtualfunc</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="157" column="17"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classMyLibrary_1_1Example_1a8c3ea5ce33b9e1fada7ff46eab0956a7" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool MyLibrary::Example::staticfunc</definition>
+        <argsstring>()</argsstring>
+        <name>staticfunc</name>
+        <qualifiedname>MyLibrary::Example::staticfunc</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="159" column="17"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para><ref refid="classMyLibrary_1_1Example" kindref="compound">Example</ref> class to demonstrate the features of the custom CSS. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><simplesect kind="author"><para>jothepro </para>
+</simplesect>
+</para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>MyLibrary::Example</label>
+        <link refid="classMyLibrary_1_1Example"/>
+      </node>
+      <node id="2">
+        <label>MyLibrary::SubclassExample&lt; TemplatedClass &gt;</label>
+        <link refid="classMyLibrary_1_1SubclassExample"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="14" column="1" bodyfile="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" bodystart="14" bodyend="162"/>
+    <listofallmembers>
+      <member refid="classMyLibrary_1_1Example_1a8c3ea5ce33b9e1fada7ff46eab0956a7" prot="public" virt="non-virtual"><scope>MyLibrary::Example</scope><name>staticfunc</name></member>
+      <member refid="classMyLibrary_1_1Example_1a1c0046b0674eb4cad09c5d3e943912b8" prot="public" virt="non-virtual"><scope>MyLibrary::Example</scope><name>test</name></member>
+      <member refid="classMyLibrary_1_1Example_1a8431ef1c10c4e2a36302b8e8556514f6" prot="public" virt="pure-virtual"><scope>MyLibrary::Example</scope><name>virtualfunc</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

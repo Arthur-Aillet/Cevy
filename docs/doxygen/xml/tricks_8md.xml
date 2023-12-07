@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="tricks_8md" kind="file" language="Markdown">
+    <compoundname>tricks.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>Tips<sp/>&amp;<sp/>Tricks</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">[TOC]</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Diagrams<sp/>with<sp/>Graphviz<sp/>{#tricks-graphviz}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">To<sp/>get<sp/>the<sp/>best-looking<sp/>class<sp/>diagrams<sp/>for<sp/>your<sp/>documentation,<sp/>generate<sp/>them<sp/>with<sp/>Graphviz<sp/>as<sp/>vector<sp/>graphics<sp/>with<sp/>transparent<sp/>background:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">#<sp/>Doxyfile</highlight></codeline>
+<codeline><highlight class="normal">HAVE_DOT<sp/>=<sp/>YES</highlight></codeline>
+<codeline><highlight class="normal">DOT_IMAGE_FORMAT<sp/>=<sp/>svg</highlight></codeline>
+<codeline><highlight class="normal">DOT_TRANSPARENT<sp/>=<sp/>YES</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">In<sp/>case<sp/>`INTERACTIVE_SVG<sp/>=<sp/>YES`<sp/>is<sp/>set<sp/>in<sp/>the<sp/>Doxyfile,<sp/>all<sp/>user-defined<sp/>dotgraphs<sp/>must<sp/>be<sp/>wrapped<sp/>with<sp/>the<sp/>`interactive_dotgraph`<sp/>CSS<sp/>class<sp/>for<sp/>them<sp/>to<sp/>be<sp/>rendered<sp/>correctly:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```md</highlight></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;interactive_dotgraph&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">\dotfile<sp/>graph.dot</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">@note<sp/>Both<sp/>the<sp/>default<sp/>overflow<sp/>scrolling<sp/>behavior<sp/>in<sp/>this<sp/>theme<sp/>and<sp/>the<sp/>interactive<sp/>editor<sp/>enabled<sp/>by<sp/>`INTERACTIVE_SVG`<sp/>are<sp/>unsatisfying<sp/>workarounds<sp/>IMHO.<sp/>Consider<sp/>designing<sp/>your<sp/>graphs<sp/>to<sp/>be<sp/>narrow<sp/>enough<sp/>to<sp/>fit<sp/>the<sp/>page<sp/>to<sp/>avoid<sp/>scrolling.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Disable<sp/>Dark<sp/>Mode<sp/>{#tricks-darkmode}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">If<sp/>you<sp/>don&apos;t<sp/>want<sp/>the<sp/>theme<sp/>to<sp/>automatically<sp/>switch<sp/>to<sp/>dark<sp/>mode<sp/>depending<sp/>on<sp/>the<sp/>browser<sp/>preference,</highlight></codeline>
+<codeline><highlight class="normal">you<sp/>can<sp/>disable<sp/>dark<sp/>mode<sp/>by<sp/>adding<sp/>the<sp/>`light-mode`<sp/>class<sp/>to<sp/>the<sp/>HTML<sp/>tag<sp/>in<sp/>the<sp/>header<sp/>template:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```html</highlight></codeline>
+<codeline><highlight class="normal">&lt;html<sp/>xmlns=&quot;http://www.w3.org/1999/xhtml&quot;<sp/>class=&quot;light-mode&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">The<sp/>same<sp/>can<sp/>be<sp/>done<sp/>to<sp/>always<sp/>enable<sp/>dark<sp/>mode:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```html</highlight></codeline>
+<codeline><highlight class="normal">&lt;html<sp/>xmlns=&quot;http://www.w3.org/1999/xhtml&quot;<sp/>class=&quot;dark-mode&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">@warning<sp/>This<sp/>only<sp/>works<sp/>if<sp/>you<sp/>don&apos;t<sp/>use<sp/>the<sp/>dark-mode<sp/>toggle<sp/>extension.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Choosing<sp/>Sidebar<sp/>Width<sp/>{#tricks-sidebar}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">If<sp/>you<sp/>have<sp/>enabled<sp/>the<sp/>sidebar-only<sp/>theme<sp/>variant,<sp/>make<sp/>sure<sp/>to<sp/>carefully<sp/>choose<sp/>a<sp/>proper<sp/>width<sp/>for<sp/>your<sp/>sidebar.</highlight></codeline>
+<codeline><highlight class="normal">It<sp/>should<sp/>be<sp/>wide<sp/>enough<sp/>to<sp/>hold<sp/>the<sp/>icon,<sp/>project<sp/>title<sp/>and<sp/>version<sp/>number.<sp/>If<sp/>the<sp/>content<sp/>is<sp/>too<sp/>wide,<sp/>it<sp/>will<sp/>be</highlight></codeline>
+<codeline><highlight class="normal">cut<sp/>off.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```css</highlight></codeline>
+<codeline><highlight class="normal">html<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>/*<sp/>Make<sp/>sure<sp/>sidebar<sp/>is<sp/>wide<sp/>enough<sp/>to<sp/>contain<sp/>the<sp/>page<sp/>title<sp/>(logo<sp/>+<sp/>title<sp/>+<sp/>version)<sp/>*/</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>--side-nav-fixed-width:<sp/>335px;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">The<sp/>chosen<sp/>width<sp/>should<sp/>also<sp/>be<sp/>set<sp/>in<sp/>the<sp/>Doxyfile:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">#<sp/>Doxyfile</highlight></codeline>
+<codeline><highlight class="normal">TREEVIEW_WIDTH<sp/>=<sp/>335</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Formatting<sp/>Tables<sp/>{#tricks-tables}</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">By<sp/>default<sp/>tables<sp/>in<sp/>this<sp/>theme<sp/>are<sp/>left-aligned<sp/>and<sp/>as<sp/>wide<sp/>as<sp/>required<sp/>to<sp/>fit<sp/>their<sp/>content.</highlight></codeline>
+<codeline><highlight class="normal">Those<sp/>properties<sp/>can<sp/>be<sp/>changed<sp/>for<sp/>individual<sp/>tables.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Centering</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Tables<sp/>can<sp/>be<sp/>centered<sp/>by<sp/>wrapping<sp/>them<sp/>in<sp/>the<sp/>`&lt;center&gt;`<sp/>HTML<sp/>tag.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;tabbed&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;span<sp/>class=&quot;tab-title&quot;&gt;Code&lt;/span&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```md</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;center&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>This<sp/>table<sp/>|<sp/>is<sp/>centered<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|------------|----------------------|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>1<sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>2<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/center&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;span<sp/>class=&quot;tab-title&quot;&gt;Result&lt;/span&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;center&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>This<sp/>table<sp/>|<sp/>is<sp/>centered<sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|------------|----------------------|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>1<sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>2<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/center&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Full<sp/>Width</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">To<sp/>make<sp/>tables<sp/>span<sp/>the<sp/>full<sp/>width<sp/>of<sp/>the<sp/>page,<sp/>no<sp/>matter<sp/>how<sp/>wide<sp/>the<sp/>content<sp/>is,<sp/>wrap<sp/>the<sp/>table<sp/>in<sp/>the<sp/>`full_width_table`<sp/>CSS<sp/>class.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">@warning<sp/>Apply<sp/>with<sp/>caution!<sp/>This<sp/>breaks<sp/>the<sp/>overflow<sp/>scrolling<sp/>of<sp/>the<sp/>table.<sp/>Content<sp/>might<sp/>be<sp/>cut<sp/>off<sp/>on<sp/>small<sp/>screens!</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;tabbed&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;span<sp/>class=&quot;tab-title&quot;&gt;Code&lt;/span&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```md</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;div<sp/>class=&quot;full_width_table&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>This<sp/>table<sp/>|<sp/>spans<sp/>the<sp/>full<sp/>width<sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|------------|----------------------|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>1<sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>2<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/div&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>```</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>&lt;span<sp/>class=&quot;tab-title&quot;&gt;Result&lt;/span&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;div<sp/>class=&quot;full_width_table&quot;&gt;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>This<sp/>table<sp/>|<sp/>spans<sp/>the<sp/>full<sp/>width<sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|------------|----------------------|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>1<sp/><sp/><sp/><sp/><sp/>|<sp/>test<sp/>2<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>&lt;/div&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;div<sp/>class=&quot;section_buttons&quot;&gt;</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">|<sp/>Previous<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Next<sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|:----------------------------------|---------------------------------------:|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>[Customization](customization.md)<sp/>|<sp/>[Example](https://jothepro.github.io/doxygen-awesome-css/class_my_library_1_1_example.html)<sp/>|</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&lt;/div&gt;</highlight></codeline>
+    </programlisting>
+    <location file="docs/doxygen/doxygen-awesome-css/docs/tricks.md"/>
+  </compounddef>
+</doxygen>

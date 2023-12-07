@@ -39,5 +39,3 @@ lib/*
 build
 lib
 bin
-docs/doxygen/*
-!docs/doxygen/.gitkeep

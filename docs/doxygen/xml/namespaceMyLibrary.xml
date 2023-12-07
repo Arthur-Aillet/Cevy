@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="namespaceMyLibrary" kind="namespace" language="C++">
+    <compoundname>MyLibrary</compoundname>
+    <innerclass refid="classMyLibrary_1_1Example" prot="public">MyLibrary::Example</innerclass>
+    <innerclass refid="classMyLibrary_1_1SecondExample" prot="public">MyLibrary::SecondExample</innerclass>
+    <innerclass refid="classMyLibrary_1_1SubclassExample" prot="public">MyLibrary::SubclassExample</innerclass>
+      <sectiondef kind="enum">
+      <memberdef kind="enum" id="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ced" prot="public" static="no" strong="no">
+        <type></type>
+        <name>Color</name>
+        <qualifiedname>MyLibrary::Color</qualifiedname>
+        <enumvalue id="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda82b4a54f6fbf39698c2a6982d75f4f0c" prot="public">
+          <name>red</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e" prot="public">
+          <name>green</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceMyLibrary_1a79a9f4bbb675f6c082b09249c5a95ceda3d4a113e58853e5d81725d92fbfceb4d" prot="public">
+          <name>blue</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="6" column="1" bodyfile="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" bodystart="6" bodyend="6"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="docs/doxygen/doxygen-awesome-css/include/MyLibrary/example.hpp" line="4" column="1"/>
+  </compounddef>
+</doxygen>

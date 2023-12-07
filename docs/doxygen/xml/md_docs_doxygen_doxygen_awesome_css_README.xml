@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="md_docs_doxygen_doxygen_awesome_css_README" kind="page">
+    <compoundname>md_docs_doxygen_doxygen_awesome_css_README</compoundname>
+    <title>Doxygen Awesome</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ulink url="https://github.com/jothepro/doxygen-awesome-css/releases/latest"><image type="html" name="https://img.shields.io/github/v/release/jothepro/doxygen-awesome-css" alt="GitHub release (latest by date)" inline="yes"></image>
+</ulink> <ulink url="https://github.com/jothepro/doxygen-awesome-css/blob/main/LICENSE"><image type="html" name="https://img.shields.io/github/license/jothepro/doxygen-awesome-css" alt="GitHub" inline="yes"></image>
+</ulink> <image type="html" name="https://img.shields.io/github/stars/jothepro/doxygen-awesome-css" alt="GitHub Repo stars" inline="yes"></image>
+</para>
+<para></para>
+<para><image type="html" name="img/screenshot.png" alt="Screenshot of Doxygen Awesome CSS" inline="yes"></image>
+</para>
+<para></para>
+<para><bold>Doxygen Awesome</bold> is a custom CSS theme for Doxygen HTML documentation with lots of customization parameters.</para>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md30">
+<title>Motivation</title>
+<para>I really like how the Doxygen HTML documentation is structured! But IMHO it looks a bit outdated.</para>
+<para>This theme is an attempt to update the visuals of Doxygen without changing its overall layout too much.</para>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md31">
+<title>Features</title>
+<para><itemizedlist>
+<listitem><para>🌈 Clean, modern design</para>
+</listitem><listitem><para>🚀 Heavily customizable by adjusting CSS variables</para>
+</listitem><listitem><para>🧩 No changes to the HTML structure of Doxygen are required</para>
+</listitem><listitem><para>📱 Improved mobile usability</para>
+</listitem><listitem><para>🌘 Dark mode support!</para>
+</listitem><listitem><para>🥇 Works best with <bold>doxygen 1.9.1</bold> - <bold>1.9.4</bold> and <bold>1.9.6</bold> - <bold>1.9.8</bold></para>
+</listitem></itemizedlist>
+</para>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md32">
+<title>Examples</title>
+<para>Some websites using this theme:</para>
+<para><itemizedlist>
+<listitem><para><ulink url="https://jothepro.github.io/doxygen-awesome-css/">Documentation of this repository</ulink></para>
+</listitem><listitem><para><ulink url="https://docs.wxwidgets.org/3.2/">wxWidgets</ulink></para>
+</listitem><listitem><para><ulink url="https://docs.opencv.org/5.x/">OpenCV 5.x</ulink></para>
+</listitem><listitem><para><ulink url="https://docs.zephyrproject.org/latest/doxygen/html/index.html">Zephyr</ulink></para>
+</listitem><listitem><para><ulink url="https://mwiesenberger.github.io/feltor/dg/html/modules.html">FELTOR</ulink></para>
+</listitem><listitem><para><ulink url="https://leomccormack.github.io/Spatial_Audio_Framework/index.html">Spatial Audio Framework (SAF)</ulink></para>
+</listitem><listitem><para><ulink url="https://jothepro.github.io/libCloudSync/">libCloudSync</ulink></para>
+</listitem><listitem><para><ulink url="https://a4z.github.io/libsl3/">libsl3</ulink></para>
+</listitem></itemizedlist>
+</para>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md33">
+<title>Installation</title>
+<para>To use the theme when generating your documentation, bring the required CSS and JS files from this repository into your project.</para>
+<para>This can be done in several ways:</para>
+<para><itemizedlist>
+<listitem><para>manually copying the files</para>
+</listitem><listitem><para>adding the project as a Git submodule</para>
+</listitem><listitem><para>adding the project as a npm/xpm dependency</para>
+</listitem><listitem><para>installing the theme system-wide</para>
+</listitem></itemizedlist>
+</para>
+<para>All theme files are located in the root of this repository and start with the prefix <computeroutput>doxygen-awesome-</computeroutput>. You may not need all of them. Follow the install instructions to figure out what files are required for your setup.</para>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md34">
+<title>Git submodule</title>
+<para>For projects that use git, add the repository as a submodule and check out the desired release:</para>
+<para><programlisting filename=".sh"><codeline><highlight class="normal">git<sp/>submodule<sp/>add<sp/>https://github.com/jothepro/doxygen-awesome-css.git</highlight></codeline>
+<codeline><highlight class="normal">cd<sp/>doxygen-awesome-css</highlight></codeline>
+<codeline><highlight class="normal">git<sp/>checkout<sp/>v2.3.1</highlight></codeline>
+</programlisting></para>
+</sect2>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md35">
+<title>npm/xpm dependency</title>
+<para>In the npm ecosystem, this project can be added as a development dependency to your project:</para>
+<para><programlisting filename=".sh"><codeline><highlight class="normal">cd<sp/>your-project</highlight></codeline>
+<codeline><highlight class="normal">npm<sp/>install<sp/>https://github.com/jothepro/doxygen-awesome-css#v2.3.1<sp/>--save-dev</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">ls<sp/>-l<sp/>node_module/@jothepro/doxygen-awesome-css</highlight></codeline>
+</programlisting></para>
+<para>Similarly, in the <ulink url="https://xpack.github.io">xPack</ulink> ecosystem, this project can be added as a development dependency to an <ulink url="https://xpack.github.io/xpm/"><computeroutput>xpm</computeroutput></ulink> managed project.</para>
+</sect2>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md36">
+<title>System-wide</title>
+<para>You can even install the theme system-wide by running <computeroutput>make install</computeroutput>. The files will be installed to <computeroutput>/usr/local/share/</computeroutput> by default, but you can customize the install location with <computeroutput>make PREFIX=/my/custom/path install</computeroutput>.</para>
+</sect2>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md37">
+<title>Choosing a layout</title>
+<para>There are two layout options. Choose one of them and configure Doxygen accordingly:</para>
+<para></para>
+<para><itemizedlist>
+<listitem><para><bold>Base Theme</bold> <image type="html" name="img/theme-variants-base.drawio.svg" inline="yes"></image>
+  Comes with the typical Doxygen titlebar. Optionally the treeview in the sidebar can be enabled.</para>
+<para>Required files: <computeroutput>doxygen-awesome.css</computeroutput></para>
+<para>Required <computeroutput>Doxyfile</computeroutput> configuration: <programlisting><codeline><highlight class="normal">GENERATE_TREEVIEW<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>YES<sp/>#<sp/>optional.<sp/>Also<sp/>works<sp/>without<sp/>treeview</highlight></codeline>
+<codeline><highlight class="normal">DISABLE_INDEX<sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal">FULL_SIDEBAR<sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal">HTML_EXTRA_STYLESHEET<sp/><sp/>=<sp/>doxygen-awesome-css/doxygen-awesome.css</highlight></codeline>
+<codeline><highlight class="normal">HTML_COLORSTYLE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>LIGHT<sp/>#<sp/>required<sp/>with<sp/>Doxygen<sp/>&gt;=<sp/>1.9.5</highlight></codeline>
+</programlisting></para>
+</listitem><listitem><para><bold>Sidebar-Only Theme</bold> <image type="html" name="img/theme-variants-sidebar-only.drawio.svg" inline="yes"></image>
+  Hides the top titlebar to give more space to the content. The treeview must be enabled in order for this theme to work.</para>
+<para>Required files: <computeroutput>doxygen-awesome.css</computeroutput>, <computeroutput>doxygen-awesome-sidebar-only.css</computeroutput></para>
+<para>Required <computeroutput>Doxyfile</computeroutput> configuration: <programlisting><codeline><highlight class="normal">GENERATE_TREEVIEW<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>YES<sp/>#<sp/>required!</highlight></codeline>
+<codeline><highlight class="normal">DISABLE_INDEX<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal">FULL_SIDEBAR<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>NO</highlight></codeline>
+<codeline><highlight class="normal">HTML_EXTRA_STYLESHEET<sp/><sp/>=<sp/>doxygen-awesome-css/doxygen-awesome.css<sp/>\</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>doxygen-awesome-css/doxygen-awesome-sidebar-only.css</highlight></codeline>
+<codeline><highlight class="normal">HTML_COLORSTYLE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>LIGHT<sp/>#<sp/>required<sp/>with<sp/>Doxygen<sp/>&gt;=<sp/>1.9.5</highlight></codeline>
+</programlisting></para>
+</listitem></itemizedlist>
+</para>
+<para></para>
+<para><linebreak/>
+</para>
+<para><simplesect kind="warning"><para><itemizedlist>
+<listitem><para>This theme is not compatible with the <computeroutput>FULL_SIDEBAR = YES</computeroutput> option provided by Doxygen!</para>
+</listitem><listitem><para><computeroutput>HTML_COLORSTYLE</computeroutput> must be set to <computeroutput>LIGHT</computeroutput> since Doxygen 1.9.5!</para>
+</listitem></itemizedlist>
+</para>
+</simplesect>
+</para>
+</sect2>
+<sect2 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md38">
+<title>Further installation instructions</title>
+<para><itemizedlist>
+<listitem><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_extensions" kindref="compound">Installing extensions</ref></para>
+</listitem><listitem><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_customization" kindref="compound">Customizing the theme (colors, spacing, border-radius, ...)</ref></para>
+</listitem><listitem><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_tricks" kindref="compound">Tips and Tricks for further configuration</ref></para>
+</listitem></itemizedlist>
+</para>
+</sect2>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md39">
+<title>Browser support</title>
+<para>Tested with</para>
+<para><itemizedlist>
+<listitem><para>Chrome 119, Chrome 119 for Android, Chrome 119 for iOS</para>
+</listitem><listitem><para>Safari 17, Safari for iOS 16</para>
+</listitem><listitem><para>Firefox 118, Firefox 120 for Android, Firefox 119 for iOS</para>
+</listitem><listitem><para>Edge 119</para>
+</listitem></itemizedlist>
+</para>
+<para>The theme does not strive to be backward compatible with (significantly) older browser versions.</para>
+</sect1>
+<sect1 id="md_docs_doxygen_doxygen_awesome_css_README_1autotoc_md40">
+<title>Credits</title>
+<para>Thanks for all the bug reports and inspiring feedback on GitHub!</para>
+<para>Special thanks to all the contributors: <linebreak/>
+<linebreak/>
+ <ulink url="https://github.com/jothepro/doxygen-awesome-css/graphs/contributors"><image type="html" name="https://contrib.rocks/image?repo=jothepro/doxygen-awesome-css" inline="yes"></image>
+ </ulink></para>
+<para></para>
+<para><table rows="2" cols="1"><row>
+<entry thead="yes" align='right'><para>Read Next    </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para><ref refid="md_docs_doxygen_doxygen_awesome_css_docs_extensions" kindref="compound">Extensions</ref>   </para>
+</entry></row>
+</table>
+</para>
+<para> </para>
+</sect1>
+    </detaileddescription>
+    <location file="docs/doxygen/doxygen-awesome-css/README.md"/>
+  </compounddef>
+</doxygen>
