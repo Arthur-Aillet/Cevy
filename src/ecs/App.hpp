@@ -79,5 +79,14 @@ class cevy::ecs::App : public cevy::ecs::World {
             _schedule.insert_schedule<T>();
         }
 
+        template<class S, class R, class ...Args>
+        void add_super_system(R(&&func)(Args...)) {
+            _schedule.add_super_system<S>(func);
+        }
+
+        template<class R, class ...Args>
+        void add_super_system(R(&&func)(Args...)) {
+            _schedule.add_super_system(func);
+        }
 
 };

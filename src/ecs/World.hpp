@@ -28,14 +28,14 @@
 
 #include "ecs.hpp"
 
-/**
+
 template<class T>
 struct is_super : public std::false_type {};
 
 template<>
-struct is_super<World&> : std::true_type {};
+struct is_super<cevy::ecs::World&> : std::true_type {};
 template<>
-struct is_super<const World&> : std::true_type {};
+struct is_super<const cevy::ecs::World&> : std::true_type {};
 
 
 template<typename T, typename A>
@@ -46,7 +46,7 @@ struct is_super<sparse_array<T, A>&> : std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
-*/
+
 
 
 /**
@@ -56,6 +56,7 @@ constexpr bool all(Args... args) { return (... && args); }
  * An Entity can only have one instance of a Component
 */
 class cevy::ecs::World {
+    using value_type = World;
     public:
         struct EntityWorldRef {
             World& world;
@@ -248,33 +249,20 @@ class cevy::ecs::World {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        // template <typename Super>
-        // const Super get_super() {
-        //     if (typeid(World&) == typeid(Super)) {
-        //         auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
-        //         if (p) {
-        //             return *p;
-        //         } else {
-        //             throw std::bad_any_cast();
-        //         }
-        //     } else {
-        //         return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
-        //     }
-        // }
+        template <typename Super>
+        const Super get_super() {
+            if (typeid(World&) == typeid(Super)) {
+                auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
+                if (p) {
+                    return *p;
+                } else {
+                    throw std::bad_any_cast();
+                }
+            } else {
+                return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
+            }
+        }
 
-        // template<class R, class ...Args>
-        // void add_super_system(R(&&func)(Args...)) {
-        //     add_super_system<R, Args...>(STAGE::Update, func);
-        // }
-
-        // template<class R, class ...Args>
-        // void add_super_system(STAGE stage, R(&&func)(Args...)) {
-        //     static_assert(all(is_super<Args>()...), "type must be reference to super");
-        //     system_function sys = [&func] (World & reg) {
-        //         func(reg.get_super<Args>()...);
-        //     };
-        //     _systems.push_back(std::make_tuple(sys, stage));
-        // }
 };
 
 template<typename... Ts>
