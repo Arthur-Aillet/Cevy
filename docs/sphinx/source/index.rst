@@ -10,9 +10,7 @@ Welcome to C++evy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. doxygenclass:: App
-    :members:
-
+   Compare.md
 
 Indices and tables
 ==================
