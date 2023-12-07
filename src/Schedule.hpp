@@ -90,7 +90,7 @@ class Schedule {
         };
 
         using system_function = std::function<void (World &)>;
-        using system = std::tuple<system_function, STAGE>;
+        using system = std::tuple<system_function, std::type_index>;
         std::vector<system> _systems;
         Schedule() = default;
         ~Schedule() = default;
@@ -98,16 +98,16 @@ class Schedule {
         void quit() const;
         void abort();
 
-        template <class... Components, typename Function>
-        void add_system(STAGE stage, Function const &f) {
+        template <typename Stage, class... Components, typename Function>
+        void add_system(Function const &f) {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
             _systems.push_back(std::make_tuple(sys, stage));
         }
 
-        template <class... Components, typename Function>
-        void add_system(STAGE stage, Function &&f) {
+        template <typename Stage, class... Components, typename Function>
+        void add_system(Function &&f) {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
@@ -116,17 +116,20 @@ class Schedule {
 
         template <class... Components, typename Function>
         void add_system(Function const &f) {
-            add_system<Components...>(STAGE::Update, f);
+            add_system<Update, Components...>(f);
         }
 
         template <class... Components, typename Function>
         void add_system(Function &&f) {
-            add_system<Components...>(STAGE::Update, f);
+            add_system<Update, Components...>(f);
         }
 
     protected:
         mutable bool _stop = false;
-        STAGE _stage = STAGE::RESET;
+        mutable bool _abort = false;
+        STAGE _stageOLD = STAGE::RESET;
+        std::list<std::type_index>::iterator _stage;
+
 
         void runStages(World& world);
         void runStage(World& world);

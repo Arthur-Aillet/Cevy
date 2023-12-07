@@ -16,22 +16,23 @@ void Schedule::runStage(World &world)
         _systems.begin(),
         _systems.end(),
         std::back_inserter(curr_sys),
-        [this](const system& sys) { return std::get<1>(sys) == _stage;});
+        [this](const system& sys) { return std::get<1>(sys) == *_stage;});
 
     /* this part could be multi-threaded */
     for (auto sys : curr_sys) {
         std::get<0>(sys.get())(world);
     }
 
-    _stage = static_cast<STAGE>(1 + static_cast<int>(_stage) );
+    _stage++;
+    // _stage = static_cast<STAGE>(1 + static_cast<int>(_stage) );
 }
 
 void Schedule::runStages(World& world) {
-    _stage = STAGE::First;
+    _stage = _schedule.begin();
     do {
         runStage(world);
     }
-    while (_stage != STAGE::RESET && _stage != STAGE::ABORT);
+    while (_stage != _schedule.end() && !_abort);
 }
 
 void Schedule::run(World &world) {
@@ -45,6 +46,6 @@ void Schedule::quit() const {
 }
 
 void Schedule::abort() {
-    _stage = STAGE::ABORT;
+    _abort = true;
     _stop = true;
 }
