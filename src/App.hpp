@@ -32,6 +32,9 @@ struct is_super<sparse_array<T, A>&> : std::true_type {};
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
 
+/**
+ * @brief Main app
+ */
 class App {
     public:
         enum class STAGE {
