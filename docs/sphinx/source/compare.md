@@ -221,7 +221,7 @@ void spawn_things(Commands commands)
 
 Connect systems without Ecs management
 
- Create an abstraction layer
+Create an abstraction layer
 
 ---
 **Exemple Rust:**
