@@ -28,7 +28,6 @@ class Schedule {
 
                 template<typename T>
                 using after = Stage<std::nullopt_t, T>;
-            constexpr operator bool() { return true; };
         };
         template<typename T>
         using before = Stage<>::before<T>;
@@ -40,7 +39,6 @@ class Schedule {
         class Update : public after<First> {};
         class PreUpdate : public before<Update> {};
         class PostUpdate : public after<Update> {};
-        class PreUpdate : public after<First> {};
 
         class StateTransition : public before<Update> {};
         class RunFixedUpdateLoop : public before<Update> {};
@@ -63,19 +61,21 @@ class Schedule {
         }
 
 
+        template<typename T, typename T::before>
+        void insert_schedule() {
+            auto& it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::before)));
+            _schedule.insert(it, std::type_index(typeid(T)));
+        }
+
+        template<typename T, typename T::after>
+        void insert_schedule() {
+            auto& it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
+            _schedule.insert(it, std::type_index(typeid(T)));
+        }
+
         template<typename T>
         void insert_schedule() {
-            if (T::before()) {
-                auto it = std::find(_schedule, std::type_index(typeid(T)));
-                _schedule.insert(it, std::type_index(typeid(T)));
-            } else if (T::after()) {
-                auto it = std::find(_schedule, std::type_index(typeid(T)));
-                ++it;
-                _schedule.insert(it, std::type_index(typeid(T)));
-            } else {
-                _schedule.push_back(std::type_index(typeid(T)));
-            }
-
+            _schedule.push_back(std::type_index(typeid(T)));
         }
 
         using system_function = std::function<void (World &)>;
@@ -92,7 +92,7 @@ class Schedule {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(std::make_tuple(sys, stage));
+            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(Stage))));
         }
 
         template <typename Stage, class... Components, typename Function>
@@ -100,7 +100,7 @@ class Schedule {
             system_function sys = [&f] (World & reg) {
                 f(reg, reg.get_components<Components>()...);
             };
-            _systems.push_back(std::make_tuple(sys, stage));
+            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(Stage))));
         }
 
         template <class... Components, typename Function>
