@@ -49,6 +49,7 @@ class Schedule {
         using type_tuple = std::tuple<std::type_index, std::any>;
         std::list<std::type_index> _schedule;
 
+    public:
         void init_default_schedule() {
             insert_schedule<First>();
             insert_schedule<Update>();
