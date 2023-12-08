@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+.vscode
+
+bin/*
+build/*
+lib/*
+build
+lib
+bin
+
+docs/doxygen/xml
