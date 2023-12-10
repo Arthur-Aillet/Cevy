@@ -15,12 +15,14 @@
 #include <any>
 
 #include "ecs.hpp"
-
+#include "World.hpp"
 
 class cevy::ecs::Schedule {
     public:
+        struct IsStage {};
+
         template<typename Before = std::nullopt_t, typename After = std::nullopt_t>
-        class Stage {
+        class Stage : public IsStage {
             public:
                 template<typename T>
                 using before = Stage<T, std::nullopt_t>;
@@ -94,8 +96,8 @@ class cevy::ecs::Schedule {
 
         template <typename S, class... Components, typename Function>
         void add_system(Function const &f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
+            system_function sys = [&f] (World & world) {
+                f(world, world.get_components<Components>()...);
             };
             _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
 
@@ -103,8 +105,8 @@ class cevy::ecs::Schedule {
 
         template <typename S, class... Components, typename Function>
         void add_system(Function &&f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
+            system_function sys = [&f] (World & world) {
+                f(world, world.get_components<Components>()...);
             };
             _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
         }
