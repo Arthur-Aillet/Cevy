@@ -56,7 +56,7 @@ constexpr bool all(Args... args) { return (... && args); }
  * An Entity can only have one instance of a Component
 */
 class cevy::ecs::World {
-    using value_type = World;
+        using value_type = World;
     public:
         struct EntityWorldRef {
             World& world;
@@ -249,20 +249,10 @@ class cevy::ecs::World {
             return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        template <typename Super>
-        const Super get_super() {
-            if (typeid(World&) == typeid(Super)) {
-                auto p = std::any_cast<std::remove_const_t<std::remove_reference_t<Super>>*>(this);
-                if (p) {
-                    return *p;
-                } else {
-                    throw std::bad_any_cast();
-                }
-            } else {
-                return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
-            }
+        template<typename Super>
+        Super& get_super() {
+            return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
         }
-
 };
 
 template<typename... Ts>
