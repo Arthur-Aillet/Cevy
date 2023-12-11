@@ -59,26 +59,27 @@ class cevy::ecs::App : public cevy::ecs::World {
             _schedule.abort();
         }
 
-        template <typename S, class... Components, typename Function>
-            // , std::enable_if_t<std::is_base_of_v<Schedule::Stage<>, S>>>
-        void add_system(Function const &f) {
-            _schedule.add_system<S, Components...>(f);
-        }
-
-        template <typename S, class... Components, typename Function>
-            // , std::enable_if_t<std::is_base_of_v<Schedule::Stage<>, S>>>
+        template <typename Function>
         void add_system(Function &&f) {
-            _schedule.add_system<S, Components...>(f);
+            _schedule.add_system<Schedule::Update>(f);
         }
 
-        template <class... Components, typename Function>
-        void add_system(Function const &f) {
-            _schedule.add_system<Schedule::Update, Components...>(f);
-        }
-
-        template <class... Components, typename Function>
+        template <typename S, class... Components, typename Function>
         void add_system(Function &&f) {
-            _schedule.add_system<Schedule::Update, Components...>(f);
+            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
+                _schedule.add_system<S, Components...>(f);
+            } else {
+                _schedule.add_system<Schedule::Update, S, Components...>(f);
+            }
+        }
+
+        template <typename S, class... Components, typename Function>
+        void add_system(Function const &f) {
+            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
+                _schedule.add_system<S, Components...>(f);
+            } else {
+                _schedule.add_system<Schedule::Update, S, Components...>(f);
+            }
         }
 
         template<typename T>

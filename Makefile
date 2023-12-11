@@ -16,4 +16,13 @@ test:
 doc:
 	cd docs/doxygen && doxygen
 
-.PHONY: all build test
+clean:
+	rm -rf ./build/*
+
+fclean: clean
+	rm -rf ./lib/*
+	rm -rf ./bin/*
+
+re: fclean build
+
+.PHONY: all build test clean fclean re
