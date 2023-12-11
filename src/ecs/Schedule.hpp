@@ -12,6 +12,7 @@
 #include <optional>
 #include <algorithm>
 #include <typeindex>
+#include <variant>
 #include <any>
 
 #include "ecs.hpp"
@@ -21,19 +22,30 @@ class cevy::ecs::Schedule {
     public:
         struct IsStage {};
 
-        template<typename Before = std::nullopt_t, typename After = std::nullopt_t>
+        template<typename Before = std::nullopt_t, typename After = std::nullopt_t, typename Repeat = std::true_type>
         class Stage : public IsStage {
             public:
-                template<typename T>
-                using before = Stage<T, std::nullopt_t>;
+                using is_repeat = Repeat;
+                using previous = Before;
+                using next = After;
 
                 template<typename T>
-                using after = Stage<std::nullopt_t, T>;
+                using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
+
+                template<typename T>
+                using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
+
         };
         template<typename T>
         using before = Stage<>::before<T>;
         template<typename T>
         using after = Stage<>::after<T>;
+
+        using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
+
+        class Startup : public at_start {};
+        class PreStartup : public before<Startup> {};
+        class PostStartup : public after<Startup> {};
 
         class First : public Stage<> {};
 
@@ -47,11 +59,15 @@ class cevy::ecs::Schedule {
         class Last : public after<PostUpdate> {};
 
     private:
-        using type_tuple = std::tuple<std::type_index, std::any>;
         std::list<std::type_index> _schedule;
+        std::list<std::type_index> _at_start_schedule;
 
     public:
         void init_default_schedule() {
+            insert_schedule<Startup>();
+            insert_schedule<PreStartup>();
+            insert_schedule<PostStartup>();
+
             insert_schedule<First>();
             insert_schedule<Update>();
             insert_schedule<PreUpdate>();
@@ -64,23 +80,36 @@ class cevy::ecs::Schedule {
             //StateTransitions and RunFixedUpdateLoop ?
         }
 
-
-        template<typename T, typename T::before>
+        template<typename T, typename std::enable_if_t<std::is_same_v<typename T::is_repeat, std::true_type>, bool> = true>
         void insert_schedule() {
-            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::before)));
-            _schedule.insert(it, std::type_index(typeid(T)));
+            if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
+                auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(typename T::previous)));
+
+                _schedule.insert(it, std::type_index(typeid(T)));
+            } else if constexpr (!std::is_same_v<typename T::next, std::nullopt_t>) {
+                auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(typename T::next)));
+
+                ++it;
+                _schedule.insert(it, std::type_index(typeid(T)));
+            } else {
+                _schedule.push_back(std::type_index(typeid(T)));
+            }
         }
 
-        template<typename T, typename T::after>
+        template<typename T, typename std::enable_if_t<std::is_same_v<typename T::is_repeat, std::false_type>, bool> = true>
         void insert_schedule() {
-            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
-            ++it;
-            _schedule.insert(it, std::type_index(typeid(T)));
-        }
+            if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
+                auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(typename T::previous)));
 
-        template<typename T>
-        void insert_schedule() {
-            _schedule.push_back(std::type_index(typeid(T)));
+                _at_start_schedule.insert(it, std::type_index(typeid(T)));
+            } else if constexpr (!std::is_same_v<typename T::next, std::nullopt_t>) {
+                auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(typename T::next)));
+
+                ++it;
+                _at_start_schedule.insert(it, std::type_index(typeid(T)));
+            } else {
+                _at_start_schedule.push_back(std::type_index(typeid(T)));
+            }
         }
 
         using system_function = std::function<void (World &)>;

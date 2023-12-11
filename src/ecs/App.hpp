@@ -59,6 +59,11 @@ class cevy::ecs::App : public cevy::ecs::World {
             _schedule.abort();
         }
 
+        template <typename Function>
+        void add_system(Function &&f) {
+            _schedule.add_system<Schedule::Update>(f);
+        }
+
         template <typename S, class... Components, typename Function>
         void add_system(Function &&f) {
             if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
