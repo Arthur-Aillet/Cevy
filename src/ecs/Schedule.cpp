@@ -28,6 +28,14 @@ void Schedule::runStage(World &world)
     _stage++;
 }
 
+void Schedule::runStartStages(World& world) {
+    _stage = _at_start_schedule.begin();
+    do {
+        runStage(world);
+    }
+    while (_stage != _at_start_schedule.end() && !_abort);
+}
+
 void Schedule::runStages(World& world) {
     _stage = _schedule.begin();
     do {
@@ -37,6 +45,7 @@ void Schedule::runStages(World& world) {
 }
 
 void Schedule::run(World &world) {
+    runStartStages(world);
     while (!_stop) {
         runStages(world);
     }

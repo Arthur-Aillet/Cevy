@@ -160,6 +160,7 @@ class cevy::ecs::Schedule {
         std::list<std::type_index>::iterator _stage;
 
 
+        void runStartStages(World& world);
         void runStages(World& world);
         void runStage(World& world);
     private:
