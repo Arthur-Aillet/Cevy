@@ -88,13 +88,15 @@ class zipper {
         using iterator = zipper_iterator<Containers...>;
         using iterator_tuple = typename iterator::iterator_tuple;
 
-        zipper(Containers &...cs) : _begin(zipper_iterator((cs.begin(), cs.size())...)), _end(zipper_iterator((cs.end(), cs.size())...)), _size({cs.size()...}) {};
+        zipper(Containers &...cs) : _begin(zipper_iterator((cs.begin(), cs.size())...)), _end(zipper_iterator((cs.end(), cs.size())...)), _size(_compute_size(std::forward(cs...))) {};
 
         iterator begin() { return _begin; };
         iterator end() { return _end; };
 
     private:
-        static size_t _compute_size(Containers &... containers);
+        static size_t _compute_size(Containers &... containers) {
+
+        }
 
         static iterator_tuple _compute_end(Containers &... containers);
     private:
