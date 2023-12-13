@@ -1,3 +1,10 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** Queries
+*/
+
 #include <vector>
 #include <cstddef>
 #include <optional>
