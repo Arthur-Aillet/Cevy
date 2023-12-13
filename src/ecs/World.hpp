@@ -27,25 +27,32 @@
 #include <type_traits>
 
 #include "ecs.hpp"
+#include "Query.hpp"
 
 
 template<class T>
 struct is_super : public std::false_type {};
 
 template<>
-struct is_super<cevy::ecs::World&> : std::true_type {};
+struct is_super<cevy::ecs::World&> : public std::true_type {};
 template<>
-struct is_super<const cevy::ecs::World&> : std::true_type {};
+struct is_super<const cevy::ecs::World&> : public std::true_type {};
 
 
 template<typename T, typename A>
-struct is_super<const SparseVector<T, A>&> : std::true_type {};
+struct is_super<const SparseVector<T, A>&> : public std::true_type {};
 
 template<typename T, typename A>
-struct is_super<SparseVector<T, A>&> : std::true_type {};
+struct is_super<SparseVector<T, A>&> : public std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
+
+template<typename... Args>
+constexpr bool any() { return (... || Args::value); };
+
+template<typename... T>
+struct Or : std::integral_constant<bool, any<T...>()> {};
 
 
 
@@ -249,9 +256,16 @@ class cevy::ecs::World {
             return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        template<typename Super>
+        template<typename Super,
+            typename std::enable_if<is_super<Super>::value>::type>
         Super& get_super() {
             return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
+        }
+
+        template<typename Q>
+            // typename std::enable_if<is_query<Q>::value>::type>
+        Q get_super() {
+            return Q::query(*this);
         }
 };
 
@@ -259,4 +273,9 @@ template<typename... Ts>
 cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... args) {
     world.add_component(entity, args...);
     return *this;
+}
+
+template<typename...T>
+cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World& w) {
+    return Query<T...>(w.get_components<T>()...);
 }

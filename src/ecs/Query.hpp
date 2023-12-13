@@ -5,6 +5,8 @@
 ** Queries
 */
 
+#pragma once
+
 #include <vector>
 #include <cstddef>
 #include <optional>
@@ -12,34 +14,43 @@
 
 #include "ecs.hpp"
 
-template <class... Containers>
+template<class T>
+struct is_query : public std::false_type {};
+
+template<typename... T>
+struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
+
+template <class... T>
 class cevy::ecs::Query {
+    using Containers = std::tuple<SparseVector<T>...>;
+    // template<template<typename> typename Containers>
+    // using Containers = SparseVector<T>;
     public:
         class iterator {
                 template<class Container>
-                using iterator_t = decltype(Container::begin());
+                using iterator_t = typename Container::iterator;
 
                 template <class Container>
                 using it_reference_t = typename iterator_t<Container>::reference;
 
             public:
-                using value_type = std::tuple<typename Containers::value_type&...>;
+                using value_type = std::tuple<T&...>;
                 using reference = value_type;
                 using pointer = void;
                 using difference_type = size_t;
                 using iterator_category = std::bidirectional_iterator_tag;
-                using iterator_tuple = std::tuple<iterator_t<Containers>...>;
+                using iterator_tuple = std::tuple<iterator_t<SparseVector<T>>...>;
 
-                template<typename... T>
+                template<typename... >
                 class zipper;
-                friend class zipper<Containers...>; // FIXME - reactivate
+                friend class zipper<T...>; // FIXME - reactivate
                 iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) {};
             public:
                 iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
 
                 iterator operator++() {
                     incr_all();
-                    return this;
+                    return *this;
                 };
                 iterator &operator++(int) {
                     auto old = *this;
@@ -54,57 +65,62 @@ class cevy::ecs::Query {
                     return lhs._idx == rhs._idx;
                 };
                 friend bool operator!=(iterator const &lhs, iterator const &rhs) {
-                    return lhs._idx == rhs._idx;
+                    return lhs._idx != rhs._idx;
                 };
 
             private:
-                template <size_t... Is>
-                void incr_all(std::index_sequence<Is...>) {
+                static constexpr  std::index_sequence_for<T...>_seq() {
+                    return std::index_sequence_for<T...>();
+                };
+                // template <size_t... Is>
+                void incr_all( /* std::index_sequence<Is...> */ ) {
                     while (!all_set() && _idx < _max) { // NOTE - check to choose <= or <
                         _idx++;
                         ([&] {
-                            (std::get<Is>(current)++);
+                            (std::get<iterator_t<SparseVector<T>>>(current)++);
                         } (), ...);
                     }
                 }
 
-                template <size_t... Is>
-                bool all_set(std::index_sequence<Is...>) {
-                    if (((std::nullopt == (*std::get<Is>(current))) && ...)) {
+                // template <size_t... Is>
+                bool all_set( /* std::index_sequence<Is...> */ ) {
+                    if (((std::nullopt == (*std::get<iterator_t<SparseVector<T>>>(current))) && ...)) {
                         return false;
                     }
                     return true;
                 }
 
-                template <size_t... Is>
-                value_type to_value(std::index_sequence<Is...>) {
-                    return {(*std::get<Is>(current))...};
+                // template <size_t... Is>
+                const value_type to_value( /* std::index_sequence<Is...> */ ) {
+                    return std::tuple<T&...>{std::get<iterator_t<SparseVector<T>>>(current)->value() ...};
                 }
             private:
                 iterator_tuple current;
                 size_t _max;
                 size_t _idx;
-
-                static constexpr std::index_sequence_for<Containers...> _seq() {
-                    return std::index_sequence_for<Containers...>();
-                };
+                // auto all = std::make_index_sequence(sizeof...(T));
 
         };
         using iterator_tuple = typename iterator::iterator_tuple;
 
-        Query(Containers &...cs) : _size(_compute_size(std::forward(cs...))), _begin(iterator(cs.begin()..., _size)), _end(iterator(cs.end()..., _size, _size)) {};
+        static Query query(World&);
+
+        Query(SparseVector<T> &...cs) : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)), _end(iterator(std::make_tuple(cs.end()...), _size, _size)) {};
 
         iterator begin() { return _begin; };
         iterator end() { return _end; };
 
+        const iterator begin() const { return _begin; };
+        const iterator end() const { return _end; };
+
     private:
-        static size_t _compute_size(Containers &... containers) {
-            return std::min(containers.size()...);
+        static size_t _compute_size(SparseVector<T> &... containers) {
+            return std::min({containers.size()...});
         }
 
         // static iterator_tuple _compute_end(Containers &... containers);
     private:
         size_t _size;
-        iterator_tuple _begin;
-        iterator_tuple _end;
+        iterator _begin;
+        iterator _end;
 };
