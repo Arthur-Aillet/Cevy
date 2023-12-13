@@ -23,8 +23,11 @@ class zipper_iterator {
         using iterator_category = std::bidirectional_iterator_tag;
         using iterator_tuple = std::tuple<iterator_t<Containers>...>;
 
-        //friend typename Containers::zipper<Containers...>; // FIXME - reactivate
-        zipper_iterator(iterator_tuple const &it_tuple, size_t max) : current(it_tuple), _max(max), _idx(0) {};
+        template<typename... T>
+        class zipper;
+        friend class zipper<Containers...>; // FIXME - reactivate
+        // friend typename zipper<Containers...>; // FIXME - reactivate
+        zipper_iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) {};
     public:
         zipper_iterator(zipper_iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
 
@@ -42,16 +45,16 @@ class zipper_iterator {
         value_type operator->() {return to_value();};
 
         friend bool operator==(zipper_iterator const &lhs, zipper_iterator const &rhs) {
-            return lhs.to_value() == rhs.to_value();
+            return lhs._idx == rhs._idx;
         };
         friend bool operator!=(zipper_iterator const &lhs, zipper_iterator const &rhs) {
-            return lhs.to_value() != rhs.to_value();
+            return lhs._idx == rhs._idx;
         };
 
     private:
         template <size_t... Is>
         void incr_all(std::index_sequence<Is...>) {
-            while (!all_set() && _idx <= _max) { // NOTE - check to choose <= or <
+            while (!all_set() && _idx < _max) { // NOTE - check to choose <= or <
                 _idx++;
                 ([&] {
                     (std::get<Is>(current)++);
@@ -61,10 +64,10 @@ class zipper_iterator {
 
         template <size_t... Is>
         bool all_set(std::index_sequence<Is...>) {
-            if (((std::nullopt != (*std::get<Is>(current))) && ...)) {
-                return true;
+            if (((std::nullopt == (*std::get<Is>(current))) && ...)) {
+                return false;
             }
-            return false;
+            return true;
         }
 
         template <size_t... Is>
@@ -88,19 +91,20 @@ class zipper {
         using iterator = zipper_iterator<Containers...>;
         using iterator_tuple = typename iterator::iterator_tuple;
 
-        zipper(Containers &...cs) : _begin(zipper_iterator((cs.begin(), cs.size())...)), _end(zipper_iterator((cs.end(), cs.size())...)), _size(_compute_size(std::forward(cs...))) {};
+        zipper(Containers &...cs) : _size(_compute_size(std::forward(cs...))), _begin(zipper_iterator(cs.begin()..., _size)), _end(zipper_iterator(cs.end()..., _size, _size)) {};
 
         iterator begin() { return _begin; };
         iterator end() { return _end; };
 
     private:
         static size_t _compute_size(Containers &... containers) {
-
+            return std::min(containers.size()...);
         }
 
-        static iterator_tuple _compute_end(Containers &... containers);
+        // static iterator_tuple _compute_end(Containers &... containers);
     private:
+        size_t _size;
         iterator_tuple _begin;
         iterator_tuple _end;
-        size_t _size;
 };
+
