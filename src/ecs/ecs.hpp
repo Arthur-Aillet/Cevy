@@ -15,4 +15,7 @@ namespace cevy::ecs {
     class Plugin;
     class Schedule;
     class World;
+
+    template <class... Containers>
+    class Query;
 }
