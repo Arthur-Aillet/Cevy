@@ -29,7 +29,6 @@ class zipper_iterator {
         template<typename... T>
         class zipper;
         friend class zipper<Containers...>; // FIXME - reactivate
-        // friend typename zipper<Containers...>; // FIXME - reactivate
         zipper_iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) {};
     public:
         zipper_iterator(zipper_iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
