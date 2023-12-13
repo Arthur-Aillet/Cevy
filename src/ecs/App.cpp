@@ -2,5 +2,7 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** game_engine
+** App
 */
+
+#include "App.hpp"
