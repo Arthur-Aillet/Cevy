@@ -1,11 +1,7 @@
-//std::unordered_map<std::type_index, component_data> _components_arrays;
 #include <vector>
 #include <cstddef>
 #include <optional>
 #include <utility>
-
-// template <class... Containers>
-// class zipper;
 
 template <class... Containers>
 class zipper_iterator {

@@ -2,7 +2,7 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** sparse_array
+** SparseVector
 */
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <iostream>
 
 template<typename Type, typename Alloc = std::allocator<Type>>
-class sparse_array {
+class SparseVector {
     public:
         using value_type = std::optional<Type>;
         using reference_type = value_type&;
@@ -26,17 +26,17 @@ class sparse_array {
         container_t _data;
 
     public:
-        sparse_array() : _data(container_t()) {};
-        ~sparse_array() {};
-        sparse_array(sparse_array const &other) : _data(other._data) {}; //copy constructor
-        sparse_array(sparse_array && other) noexcept : _data(std::move(other._data)) {}; //move constructor
+        SparseVector() : _data(container_t()) {};
+        ~SparseVector() {};
+        SparseVector(SparseVector const &other) : _data(other._data) {}; //copy constructor
+        SparseVector(SparseVector && other) noexcept : _data(std::move(other._data)) {}; //move constructor
 
-        sparse_array &operator = (sparse_array const &other) { //copy assignment operator
+        SparseVector &operator = (SparseVector const &other) { //copy assignment operator
             _data = other._data;
             return *this;
         };
 
-        sparse_array &operator = (sparse_array &&other) noexcept { // move assignment operator
+        SparseVector &operator = (SparseVector &&other) noexcept { // move assignment operator
             _data = other._data;
             return *this;
         };

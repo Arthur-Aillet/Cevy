@@ -15,7 +15,7 @@
  * World. Holds the actual components and entities
  */
 
-#include "./sparse_array.hpp"
+#include "./SparseVector.hpp"
 #include "./Entity.hpp"
 
 #include <unordered_map>
@@ -39,10 +39,10 @@ struct is_super<const cevy::ecs::World&> : std::true_type {};
 
 
 template<typename T, typename A>
-struct is_super<const sparse_array<T, A>&> : std::true_type {};
+struct is_super<const SparseVector<T, A>&> : std::true_type {};
 
 template<typename T, typename A>
-struct is_super<sparse_array<T, A>&> : std::true_type {};
+struct is_super<SparseVector<T, A>&> : std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
@@ -81,15 +81,15 @@ class cevy::ecs::World {
 
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
-        sparse_array<Entity> _entities;
+        SparseVector<Entity> _entities;
 
     /* Bevy-compliant */
     public:
         /// get all entities
-        sparse_array<Entity>& entities();
+        SparseVector<Entity>& entities();
 
         /// get all entities
-        const sparse_array<Entity>& entities() const;
+        const SparseVector<Entity>& entities() const;
 
         /// create a new empty entity
         EntityWorldRef spawn_empty();
@@ -115,7 +115,7 @@ class cevy::ecs::World {
         /// get a Component T associated with a given Entity, or Nothing if no such Component
         template<typename T>
         std::optional<ref<T>> get(Entity entity) {
-            sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
+            SparseVector<T>& v = std::any_cast<SparseVector<T>&>(std::get<0>(_components_arrays[std::type_index(typeid(T))]));
             std::optional<T> optional = v[entity];
 
             if (optional)
@@ -127,7 +127,7 @@ class cevy::ecs::World {
         /// get a Component T associated with a given Entity, or Nothing if no such Component
         template<typename T>
         std::optional<ref<const T>> get(Entity entity) const {
-            const sparse_array<T>& v = std::any_cast<sparse_array<T>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(T)))));
+            const SparseVector<T>& v = std::any_cast<SparseVector<T>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(T)))));
             std::optional<const T> optional = v[entity];
 
             if (optional)
@@ -144,7 +144,7 @@ class cevy::ecs::World {
                 if (Entity < cmpnts.size())
                     cmpnts[Entity] = std::nullopt;
             };
-            std::any a = std::make_any<sparse_array<T>>();
+            std::any a = std::make_any<SparseVector<T>>();
 
             _components_arrays.insert({std::type_index(typeid(T)), std::make_tuple(a, f_e)});
 
@@ -209,13 +209,13 @@ class cevy::ecs::World {
         Entity spawn_at(std::size_t idx);
 
         template <typename Component>
-        typename sparse_array<Component>::reference_type add_component(Entity const &to, Component &&c) {
+        typename SparseVector<Component>::reference_type add_component(Entity const &to, Component &&c) {
             auto &array = get_components<Component>();
             return array.insert_at(to, std::forward<Component>(c));
         }
 
         template <typename Component, typename ... Params>
-        typename sparse_array<Component>::reference_type emplace_component(Entity const &to, Params &&... p) {
+        typename SparseVector<Component>::reference_type emplace_component(Entity const &to, Params &&... p) {
             auto &array = get_components<Component>();
             return array.emplace_at(to, p...);
         }
@@ -228,25 +228,25 @@ class cevy::ecs::World {
         }
 
         template <class Component>
-        sparse_array<Component> &register_component() {
+        SparseVector<Component> &register_component() {
             erase_access f_e = [] (World & reg, Entity const & Entity) {
                 auto &cmpnts = reg.get_components<Component>();
                 if (Entity < cmpnts.size())
                     cmpnts[Entity] = std::nullopt;
             };
-            std::any a = std::make_any<sparse_array<Component>>();
+            std::any a = std::make_any<SparseVector<Component>>();
 
             _components_arrays.insert({std::type_index(typeid(Component)), std::make_tuple(a, f_e)});
-            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
+            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
         }
 
         template <class Component>
-        sparse_array<Component> &get_components() {
-            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
+        SparseVector<Component> &get_components() {
+            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
         }
         template <class Component>
-        sparse_array<Component> const &get_components() const {
-            return std::any_cast<sparse_array<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+        SparseVector<Component> const &get_components() const {
+            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
         template <typename Super>

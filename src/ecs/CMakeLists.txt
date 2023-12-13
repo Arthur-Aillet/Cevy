@@ -6,9 +6,9 @@
 ##
 
 
-add_library(sparse_array
+add_library(SparseVector
   STATIC
-  sparse_array.cpp
+  SparseVector.cpp
   )
 
 add_library(entity
@@ -22,7 +22,7 @@ add_library(zipper
   zipper_iterator.cpp
   )
 
-target_link_libraries(entity sparse_array)
+target_link_libraries(entity SparseVector)
 
 add_library(world
   STATIC
@@ -45,5 +45,5 @@ add_library(app
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
 add_library(ecs SHARED ${CEVY_HEADERS})
-target_link_libraries(ecs sparse_array entity world schedule app zipper)
+target_link_libraries(ecs SparseVector entity world schedule app zipper)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
