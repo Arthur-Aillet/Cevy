@@ -4,6 +4,8 @@ add_library(network
   client.cpp
   server.hpp
   server.cpp
+  network.hpp
+  network.cpp
 )
 
 set(ASIO_FOLDER ${CMAKE_BINARY_DIR}/_deps/asio)
