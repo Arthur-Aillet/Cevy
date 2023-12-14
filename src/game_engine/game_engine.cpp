@@ -1,8 +1,14 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** game_engine
+*/
+
 #include "game_engine.hpp"
 #include "camera.hpp"
 #include "rlImGui.h"
 #include "imgui.h"
-#include <iostream>
 
 Cevy::GameEngine::GameEngine() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);

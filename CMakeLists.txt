@@ -1,3 +1,10 @@
+##
+## Agartha-Software, 2023
+## Cevy
+## File description:
+## Cevy project cmake
+##
+
 cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -7,9 +14,9 @@ set(Cevy_VERSION 0.1)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -header-filter=. -checks=*,-llvmlibc-*)
-
 add_subdirectory(deps)
+
+add_compile_options(-Wall -Wextra)
 
 add_subdirectory(src)
 
