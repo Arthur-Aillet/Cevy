@@ -166,7 +166,7 @@ class cevy::ecs::World {
         /// remove a resource from this world; TODO: DO
         template<typename R>
         std::optional<R> remove_resource() {
-
+            return _resource_manager.remove_resource<R>();
         }
 
         /// true if the world holds this Resource TODO: DO
@@ -259,6 +259,12 @@ class cevy::ecs::World {
             typename std::enable_if_t<is_query<Q>::value, bool> = true>
         Q get_super() {
             return Q::query(*this);
+        }
+
+        template<typename R,
+            typename std::enable_if_t<is_resource<R>::value, bool> = true>
+        R get_super() {
+            return _resource_manager.get<typename R::value>();
         }
 };
 

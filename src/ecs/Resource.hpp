@@ -11,13 +11,24 @@
 #include <unordered_map>
 
 template <typename Content>
+class Resource;
+
+template<class T>
+struct is_resource : public std::false_type {};
+
+template<typename T>
+struct is_resource<Resource<T>> : public std::true_type {};
+
+template <typename Content>
 class Resource {
     private:
         Content &_content;
         friend class ResourceManager;
         Resource(Content& content) : _content(content) {};
     public:
-        operator Content() { return _content; }
+        using value = Content;
+        operator Content () const { return _content; }
+        operator Content&() { return _content; }
 };
 
 class ResourceManager {
@@ -35,12 +46,18 @@ class ResourceManager {
 
         template <typename Content>
         std::optional<Content> remove_resource() {
-            //_ressources_map[std::type_index(typeid(Content))];
+            auto it = _ressources_map.find(std::type_index(typeid(Content)));
+
+            if (it != _ressources_map.end()) {
+                Content val = std::any_cast<Content>(_ressources_map[std::type_index(typeid(Content))]);
+                _ressources_map.erase(it);
+                return std::optional<Content>(val);
+            }
+            return std::nullopt;
         }
 
         template <typename Content>
-        Resource<Content>& get_resource() {
-            return std::any_cast<Resource<Content>>(_ressources_map[std::type_index(typeid(Content))]);
-
+        Resource<Content> get() {
+            return Resource(std::any_cast<Content&>(_ressources_map[std::type_index(typeid(Content))]));
         }
 };
