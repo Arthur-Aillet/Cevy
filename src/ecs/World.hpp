@@ -15,8 +15,9 @@
  * World. Holds the actual components and entities
  */
 
-#include "./SparseVector.hpp"
-#include "./Entity.hpp"
+#include "SparseVector.hpp"
+#include "Entity.hpp"
+#include "Resource.hpp"
 
 #include <unordered_map>
 #include <any>
@@ -46,8 +47,6 @@ constexpr bool any() { return (... || Args::value); };
 
 template<typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
-
-
 
 /**
  * Stores Entities, Components (and ressources), and exposes operations
@@ -82,6 +81,7 @@ class cevy::ecs::World {
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
         SparseVector<Entity> _entities;
+        ResourceManager _resource_manager;
 
     /* Bevy-compliant */
     public:
@@ -157,13 +157,13 @@ class cevy::ecs::World {
 
         }
 
-        /// replace a resource to the world; TODO: DO
+        /// replace a resource to the world
         template<typename R>
-        void insert_resource(const R& r) {
-
+        void insert_resource(const R& value) {
+            _resource_manager.insert_resource(value);
         }
 
-        /// rempve a resource from this world; TODO: DO
+        /// remove a resource from this world; TODO: DO
         template<typename R>
         std::optional<R> remove_resource() {
 
