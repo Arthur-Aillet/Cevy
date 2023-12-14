@@ -16,7 +16,7 @@ additionnally, TCP/IP may be used for asset streaming, e.g. User Generated conte
 ### Client:
 The *client* is responsible for delivering client actions to the server, and updating its internal states as the server dictates.
 Client Actions are actions, chosen to be performed by the user, that have an impact on the Server-Wide state, the Player, or any other Player.
-These actions are fallable, and the client must act accordingly should the server fail the Client Action.
+These actions are fallible, and the client must act accordingly should the server fail the Client Action.
 (A failure mode of Try Again may be made available, this indicates that the client should attempt the action again)
 In an effort to decouple Networking from display/UI, some client actions can be assumed to have succeed before receiving confirmation from the server, in order to let the user observe the action in a timely manner.
 Other actions, particularly security oriented, can not be assumed until the server has let the action succeed or fail.
@@ -42,8 +42,9 @@ A *bot* is a special type of client with no user. It is privy to all information
 ### State
 
 A State is information specied for a given timepoint, it is defined to be true in that instant, but undefined outside. A State that wasn't specified to have changed can be assumed to be unchanged if the assumption can be corrected afterwards by the Client.
+//TODO: Reword this ?
 
-The client may request the server to specify a State
+The client may request the server to specify a State. By default, the server is not required to fulfill that request
 
 #### State Communication
 
@@ -63,7 +64,7 @@ A State Change is an event that specifies a State's value was updated. It is def
 
 |  Emitter  | Communication |     Component     |     Pre Value     |     Post Value    |
 |-----------|---------------|-------------------|-------------------|-------------------|
-|  Server   | StateChange   | {named descritor} | {structured data} | {structured data} |
+|  Server   |  StateChange  | {named descritor} | {structured data} | {structured data} |
 
 ### Client Action
 
@@ -72,12 +73,23 @@ A Client Action is a request, initiated by the client, that the server must let 
 
 #### Client Action Responses
 
-|   Response    |     Component      |                 Meaning                      | Consequence                                                                                                          |
-|---------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| ActionSuccess | {optional message} | action was sucessful                         | the client can operate following this action's sucess                                                                |
-| ActionFailure |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                          |
-| ActionFailure | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                        |
-| ActionFailure |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                         |
-| ActionFailure |    ActionWaiting   | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                        |
-| ActionFailure |    ActionDelayed   | this action will succeed at a later time     | the client should consider the action failed. The server will send a State Change regarding the sucess of the Action |
-| ActionFailure |        BUSY        | the server refused to process the action     | the client should send the action request again after a small delay                                                  |
+|  Emitter  |   Request     |     Component      |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Client   |     Action    |   {named action}   | {structured data} |
+
+
+| Emitter |
+|---------|
+| Server  |
+
+↘
+
+|   Response    |     Component      |       Value        |                 Meaning                      | Consequence                                                                                                          |
+|---------------|--------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| ActionSuccess |   {named action}   | {optional message} | this action was sucessful                    | the client can operate following this action's sucess                                                                |
+| ActionFailure |   {named action}   | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                        |
+| ActionFailure |   {named action}   |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                          |
+| ActionFailure |   {named action}   |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                         |
+| ActionFailure |   {named action}   |    ActionWaiting   | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                        |
+| ActionFailure |   {named action}   |    ActionDelayed   | this action will succeed at a later time     | the client should consider the action failed. The server will send a State Change regarding the sucess of the Action |
+| ActionFailure |   {named action}   |        BUSY        | the server refused to process the action     | the client should send the action request again after a small delay                                                  |
