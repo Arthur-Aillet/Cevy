@@ -99,10 +99,7 @@ class cevy::ecs::Query {
 
                 // template <size_t... Is>
                 bool all_set( /* std::index_sequence<Is...> */ ) {
-                    if (((std::nullopt == (*std::get<iterator_t<SparseVector<T>>>(current))) && ...)) {
-                        return false;
-                    }
-                    return true;
+                    return ((std::nullopt != (*std::get<iterator_t<SparseVector<T>>>(current))) && ...);
                 }
 
                 // template <size_t... Is>
