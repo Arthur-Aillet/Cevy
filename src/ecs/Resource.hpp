@@ -41,7 +41,7 @@ class ResourceManager {
         void insert_resource(Content &value) {
             std::any a = std::make_any<Content>(value);
 
-            _ressources_map.insert({std::type_index(typeid(Content)), a});
+            _ressources_map[std::type_index(typeid(Content))] = a;
         }
 
         template <typename Content>
