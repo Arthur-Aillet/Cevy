@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "ecs.hpp"
+#include "SparseVector.hpp"
 
 template<class T>
 struct is_query : public std::false_type {};
@@ -45,7 +46,7 @@ class cevy::ecs::Query {
                 template<typename... >
                 class zipper;
                 friend class zipper<T...>; // FIXME - reactivate
-                iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) { sync() };
+                iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) { sync(); };
             public:
                 iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
 
