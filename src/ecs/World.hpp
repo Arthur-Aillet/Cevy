@@ -49,7 +49,7 @@ template<typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
 
 /**
- * Stores Entities, Components (and ressources), and exposes operations
+ * Stores Entities, Components (and resources), and exposes operations
  *
  * Each entity has Components, which must first each be registered to the World
  * An Entity can only have one instance of a Component
@@ -151,52 +151,52 @@ class cevy::ecs::World {
             return std::type_index(typeid(T));
         };
 
-        /// register a resource to the world; TODO: DO
-        template<typename R>
-        ComponentId init_resource() {
-
+        /// emplace a resource to the world by calling the
+        template<typename R, typename ... Params>
+        void init_resource(Params&& ... p) {
+            _resource_manager.insert_resource(R(p...));
         }
 
-        /// replace a resource to the world
+        /// insert a resource to the world
         template<typename R>
         void insert_resource(const R& value) {
             _resource_manager.insert_resource(value);
         }
 
-        /// remove a resource from this world; TODO: DO
+        /// remove a resource from this world
         template<typename R>
         std::optional<R> remove_resource() {
             return _resource_manager.remove_resource<R>();
         }
 
-        /// true if the world holds this Resource TODO: DO
+        /// true if the world holds this Resource
         template<typename R>
         bool contains_resource() {
-
+            return _resource_manager.contains_resource<R>();
         }
 
-        /// access a given Resource TODO: DO
+        /// access a given Resource
         template<typename R>
         R& resource() {
-
+            return _resource_manager.resource<R>();
         }
 
-        /// access a given Resource TODO: DO
+        /// access a given Resource
         template<typename R>
         const R& resource() const {
-
+            return _resource_manager.resource<R>();
         }
 
-        /// access a given Resource, or None if it not in this world TODO: DO
+        /// access a given Resource, or None if it not in this world
         template<typename R>
         std::optional<ref<R>> get_resource() {
-
+            return _resource_manager.get_resource<R>();
         }
 
-        /// access a given Resource, or None if it not in this world TODO: DO
+        /// access a given Resource, or None if it not in this world
         template<typename R>
         std::optional<ref<const R>> get_resource() const {
-
+            return _resource_manager.get_resource<R>();
         }
 
         /// send an event TODO: DO
