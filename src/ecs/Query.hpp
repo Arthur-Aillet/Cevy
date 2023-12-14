@@ -67,7 +67,6 @@ class cevy::ecs::Query {
                     return lhs._idx == rhs._idx;
                 };
                 friend bool operator!=(iterator const &lhs, iterator const &rhs) {
-                    std::cerr << lhs._idx << "," << rhs._idx << std::endl;
                     return lhs._idx != rhs._idx;
                 };
 
