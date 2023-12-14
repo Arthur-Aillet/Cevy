@@ -13,6 +13,9 @@ test:
 	cmake -DTESTS=on -S . -B ./build
 	make --no-print-directory -C build tests-run-cevy
 
+run:
+	make --no-print-directory -C .. run
+
 doc:
 	cd docs/doxygen && doxygen
 
