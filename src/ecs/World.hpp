@@ -31,19 +31,12 @@
 
 
 template<class T>
-struct is_super : public std::false_type {};
+struct is_world : public std::false_type {};
 
 template<>
-struct is_super<cevy::ecs::World&> : public std::true_type {};
+struct is_world<cevy::ecs::World&> : public std::true_type {};
 template<>
-struct is_super<const cevy::ecs::World&> : public std::true_type {};
-
-
-template<typename T, typename A>
-struct is_super<const SparseVector<T, A>&> : public std::true_type {};
-
-template<typename T, typename A>
-struct is_super<SparseVector<T, A>&> : public std::true_type {};
+struct is_world<const cevy::ecs::World&> : public std::true_type {};
 
 template<typename... Args>
 constexpr bool all(Args... args) { return (... && args); }
@@ -256,14 +249,14 @@ class cevy::ecs::World {
             return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
         }
 
-        template<typename Super,
-            typename std::enable_if<is_super<Super>::value>::type>
-        Super& get_super() {
-            return std::any_cast<Super>(std::get<0>(_components_arrays[std::type_index(typeid(typename std::remove_reference<Super>::type::value_type::value_type))]));
+        template<typename W,
+            typename std::enable_if_t<is_world<W>::value, bool> = true>
+        cevy::ecs::World& get_super() {
+            return *this;
         }
 
-        template<typename Q>
-            // typename std::enable_if<is_query<Q>::value>::type>
+        template<typename Q,
+            typename std::enable_if_t<is_query<Q>::value, bool> = true>
         Q get_super() {
             return Q::query(*this);
         }
