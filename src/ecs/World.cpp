@@ -61,3 +61,8 @@ void World::clear_resources()
 {
     /* implement */
 }
+
+// template<>
+// cevy::ecs::World& cevy::ecs::World::get_super<cevy::ecs::World>() {
+//     return *this;
+// }
