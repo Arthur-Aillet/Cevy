@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <optional>
 #include <utility>
+#include <iostream>
 
 #include "ecs.hpp"
 
@@ -44,7 +45,7 @@ class cevy::ecs::Query {
                 template<typename... >
                 class zipper;
                 friend class zipper<T...>; // FIXME - reactivate
-                iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) {};
+                iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) { sync() };
             public:
                 iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
 
@@ -65,6 +66,7 @@ class cevy::ecs::Query {
                     return lhs._idx == rhs._idx;
                 };
                 friend bool operator!=(iterator const &lhs, iterator const &rhs) {
+                    std::cerr << lhs._idx << "," << rhs._idx << std::endl;
                     return lhs._idx != rhs._idx;
                 };
 
@@ -74,6 +76,19 @@ class cevy::ecs::Query {
                 };
                 // template <size_t... Is>
                 void incr_all( /* std::index_sequence<Is...> */ ) {
+                    if (_idx == _max)
+                        return;
+                    do {
+                        _idx++;
+                        ([&] {
+                            (std::get<iterator_t<SparseVector<T>>>(current)++);
+                        } (), ...);
+                    } while (!all_set() && _idx < _max); // NOTE - check to choose <= or <
+                }
+
+                void sync() {
+                    if (_idx == _max)
+                        return;
                     while (!all_set() && _idx < _max) { // NOTE - check to choose <= or <
                         _idx++;
                         ([&] {
@@ -95,6 +110,7 @@ class cevy::ecs::Query {
                     return std::tuple<T&...>{std::get<iterator_t<SparseVector<T>>>(current)->value() ...};
                 }
             private:
+            public:
                 iterator_tuple current;
                 size_t _max;
                 size_t _idx;
@@ -120,6 +136,7 @@ class cevy::ecs::Query {
 
         // static iterator_tuple _compute_end(Containers &... containers);
     private:
+    public:
         size_t _size;
         iterator _begin;
         iterator _end;
