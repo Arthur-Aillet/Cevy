@@ -147,7 +147,7 @@ class cevy::ecs::Schedule {
 
         template<class S, class R, class ...Args>
         void add_super_system(R(&&func)(Args...)) {
-            static_assert(all(is_super<Args>()...), "type must be reference to super");
+            static_assert(all(Or<is_query<Args>, is_world<Args>>()...), "type must be reference to super, or query");
             system_function sys = [&func] (World & reg) {
                 func(reg.get_super<Args>()...);
             };
