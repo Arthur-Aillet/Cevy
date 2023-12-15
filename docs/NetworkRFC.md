@@ -26,7 +26,7 @@ Other actions, particularly security oriented, can not be assumed until the serv
 The *server* is responsible for delivering state and state change information to the client,
 missing state information should be considered to be out of date by the client.
 
-the server can choose to let fail or succeed Client Actions, but it must respond.
+the server can choose to let fail or succeed Client Actions. By default, it must respond.
 the server keeps track of all connect Client Actions, and will relay state-change information triggered by such an action if applicable
 
 ### User:
@@ -42,7 +42,6 @@ A *bot* is a special type of client with no user. It is privy to all information
 ### State
 
 A State is information specied for a given timepoint, it is defined to be true in that instant, but undefined outside. A State that wasn't specified to have changed can be assumed to be unchanged if the assumption can be corrected afterwards by the Client.
-//TODO: Reword this ?
 
 The client may request the server to specify a State. By default, the server is not required to fulfill that request
 
@@ -68,7 +67,8 @@ A State Change is an event that specifies a State's value was updated. It is def
 
 ### Client Action
 
-A Client Action is a request, initiated by the client, that the server must let succeed or fail. It has one Success response, with an optionnal structured message, and several Failure responses.
+A Client Action is a request, initiated by the client. By default, the server must respond to with a success or failure.
+It has one Success response, with an optionnal structured message, and several Failure responses.
 
 
 #### Client Action Responses
