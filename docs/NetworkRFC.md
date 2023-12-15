@@ -12,23 +12,41 @@ additionnally, TCP/IP may be used for asset streaming, e.g. User Generated conte
 
 ### Data format
 
-|    Shorthand     |      Object      |         Type        |                 Composition               |
+Each UDP packet contains a Payload header followed by Payload data
+the payload header holds a value of half the payload size. The payload size is 2 * payload value.
+A single padding byte of 0xff is permitted if the 'true' content is of odd length
+the allowed maximum payload size is 506 bytes (to be encoded as `253` in the header)
+
+|    Shorthand     |   Meta Object    |         Type        |                 Composition               |
 |------------------|------------------|---------------------|-------------------------------------------|
 |      Magic       |   Magic number   |     single value    |                   4 bytes                 |
 |                  |     Paylaod      |      composite      |     *Payload header* + *Payload data*     |
 |                  |  Payload header  |     single value    |                   1 bytes                 |
 |                  |   Payload data   |      composite      |       2 * [*Payload header*] bytes        |
-|       Data       |  Structure data  |      composite      |         *Short size* + raw data           |
+
+The Payload Data itself contains a concatenation of Objects;
+|    Shorthand     |   Emitter   |      Object      |         Type        |                 Composition               |
+|------------------|-------------|------------------|---------------------|-------------------------------------------|
+|      State       |    Server   |   State Update   |      composite      |      `C::State` + Descriptor + Data       |
+|      State?      |    Client   |   State Request  |      composite      |      `C::StateRequest` + Descriptor       |
+|    StateChange   |    Server   |   State Change   |      composite      |`C::StateChange` + Descriptor + Data + Data|
+|      Action      |    Client   |  Client Action   |      composite      |      `C::Action` + Descriptor + Data      |
+|      Sucess      |    Server   |  Action Success  |      composite      |   `C::ActionSucess` + Descriptor + Data   |
+|     Failure      |    Server   |  Action Failure  |      composite      | `C::ActionFailure` + Descriptor + Reason  |
+TODO: metadata objects
+
+Objects are composed of Sub-Objects;
+
+|    Shorthand     |    Sub-Object    |         Type        |                 Composition               |
+|------------------|------------------|---------------------|-------------------------------------------|
+|       Data       |  Structured data |      composite      |         *Short size* + raw data           |
 |       Size       |    Short size    |     single value    |                   1 byte                  |
 |        C         |  Communication   |        Enum         |                   1 byte                  |
 |      Reason      |  Failure reason  |        Enum         |                   1 byte                  |
 |    Descriptor    | Named descriptor |         ID          |                   2 bytes                 |
-|      State       |   State Update   |      composite      |      `C::State` + Descriptor + Data       |
-|      State?      |   State Request  |      composite      |      `C::StateRequest` + Descriptor       |
-|    StateChange   |   State Change   |      composite      |`C::StateChange` + Descriptor + Data + Data|
-|      Action      |  Client Action   |      composite      |      `C::Action` + Descriptor + Data      |
-|      Sucess      |  Action Success  |      composite      |   `C::ActionSucess` + Descriptor + Data   |
-|     Failure      |  Action Failure  |      composite      |  `C::ActionFailue` + Descriptor + Reason  |
+
+
+
 
 ---
 ## Roles:
