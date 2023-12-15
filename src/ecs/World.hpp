@@ -19,6 +19,7 @@
 #include "Entity.hpp"
 #include "Resource.hpp"
 
+#include <string>
 #include <unordered_map>
 #include <any>
 #include <typeindex>
@@ -29,7 +30,6 @@
 
 #include "ecs.hpp"
 #include "Query.hpp"
-
 
 template<class T>
 struct is_world : public std::false_type {};
@@ -109,7 +109,7 @@ class cevy::ecs::World {
         /// spawn an entity with defined components
         template<typename... Ts>
         EntityWorldRef spawn(Ts... a) {
-            auto e = spawn_empty().insert(a...);
+            return spawn_empty().insert(a...);
         }
 
         /// get a Component T associated with a given Entity, or Nothing if no such Component
@@ -242,11 +242,23 @@ class cevy::ecs::World {
 
         template <class Component>
         SparseVector<Component> &get_components() {
-            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
+            auto id = std::type_index(typeid(Component));
+            auto it = _components_arrays.find(id);
+
+            if (it != _components_arrays.end()) {
+                return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays[id]));
+            }
+            throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
         }
         template <class Component>
         SparseVector<Component> const &get_components() const {
-            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays.at(std::type_index(typeid(Component)))));
+            auto id = std::type_index(typeid(Component));
+            auto it = _components_arrays.find(id);
+
+            if (it != _components_arrays.end()) {
+                return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays.at(id)));
+            }
+            throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
         }
 
         template<typename W,
@@ -270,7 +282,7 @@ class cevy::ecs::World {
 
 template<typename... Ts>
 cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... args) {
-    world.add_component(entity, args...);
+    (world.add_component(entity, std::forward<Ts>(args)), ...);
     return *this;
 }
 
