@@ -1,10 +1,20 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** GameEngine
+*/
+
 #pragma once
 
-#include "raylib.h"
-#include "camera.hpp"
+#include "Plugin.hpp"
+#include "ecs.hpp"
 
-namespace Cevy {
-    class GameEngine {
+namespace cevy {
+    class Engine : public cevy::ecs::Plugin {
+        public:
+            void static build(cevy::ecs::App& app);
+        /*
         private:
             int screenWidth = 800;
             int screenHeight = 450;
@@ -15,7 +25,8 @@ namespace Cevy {
         public:
             void Fullscreen (void);
             void DebugWindow (void);
-            GameEngine();
+            Engine();
             void update(void);
+        */
     };
 }

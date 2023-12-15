@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../cevy.hpp"
+#include "cevy.hpp"
 
 namespace cevy::ecs {
     class App;

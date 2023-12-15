@@ -2,22 +2,55 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** game_engine
+** Engine
 */
 
-#include "game_engine.hpp"
-#include "camera.hpp"
+#include "Engine.hpp"
+#include "ecs.hpp"
+#include "raylib.h"
 #include "rlImGui.h"
+#include "Schedule.hpp"
+#include "App.hpp"
+#include "Camera.hpp"
 #include "imgui.h"
 
-Cevy::GameEngine::GameEngine() {
+void init_window() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(this->screenWidth, this->screenHeight, "raylib [core] example - basic window");
+    InitWindow(800, 450, "raylib [core] example - basic window");
     SetTargetFPS(60);
     rlImGuiSetup(true);
 }
 
-void Cevy::GameEngine::DebugWindow (void) {
+void update_window(cevy::ecs::Query<Cevy::Camera> cams) {
+    BeginDrawing();
+
+    ClearBackground(WHITE);
+    for (auto cam : cams) {
+        BeginMode3D(std::get<0>(cam));
+
+        DrawGrid(100, 1.0f);
+
+        EndMode3D();
+    }
+    EndDrawing();
+}
+
+void cevy::Engine::build(cevy::ecs::App& app) {
+    app.add_system<cevy::ecs::Schedule::PreStartup>(init_window);
+    app.add_system<cevy::ecs::Schedule::PostUpdate>(update_window);
+    app.init_component<Cevy::Camera>();
+    app.spawn(Cevy::Camera());
+    //app.add_component(test, Cevy::Camera());
+    //app.spawn(Cevy::Camera());
+    //app.init_component<Camera>();
+}
+
+
+/*
+cevy::Engine::Engine() {
+}
+
+void cevy::Engine::DebugWindow (void) {
     if (IsKeyPressed(KEY_F10)) {
         debugMode = (debugMode == false);
         if (debugMode)
@@ -35,12 +68,12 @@ void Cevy::GameEngine::DebugWindow (void) {
         }
         rlImGuiEnd();
     } else {
-        UpdateCamera(camera, CAMERA_FIRST_PERSON);
+        UpdateCamera(&camera, CAMERA_FIRST_PERSON);
         DisableCursor();
     }
 }
 
-void Cevy::GameEngine::Fullscreen (void) {
+void cevy::Engine::Fullscreen (void) {
     if (IsWindowFullscreen()) {
         int display = GetCurrentMonitor();
         this->screenWidth = GetMonitorWidth(display);
@@ -55,7 +88,7 @@ void Cevy::GameEngine::Fullscreen (void) {
  	ToggleFullscreen();
 }
 
-void Cevy::GameEngine::update(void) {
+void cevy::Engine::update(void) {
     const char* text = "Your first window!";
     Vector2 text_size;
 
@@ -76,3 +109,4 @@ void Cevy::GameEngine::update(void) {
         EndDrawing();
     }
 }
+*/

@@ -1,8 +1,6 @@
-#include "camera.hpp"
-#include <iostream>
+#include "Camera.hpp"
 
-Cevy::Camera::Camera()
-{
+Cevy::Camera::Camera() {
     this->camera = { 0 };
     this->camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
     this->camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
