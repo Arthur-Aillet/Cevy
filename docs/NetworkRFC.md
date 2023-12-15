@@ -12,75 +12,23 @@ additionnally, TCP/IP may be used for asset streaming, e.g. User Generated conte
 
 ### Data format
 
-//FIXME - **Packet type** On le décend à 16 bits ? le nom des objets peuvent être un peu long et donc ne pas tenir dans 16 bits. Si on veux décendre à 16 bits on peux faire une table de correspondance. On défini un nombre pour chaque classe qu'il est possible d'envoyer.
-
-<style>
-table, {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  text-align: center;
-  border: 1px solid black;
-  padding: 10px;
-}
-</style>
-
-<table>
-  <tr>
-    <td>0</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>6</td>
-    <td>7</td>
-    <td>8</td>
-    <td>9</td>
-    <td>10</td>
-    <td>11</td>
-    <td>12</td>
-    <td>13</td>
-    <td>14</td>
-    <td>15</td>
-    <td>16</td>
-    <td>17</td>
-    <td>18</td>
-    <td>19</td>
-    <td>20</td>
-    <td>21</td>
-    <td>22</td>
-    <td>23</td>
-    <td>24</td>
-    <td>25</td>
-    <td>26</td>
-    <td>27</td>
-    <td>28</td>
-    <td>29</td>
-    <td>30</td>
-    <td>31</td>
-  </tr>
-  <tr>
-    <td colspan="32"> Magic number </td>
-  </tr>
-  <tr>
-    <td colspan="32"> Packet type </td>
-  </tr>
-  <tr>
-    <td colspan="32"> Playload size </td>
-  </tr>
-  <tr>
-    <td colspan="32"> Data (variable size) </td>
-  </tr>
-</table>
-
-
-
-- **Magic number** (32 bits): Number for check that it is a good packet
-- **Packet type** (32 bits): It is the type of the object send
-- **Payload size** (32 bits): Number of objects send
+|    Shorthand     |      Object      |         Type        |                 Composition               |
+|------------------|------------------|---------------------|-------------------------------------------|
+|      Magic       |   Magic number   |     single value    |                   4 bytes                 |
+|                  |     Paylaod      |      composite      |     *Payload header* + *Payload data*     |
+|                  |  Payload header  |     single value    |                   1 bytes                 |
+|                  |   Payload data   |      composite      |       2 * [*Payload header*] bytes        |
+|       Data       |  Structure data  |      composite      |         *Short size* + raw data           |
+|       Size       |    Short size    |     single value    |                   1 byte                  |
+|        C         |  Communication   |        Enum         |                   1 byte                  |
+|      Reason      |  Failure reason  |        Enum         |                   1 byte                  |
+|    Descriptor    | Named descriptor |         ID          |                   2 bytes                 |
+|      State       |   State Update   |      composite      |      `C::State` + Descriptor + Data       |
+|      State?      |   State Request  |      composite      |      `C::StateRequest` + Descriptor       |
+|    StateChange   |   State Change   |      composite      |`C::StateChange` + Descriptor + Data + Data|
+|      Action      |  Client Action   |      composite      |      `C::Action` + Descriptor + Data      |
+|      Sucess      |  Action Success  |      composite      |   `C::ActionSucess` + Descriptor + Data   |
+|     Failure      |  Action Failure  |      composite      |  `C::ActionFailue` + Descriptor + Reason  |
 
 ---
 ## Roles:
