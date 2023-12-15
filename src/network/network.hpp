@@ -1,12 +1,14 @@
 #pragma once
 
-#include "../entity.hpp"
 #include "asio.hpp"
+#include <cstdint>
 #include <iostream>
 #include <sstream>
+#include <sys/types.h>
 #include <typeinfo>
 
-using namespace asio;
+#include "../entity.hpp"
+#include "../sparse_array.hpp"
 
 /**NOTE - Utiliser des templates pour envoyer les données
  * prend donc n'importe qu'elle type en entré (on doit créer un prototype de la fonction pour chaque type possible)
@@ -19,11 +21,21 @@ using namespace asio;
 
 class Networks
 {
+    public:
+        enum C {
+            State,
+            StateRequest,
+            StateChange,
+            Action,
+            ActionSuccess,
+            ActionFailure,
+        };
+
     private:
         template <typename Component>
-        std::stringstream serialization(Component const &component) {
+        std::stringstream serialization(sparse_array<Component> components) {
             std::stringstream ss;
-            ss << typeid(Component).name() << ' ' << component;
+            ss << typeid(Component).name() << ' ' << components;
             return ss;
         }
 
@@ -33,7 +45,7 @@ class Networks
             Component component;
             iss >> typeIdName >> component;
             if (typeIdName != typeid(component).name()) {
-                std::cerr << "Error: Ivalide component type: " << typeIdName << std::endl;
+                std::cerr << "Error: Invalide component type: " << typeIdName << std::endl;
             }
             return {typeIdName, component};
         }

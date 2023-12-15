@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./network.hpp"
+#include "network.hpp"
 #include "../sparse_array.hpp"
 
 
