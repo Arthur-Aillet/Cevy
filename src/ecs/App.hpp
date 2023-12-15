@@ -38,8 +38,7 @@ class cevy::ecs::App : public cevy::ecs::World {
                 std::is_base_of_v<Plugin, GivenPlugin>,
                 "Given plugin does not derive from Cevy Plugin class"
             );
-            GivenPlugin plugin;
-            plugin.build(*this);
+            GivenPlugin::build(*this);
         }
 
     public:
@@ -59,42 +58,19 @@ class cevy::ecs::App : public cevy::ecs::World {
             _schedule.abort();
         }
 
-        template <typename Function>
-        void add_system(Function &&f) {
-            _schedule.add_system<Schedule::Update>(f);
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function &&f) {
-            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
-                _schedule.add_system<S, Components...>(f);
-            } else {
-                _schedule.add_system<Schedule::Update, S, Components...>(f);
-            }
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function const &f) {
-            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
-                _schedule.add_system<S, Components...>(f);
-            } else {
-                _schedule.add_system<Schedule::Update, S, Components...>(f);
-            }
-        }
-
         template<typename T>
         void add_stage() {
             _schedule.insert_schedule<T>();
         }
 
         template<class S, class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            _schedule.add_super_system<S>(func);
+        void add_system(R(&&func)(Args...)) {
+            _schedule.add_system<S>(func);
         }
 
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            _schedule.add_super_system(func);
+        void add_system(R(&&func)(Args...)) {
+            _schedule.add_system(func);
         }
 
 };

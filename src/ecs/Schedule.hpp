@@ -123,32 +123,15 @@ class cevy::ecs::Schedule {
         void quit() const;
         void abort();
 
-        template <typename S, class... Components, typename Function>
-        void add_system(Function const &f) {
-            system_function sys = [&f] (World & world) {
-                f(world, world.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function &&f) {
-            system_function sys = [&f] (World & world) {
-                f(world, world.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-        }
-
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            add_super_system<Update>(func);
+        void add_system(R(&&func)(Args...)) {
+            add_system<Update>(func);
         }
 
         template<class S, class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
+        void add_system(R(&&func)(Args...)) {
             static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>>()...), "type must be reference to query, world or resource");
-            system_function sys = [&func] (World & reg) {
+            system_function sys = [&func] (World & reg) mutable {
                 func(reg.get_super<Args>()...);
             };
             _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
