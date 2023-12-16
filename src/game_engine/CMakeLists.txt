@@ -1,3 +1,11 @@
+##
+## Agartha-Software, 2023
+## Cevy
+## File description:
+## game_engine-cmake
+##
+
+
 add_library(game_engine
   STATIC
   position.hpp

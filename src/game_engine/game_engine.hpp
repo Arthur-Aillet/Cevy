@@ -1,4 +1,15 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** game_engine
+*/
+
 #pragma once
+
+typedef struct drawable_s {
+    /* data */
+} drawable;
 
 #include "raylib.h"
 #include "camera.hpp"
