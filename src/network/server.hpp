@@ -1,7 +1,14 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** network server
+*/
+
 #pragma once
 
 #include "network.hpp"
-#include "../sparse_array.hpp"
+#include "../ecs/SparseVector.hpp"
 
 
 class Server : public Networks {
@@ -11,7 +18,7 @@ class Server : public Networks {
     private:
         asio::io_service &_service;
         asio::ip::tcp::acceptor _acceptor;
-        sparse_array<asio::ip::tcp::socket> _sockets;
+        SparseVector<asio::ip::tcp::socket> _sockets;
 
     public:
         Server(asio::io_service &service, int port = 8080) : _service(service), _acceptor(service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}

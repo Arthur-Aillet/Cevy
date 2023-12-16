@@ -1,3 +1,10 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** network
+*/
+
 #pragma once
 
 #include "asio.hpp"
@@ -7,8 +14,8 @@
 #include <sys/types.h>
 #include <typeinfo>
 
-#include "../entity.hpp"
-#include "../sparse_array.hpp"
+// #include "../entity.hpp"
+#include "../ecs/SparseVector.hpp"
 
 /**NOTE - Utiliser des templates pour envoyer les données
  * prend donc n'importe qu'elle type en entré (on doit créer un prototype de la fonction pour chaque type possible)
@@ -33,7 +40,7 @@ class Networks
 
     private:
         template <typename Component>
-        std::stringstream serialization(sparse_array<Component> components) {
+        std::stringstream serialization(SparseVector<Component> components) {
             std::stringstream ss;
             ss << typeid(Component).name() << ' ' << components;
             return ss;

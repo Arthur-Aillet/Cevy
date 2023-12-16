@@ -1,8 +1,16 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** network client
+*/
+
 #pragma once
 
 #include "network.hpp"
 #include <iostream>
 #include <memory>
+
 class Client : public Networks
 {
     private:
