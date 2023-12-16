@@ -12,6 +12,7 @@
 #include "Schedule.hpp"
 #include "App.hpp"
 #include "Camera.hpp"
+#include "Position.hpp"
 #include "imgui.h"
 
 void init_window() {
@@ -21,7 +22,11 @@ void init_window() {
     rlImGuiSetup(true);
 }
 
-void update_window(cevy::ecs::Query<Cevy::Camera> cams) {
+void update_window(cevy::ecs::Query<cevy::Camera> cams) {
+    //cmd.spawn_empty().insert(cevy::Position());
+    for (auto cam : cams) {
+        UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
+    }
     BeginDrawing();
 
     ClearBackground(WHITE);
@@ -36,13 +41,12 @@ void update_window(cevy::ecs::Query<Cevy::Camera> cams) {
 }
 
 void cevy::Engine::build(cevy::ecs::App& app) {
+    app.add_stage<RenderStage>();
     app.add_system<cevy::ecs::Schedule::PreStartup>(init_window);
-    app.add_system<cevy::ecs::Schedule::PostUpdate>(update_window);
-    app.init_component<Cevy::Camera>();
-    app.spawn(Cevy::Camera());
-    //app.add_component(test, Cevy::Camera());
-    //app.spawn(Cevy::Camera());
-    //app.init_component<Camera>();
+    app.add_system<cevy::RenderStage>(update_window);
+    app.init_component<cevy::Camera>();
+    app.init_component<cevy::Position>();
+    app.spawn(cevy::Camera());
 }
 
 
@@ -68,7 +72,6 @@ void cevy::Engine::DebugWindow (void) {
         }
         rlImGuiEnd();
     } else {
-        UpdateCamera(&camera, CAMERA_FIRST_PERSON);
         DisableCursor();
     }
 }

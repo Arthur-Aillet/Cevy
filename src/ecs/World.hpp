@@ -17,13 +17,14 @@
 
 #include "SparseVector.hpp"
 #include "Entity.hpp"
+#include "Commands.hpp"
+#include "Command.hpp"
 #include "Resource.hpp"
 
-#include <string>
+#include <queue>
 #include <unordered_map>
 #include <any>
 #include <typeindex>
-#include <iostream>
 #include <tuple>
 #include <functional>
 #include <type_traits>
@@ -36,6 +37,7 @@ struct is_world : public std::false_type {};
 
 template<>
 struct is_world<cevy::ecs::World&> : public std::true_type {};
+
 template<>
 struct is_world<const cevy::ecs::World&> : public std::true_type {};
 
@@ -47,6 +49,18 @@ constexpr bool any() { return (... || Args::value); };
 
 template<typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
+
+namespace cevy {
+    namespace ecs {
+        class Commands;
+    }
+}
+
+template<class T>
+struct is_commands : public std::false_type {};
+
+template<>
+struct is_commands<cevy::ecs::Commands> : public std::true_type {};
 
 /**
  * Stores Entities, Components (and resources), and exposes operations
@@ -71,8 +85,12 @@ class cevy::ecs::World {
         };
 
         using erase_access = std::function<void (World &, Entity const &)>;
+        using command = std::function<void (World &)>;
         using component_data = std::tuple<std::any, erase_access>;
 
+        friend class cevy::ecs::Schedule;
+        friend class cevy::ecs::Commands;
+        std::queue<command> _command_queue;
     /* Bevy-compliant */
     public:
         /// @brief Id refering to a specific component
@@ -107,9 +125,9 @@ class cevy::ecs::World {
         void clear_resources();
 
         /// spawn an entity with defined components
-        template<typename... Ts>
-        EntityWorldRef spawn(Ts... a) {
-            return spawn_empty().insert(a...);
+        template<typename... Components>
+        EntityWorldRef spawn(Components... c) {
+            return spawn_empty().insert(c...);
         }
 
         /// get a Component T associated with a given Entity, or Nothing if no such Component
@@ -206,11 +224,10 @@ class cevy::ecs::World {
         }
 
     public:
-        Entity spawn_at(std::size_t idx);
-
         template <typename Component>
         typename SparseVector<Component>::reference_type add_component(Entity const &to, Component &&c) {
             auto &array = get_components<Component>();
+
             return array.insert_at(to, std::forward<Component>(c));
         }
 
@@ -225,19 +242,6 @@ class cevy::ecs::World {
             auto &array = get_components<Component>();
             if (from < array.size())
                 array.erase(from);
-        }
-
-        template <class Component>
-        SparseVector<Component> &register_component() {
-            erase_access f_e = [] (World & reg, Entity const & Entity) {
-                auto &cmpnts = reg.get_components<Component>();
-                if (Entity < cmpnts.size())
-                    cmpnts[Entity] = std::nullopt;
-            };
-            std::any a = std::make_any<SparseVector<Component>>();
-
-            _components_arrays.insert({std::type_index(typeid(Component)), std::make_tuple(a, f_e)});
-            return std::any_cast<SparseVector<Component>&>(std::get<0>(_components_arrays[std::type_index(typeid(Component))]));
         }
 
         template <class Component>
@@ -278,6 +282,71 @@ class cevy::ecs::World {
         R get_super() {
             return _resource_manager.get<typename R::value>();
         }
+
+        template<typename C,
+            typename std::enable_if_t<is_commands<C>::value, bool> = true>
+        C get_super();
+};
+
+namespace cevy {
+    namespace ecs {
+        class EntityCommands;
+    }
+}
+
+class cevy::ecs::Commands {
+    private:
+        friend class cevy::ecs::World;
+
+        cevy::ecs::World& _world_access;
+        Commands(cevy::ecs::World& world_access) : _world_access(world_access) {};
+    public:
+    /*
+        template<typename GivenCommand>
+        void add(const GivenCommand &a) {
+            static_assert(
+                std::is_base_of_v<Command, GivenCommand>,
+                "Given command does not derive from Cevy command class"
+            );
+            auto l = [a] (cevy::ecs::World &w) {
+                a.apply(w);
+            };
+            _world_access._command_queue.push(l);
+        }
+    */
+        void add(std::function<void (cevy::ecs::World &w)>&& f) {
+            _world_access._command_queue.push(f);
+        }
+
+        template<typename R>
+        void insert_resource(const R& value) {
+            add([value] (cevy::ecs::World &w) {
+                w.insert_resource(value);
+            });
+        }
+
+        cevy::ecs::EntityCommands spawn_empty();
+
+        template<typename... Ts>
+        cevy::ecs::EntityCommands spawn(Ts... a);
+};
+
+
+class cevy::ecs::EntityCommands {
+    private:
+        cevy::ecs::Entity _entity;
+        cevy::ecs::Commands &_commands;
+
+        friend class cevy::ecs::Commands;
+        EntityCommands(cevy::ecs::Commands& commands, cevy::ecs::Entity entity)  : _entity(entity), _commands(commands) {};
+    public:
+        template<typename... Components>
+        cevy::ecs::EntityCommands &insert(Components &&... c) {
+            _commands.add([... c = std::forward<Components>(c), &e = _entity] (cevy::ecs::World &w) mutable {
+                (w.add_component(e, c), ...);
+            });
+            return *this;
+        }
 };
 
 template<typename... Ts>
@@ -289,4 +358,15 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 template<typename...T>
 cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World& w) {
     return Query<T...>(w.get_components<T>()...);
+}
+
+template<typename C,
+    typename std::enable_if_t<is_commands<C>::value, bool>>
+C cevy::ecs::World::get_super() {
+    return cevy::ecs::Commands(*this);
+}
+
+template<typename... Ts>
+cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
+    return spawn_empty().insert(a...);
 }

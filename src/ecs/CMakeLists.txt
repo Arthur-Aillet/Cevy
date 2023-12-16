@@ -22,6 +22,8 @@ add_library(world
   STATIC
   World.cpp
   World.hpp
+  Commands.cpp
+  Commands.hpp
   )
 
 add_library(schedule

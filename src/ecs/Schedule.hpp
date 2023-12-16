@@ -12,8 +12,6 @@
 #include <optional>
 #include <algorithm>
 #include <typeindex>
-#include <variant>
-#include <any>
 
 #include "ecs.hpp"
 #include "World.hpp"
@@ -130,7 +128,7 @@ class cevy::ecs::Schedule {
 
         template<class S, class R, class ...Args>
         void add_system(R(&&func)(Args...)) {
-            static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>>()...), "type must be reference to query, world or resource");
+            static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...), "type must be reference to query, world, commands or resource");
             system_function sys = [&func] (World & reg) mutable {
                 func(reg.get_super<Args>()...);
             };

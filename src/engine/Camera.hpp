@@ -2,7 +2,7 @@
 
 #include "raylib.h"
 
-namespace Cevy {
+namespace cevy {
     class Camera {
         private:
             /* data */

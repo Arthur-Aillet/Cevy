@@ -48,6 +48,11 @@ void Schedule::run(World &world) {
     runStartStages(world);
     while (!_stop) {
         runStages(world);
+        while(!world._command_queue.empty()) {
+            std::function<void(World &)> func = world._command_queue.front();
+            world._command_queue.pop();
+            func(world);
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 
 add_library(engine
   STATIC
-  position.hpp
+  Position.hpp
   velocity.hpp
   Engine.hpp
   Engine.cpp

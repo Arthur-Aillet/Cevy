@@ -9,24 +9,12 @@
 
 #include "Plugin.hpp"
 #include "ecs.hpp"
+#include "Schedule.hpp"
 
 namespace cevy {
+    class RenderStage : public cevy::ecs::Schedule::before<cevy::ecs::Schedule::PreUpdate> {};
     class Engine : public cevy::ecs::Plugin {
         public:
             void static build(cevy::ecs::App& app);
-        /*
-        private:
-            int screenWidth = 800;
-            int screenHeight = 450;
-            int windowWidth;
-            int windowHeight;
-            bool debugMode = false;
-            Camera camera;
-        public:
-            void Fullscreen (void);
-            void DebugWindow (void);
-            Engine();
-            void update(void);
-        */
     };
 }

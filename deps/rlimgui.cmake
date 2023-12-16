@@ -1,12 +1,16 @@
-FetchContent_Declare(
-    rlimgui
-    DOWNLOAD_EXTRACT_TIMESTAMP OFF
-    GIT_REPOSITORY https://github.com/raylib-extras/rlImGui
-    GIT_TAG main
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/rlimgui
-  )
 
-FetchContent_MakeAvailable(rlimgui)
+find_package(rlimgui ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
+if (NOT rlimgui_FOUND) # If there's none, fetch and build raylib
+  FetchContent_Declare(
+      rlimgui
+      DOWNLOAD_EXTRACT_TIMESTAMP OFF
+      GIT_REPOSITORY https://github.com/raylib-extras/rlImGui
+      GIT_TAG main
+      SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/rlimgui
+    )
+
+  FetchContent_Populate(rlimgui)
+endif()
 
 set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)
 set(IMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/imgui)

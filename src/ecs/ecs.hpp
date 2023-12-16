@@ -14,6 +14,9 @@ namespace cevy::ecs {
     class Entity;
     class Plugin;
     class Schedule;
+    class Commands;
+    class Command;
+    class EntityCommands;
     class World;
 
     template <class... Containers>
