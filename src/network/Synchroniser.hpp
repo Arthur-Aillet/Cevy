@@ -7,12 +7,14 @@
 
 #pragma once
 
-#include "network.hpp"
-#include "../cevy.hpp"
-#include "../ecs/ecs.hpp"
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <typeindex>
+
+#include "network.hpp"
+#include "../cevy.hpp"
+#include "../ecs/ecs.hpp"
 
 class Synchroniser {
 public:
