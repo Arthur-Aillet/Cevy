@@ -133,7 +133,9 @@ class NetworkBase
 
         template<typename Function>
         void writeUDP(const std::vector<uint8_t>& data, Function&& func) {
-            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, func);
+            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, [this](asio::error_code error, size_t bytes) {
+                std::cout << "fonction à remplacer" << std::endl;
+            });
         }
 
         virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) {
