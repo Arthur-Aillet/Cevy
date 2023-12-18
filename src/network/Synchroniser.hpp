@@ -12,17 +12,16 @@
 #include <vector>
 #include <typeindex>
 
-#include "network.hpp"
+#include "CevyNetwork.hpp"
 #include "../cevy.hpp"
 #include "../ecs/ecs.hpp"
 #include "../ecs/App.hpp"
 
-template<typename Block, typename... Component>
-class SyncBlock;
-
-
 class Synchroniser {
 public:
+    struct SyncId {};
+    template<typename Block, typename... Component>
+    class SyncBlock;
     using BlockType = std::type_index;
     using ComponentType = std::type_index;
     enum class Mode {
@@ -32,7 +31,7 @@ public:
 
     virtual void build(cevy::ecs::World& world) = 0;
 
-    Synchroniser(Network& net, Mode mode) : mode(mode), _net(net) {};
+    Synchroniser(CevyNetwork& net, Mode mode) : mode(mode), _net(net) {};
     ~Synchroniser() {};
 
     template<typename Stage, typename Block, typename... Component>
@@ -44,7 +43,7 @@ public:
     }
 
 protected:
-    Network& _net;
+    CevyNetwork& _net;
     // std::unordered_map<BlockType, std::vector<ComponentType>> _sync_map;
     Mode mode;
 
@@ -52,25 +51,34 @@ private:
 };
 
 template<typename Block, typename... Component>
-class SyncBlock {
-    SyncBlock(Synchroniser::Mode mode) : mode(mode) {};
+class Synchroniser::SyncBlock {
+    SyncBlock(Synchroniser::Mode mode, CevyNetwork& net) : mode(mode), _net(net) {};
+    CevyNetwork& _net;
 
-    void system_send(cevy::ecs::Query<Component...>& q) {
+    template<typename T>
+    static uint16_t id(size_t sync_id) {
+
+    }
+
+
+    void system_send(cevy::ecs::Query<SyncId, Component...>& q) {
         for (auto& e : q) {
+            auto sync_id = std::get<SyncId>(e);
             std::vector<uint8_t> block;
             ([&] {
                 constexpr size_t size =  sizeof(Component);
                 std::array<uint8_t, size> vec;
                 std::memcpy(&vec.data(), &std::get<Component>(e), size);
-                block.insert(vec.begin(), vec.end());
+                block.insert(block.end(), vec.begin(), vec.end());
             } (), ...);
-            //network.send(id<Block>(e.id()), block);
+            _net.sendState(id<Block>(sync_id), block);
         }
     }
 
-    void system_recv(cevy::ecs::Query<Component...>& q) {
+    void system_recv(cevy::ecs::Query<SyncId, Component...>& q) {
         for (auto& e : q) {
-            std::optional<std::vector<uint8_t>> block_; // = network.recv(id<Block>(e.id()));
+            auto sync_id = std::get<SyncId>(e);
+            std::optional<std::vector<uint8_t>> block_ = _net.recvState(id<Block>(sync_id));
             if (!block_)
                 return;
             std::vector<uint8_t>& block = block_.value();
@@ -84,12 +92,12 @@ class SyncBlock {
         }
     }
 
-    void operator() (cevy::ecs::Query<Component...> q) {
-        if (mode == Synchroniser::Mode::Server)
+    void operator() (cevy::ecs::Query<SyncId, Component...> q) {
+        if (mode == Mode::Server)
             system_send(q);
-        if (mode == Synchroniser::Mode::Client)
+        if (mode == Mode::Client)
             system_recv(q);
     };
 
-    Synchroniser::Mode mode;
+    Mode mode;
 };

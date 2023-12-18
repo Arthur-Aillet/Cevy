@@ -2,7 +2,7 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** network
+** networkBase
 */
 
 #pragma once
@@ -17,6 +17,7 @@
 #include <typeinfo>
 #include <asio/ip/udp.hpp>
 #include <vector>
+#include <stdint.h>
 
 // #include "../entity.hpp"
 #include "../ecs/SparseVector.hpp"
@@ -30,18 +31,8 @@
  * deserialzer l'objet dans le type trouvée
 */
 
-class Network
+class NetworkBase
 {
-    public:
-        enum C {
-            State,
-            StateRequest,
-            StateChange,
-            Action,
-            ActionSuccess,
-            ActionFailure,
-        };
-
     private:
         template <typename Component>
         std::stringstream serialization(SparseVector<Component> components) {
@@ -66,7 +57,7 @@ class Network
             asio::io_context io_context;
             asio::ip::udp::socket udp(io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), 13));
             asio::ip::tcp::socket tcp(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 999));
-            Network server = Network(std::move(udp), std::move(tcp));
+            NetworkBase server = NetworkBase(std::move(udp), std::move(tcp));
             std::cout << "setting up read;" << std::endl;
             server.readUDP();
             std::cout << "running" << std::endl;
@@ -84,7 +75,7 @@ class Network
             asio::ip::udp::socket udp(io_context);
             udp.open(asio::ip::udp::v4());
             asio::ip::tcp::socket tcp(io_context);
-            Network client = Network(std::move(udp), std::move(tcp));
+            NetworkBase client = NetworkBase(std::move(udp), std::move(tcp));
             client._udp_endpoint = receiver_endpoint;
             while (std::cin.good()) {
                 std::string line;
@@ -105,27 +96,21 @@ class Network
         std::array<uint8_t, 512> _udp_recv;
         std::vector<uint8_t> _tcp_recv;
 
-        Network(asio::ip::udp::socket&& udp_socket, asio::ip::tcp::socket&& tcp_socket)
+        NetworkBase(asio::ip::udp::socket&& udp_socket, asio::ip::tcp::socket&& tcp_socket)
          : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
 
         void readUDP() {
             _udp_socket.async_receive_from(
-                asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes){this->udp_receive(error, bytes);}
+                asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes){this->udp_receive(error, bytes, this->_udp_recv); readUDP();}
             );
         }
 
-        void writeUDP(const std::vector<uint8_t>& data) {
-            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, [](asio::error_code, size_t){});
+        template<typename Function>
+        void writeUDP(const std::vector<uint8_t>& data, Function&& func) {
+            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, func);
         }
 
-        void udp_receive(asio::error_code error, size_t bytes) {
-            std::cout << "revieved " << bytes << " bytes:" << std::endl;
-            for (auto i = 0; i < bytes; ++i) {
-                std:: cout << std::hex << _udp_recv[i];
-            }
-            std::cout << std::endl << std::endl;
-            readUDP();
-        }
+        virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) = 0;
 
         template <typename Component>
         void sendComponent(asio::ip::tcp::socket &socket, Component const &component) {
