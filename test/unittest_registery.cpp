@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
 #include "../src/registry.hpp"
-#include "../src/sparse_array.hpp"
+#include "../src/SparseVector.hpp"
 
 Test(registering, constructors) {
     registry app;
