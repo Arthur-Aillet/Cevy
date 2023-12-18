@@ -10,6 +10,7 @@
 #include "ecs.hpp"
 #include "raylib.h"
 #include "rlImGui.h"
+#include "AssetManager.hpp"
 #include "Schedule.hpp"
 #include "App.hpp"
 #include "DefaultPlugin.hpp"
@@ -33,6 +34,9 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 }
 
 void update_window(cevy::ecs::Query<cevy::Camera> cams) {
+    static Model model = LoadModel("resources/church.obj");                 // Load OBJ model
+    static Texture2D texture = LoadTexture("resources/church_diffuse.png"); // Load model texture (diffuse map)
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
     for (auto cam : cams) {
         UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
@@ -42,6 +46,7 @@ void update_window(cevy::ecs::Query<cevy::Camera> cams) {
     for (auto cam : cams) {
         BeginMode3D(std::get<0>(cam));
 
+        DrawModel(model, Vector3 {0, 0, 0}, 0.1, WHITE);   // Draw 3d model with texture
         DrawGrid(100, 1.0f);
 
         EndMode3D();
@@ -57,9 +62,14 @@ void list_pos(cevy::ecs::Query<cevy::Position> pos) {
 
 void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_plugins(cevy::ecs::DefaultPlugin());
+    app.add_plugins(cevy::AssetManagerPlugin());
+    app.add_plugins();
+    app.add_stage<StartupRenderStage>();
     app.add_stage<PreStartupRenderStage>();
-    app.add_stage<PreRenderStage>();
+    app.add_stage<PostStartupRenderStage>();
     app.add_stage<RenderStage>();
+    app.add_stage<PreRenderStage>();
+    app.add_stage<PostRenderStage>();
     app.add_system<cevy::PreStartupRenderStage>(init_window);
     app.add_system<cevy::RenderStage>(update_window);
     app.add_system<cevy::RenderStage>(list_pos);

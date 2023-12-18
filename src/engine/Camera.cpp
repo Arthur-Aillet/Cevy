@@ -1,3 +1,10 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** Camera
+*/
+
 #include "Camera.hpp"
 
 cevy::Camera::Camera() {

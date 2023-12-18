@@ -14,6 +14,8 @@ add_library(engine
   Engine.cpp
   Camera.hpp
   Camera.cpp
+  assets/AssetManager.cpp
+  assets/AssetManager.hpp
   )
 
 set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)
@@ -23,6 +25,8 @@ target_link_libraries(engine PUBLIC raylib imgui rlImGui ecs)
 
 target_include_directories(engine PUBLIC
   ../ecs
+  .
+  assets
 )
 
 target_include_directories(rlImGui PUBLIC
