@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <unordered_map>
 #include <vector>
 #include <typeindex>
 
@@ -36,7 +37,8 @@ public:
 
     template<typename Stage, typename Block, typename... Component>
     void add_sync(cevy::ecs::App& app) {
-        app.add_super_system<Stage>(SyncBlock<Block, Component...>(mode));
+        _blocks[BlockType(typeid(Block))] = ++_blockCount;
+        app.add_super_system<Stage>(SyncBlock<Block, Component...>(mode, *this));
         // ([&] {
         //     (_sync_map[typeid(Block)].push_back(typeid(Component)));
         // } (), ...);
@@ -44,6 +46,8 @@ public:
 
 protected:
     CevyNetwork& _net;
+    std::unordered_map<BlockType, uint8_t> _blocks;
+    uint8_t _blockCount;
     // std::unordered_map<BlockType, std::vector<ComponentType>> _sync_map;
     Mode mode;
 
@@ -52,18 +56,29 @@ private:
 
 template<typename Block, typename... Component>
 class Synchroniser::SyncBlock {
-    SyncBlock(Synchroniser::Mode mode, CevyNetwork& net) : mode(mode), _net(net) {};
+    SyncBlock(Synchroniser::Mode mode, Synchroniser& sync, CevyNetwork& net) : mode(mode), _sync(sync), _net(sync._net) {};
+    Synchroniser& _sync;
     CevyNetwork& _net;
 
     template<typename T>
-    static uint16_t id(size_t sync_id) {
+    uint16_t id(uint16_t sync_id) {
+        auto it = _sync._blocks.find(BlockType(typeid(T)));
 
+        if (it != _sync._blocks.end()) {
+            uint16_t block = it->second;
+            block <<= 10;
+            block &= (sync_id & ((1 << 10) - 1));
+            return block;
+        }
+        return 0;
     }
 
 
     void system_send(cevy::ecs::Query<SyncId, Component...>& q) {
         for (auto& e : q) {
             auto sync_id = std::get<SyncId>(e);
+            if (!sync_id)
+                continue;
             std::vector<uint8_t> block;
             ([&] {
                 constexpr size_t size =  sizeof(Component);
