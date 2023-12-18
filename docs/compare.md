@@ -122,7 +122,7 @@ fn main() {
   app::new()
     .add_plugin(CameraPlugin)
     .add_system(First, spawn_player)
-    .init_ressource(clock::new())
+    .init_resource(clock::new())
     .run();
 }
 
@@ -135,8 +135,8 @@ int main()
     App app;
     app.add_plugin<CameraPlugin>();
     app.add_system(STAGE::First, spawn_player);
-    app.init_ressource<Clock>(/* initializer-list */); // for emplace-ctor
-    app.init_ressource(Clock());
+    app.init_resource<Clock>(/* initializer-list */); // for emplace-ctor
+    app.init_resource(Clock());
     app.run();
 }
 
@@ -149,7 +149,7 @@ data of some kind
 **Exemple Rust:**
 ```rust
 
-.init_ressource(clock::new())
+.init_resource(clock::new())
 
 fn greet_people(time: Res<Time>, query: Query<&Name, With<Person>>) {
     for name in &query {
@@ -161,7 +161,7 @@ fn greet_people(time: Res<Time>, query: Query<&Name, With<Person>>) {
 **Exemple C++:**
 ```cpp
 
-.init_ressources<Clock>(/* initializer-list */);
+.init_resources<Clock>(/* initializer-list */);
 
 void greet_people(Resource<Time> time, Query<Name, With<Person>>& query)
 {
@@ -292,7 +292,7 @@ void event_trigger(EventWriter<MyEvent>& event)
 ```
 ## EventReader
 
-System executed on ressources and given component groups when signal is sent
+System executed on resources and given component groups when signal is sent
 
 ---
 **Exemple Rust:**
@@ -363,7 +363,7 @@ app.add_systems(OnEnter(AppState::Menu), ...);
 // app.add_systems(Update, ..., run_if(?in_state(AppState::InGame)));
 /* -> not planned */
 
-void menu(Ressource<NextState<AppState>>& next_state)
+void menu(Resource<NextState<AppState>>& next_state)
 {
     if (...) {
         next_state.set(AppState::InGame);
@@ -379,7 +379,7 @@ App superset creating the default ECS App and adding
 plugins to control bases, holding utilities for all games
 
 ---
-**Ressources:**
+**Resources:**
 
  - Asset Manager
  - Global Timer

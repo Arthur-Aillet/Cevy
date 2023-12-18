@@ -31,12 +31,12 @@ class SparseVector {
         SparseVector(SparseVector const &other) : _data(other._data) {}; //copy constructor
         SparseVector(SparseVector && other) noexcept : _data(std::move(other._data)) {}; //move constructor
 
-        SparseVector &operator = (SparseVector const &other) { //copy assignment operator
+        SparseVector &operator= (SparseVector const &other) { //copy assignment operator
             _data = other._data;
             return *this;
         };
 
-        SparseVector &operator = (SparseVector &&other) noexcept { // move assignment operator
+        SparseVector &operator= (SparseVector &&other) noexcept { // move assignment operator
             _data = other._data;
             return *this;
         };

@@ -83,13 +83,13 @@ class cevy::ecs::Query {
                         ([&] {
                             (std::get<iterator_t<SparseVector<T>>>(current)++);
                         } (), ...);
-                    } while (!all_set() && _idx < _max); // NOTE - check to choose <= or <
+                    } while (_idx < _max && !all_set()); // NOTE - check to choose <= or <
                 }
 
                 void sync() {
                     if (_idx == _max)
                         return;
-                    while (!all_set() && _idx < _max) { // NOTE - check to choose <= or <
+                    while (_idx < _max && !all_set()) { // NOTE - check to choose <= or <
                         _idx++;
                         ([&] {
                             (std::get<iterator_t<SparseVector<T>>>(current)++);
