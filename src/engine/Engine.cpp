@@ -13,6 +13,7 @@
 #include "Schedule.hpp"
 #include "App.hpp"
 #include "Camera.hpp"
+#include "Keyboard.hpp"
 #include "Position.hpp"
 #include "Commands.hpp"
 #include "EntityCommands.hpp"
@@ -29,9 +30,9 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position> cams, cevy::ec
     cmd.spawn_empty().insert(cevy::Position());
     for (auto cam : cams) {
         std::get<0>(cam).camera.position = std::get<1>(cam);
-        UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
     BeginDrawing();
+
 
     ClearBackground(WHITE);
     for (auto cam : cams) {
