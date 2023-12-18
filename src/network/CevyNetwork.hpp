@@ -27,8 +27,8 @@ class CevyNetwork : protected NetworkBase {
             ActionSuccess  = 5,
             ActionFailure  = 6,
         };
-        enum class Event {
-            Summon,
+        enum class Event : unsigned short {
+            Summon         = 1,
         };
 
         CevyNetwork();
@@ -69,13 +69,17 @@ class CevyNetwork : protected NetworkBase {
         }
         using error_code = asio::error_code;
 
+
+
         void handle_events(size_t bytes, std::array<uint8_t, 512>& buffer) {
-            // if ((half){.b.b0 = buffer[0], .b.b1 = buffer[1]}.h == Event::Summon)
-            uint64_t id;
-            std::memcpy(&id, &buffer[1], sizeof(id));
-            std::vector<uint8_t> vec;
-            vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
-            _states_recv[id] = vec;
+            half h = {.b.b0 = buffer[1], .b.b1 = buffer[2]};
+            if (h.h == static_cast<uint16_t>(Event::Summon)) {
+                uint64_t id;
+                std::memcpy(&id, &buffer[1], sizeof(id));
+                std::vector<uint8_t> vec;
+                vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
+                _summon_recv[id] = vec;
+            }
         }
 
     protected:
@@ -96,4 +100,6 @@ class CevyNetwork : protected NetworkBase {
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
 
+        std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_recv;
+        std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
 };
