@@ -7,11 +7,8 @@
 
 add_library(network
   STATIC
-  client.hpp
-  client.cpp
-  server.hpp
-  server.cpp
-  network.hpp
+  NetworkBase.hpp
+  CevyNetwork.hpp
   network.cpp
 )
 

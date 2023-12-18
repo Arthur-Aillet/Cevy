@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Network.hpp"
+#include "NetworkBase.hpp"
 #include <asio/error_code.hpp>
 #include <cstdint>
 #include <cstring>

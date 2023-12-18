@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "asio.hpp"
+#include <asio.hpp>
 #include <asio/buffer.hpp>
 #include <asio/error_code.hpp>
 #include <cstddef>
@@ -81,7 +81,7 @@ class NetworkBase
             while (std::cin.good()) {
                 std::string line;
                 std::cin >> line;
-                client.writeUDP(std::vector<uint8_t>(line.begin(), line.end()));
+                client.writeUDP(std::vector<uint8_t>(line.begin(), line.end()), [](){});
                 io_context.run();
             }
         }
@@ -111,7 +111,7 @@ class NetworkBase
             _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, func);
         }
 
-        void udp_receive(asio::error_code error, size_t bytes) {
+        void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) {
             if (!error) {
                 std::cout << "revieved " << bytes << " bytes:" << std::endl;
                 for (size_t i = 0; i < bytes; ++i) {
