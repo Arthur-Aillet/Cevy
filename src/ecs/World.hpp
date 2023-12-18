@@ -51,12 +51,12 @@ struct Or : std::integral_constant<bool, any<T...>()> {};
 namespace cevy {
     namespace ecs {
         class Commands;
+
+        struct Control {
+            bool abort;
+        };
     }
 }
-
-struct Control {
-    bool abort;
-};
 
 template<class T>
 struct is_commands : public std::false_type {};
@@ -227,10 +227,6 @@ class cevy::ecs::World {
         }
 
     public:
-        World() {
-            insert_resource(Control{ .abort = false });
-        }
-
         template <typename Component>
         typename SparseVector<Component>::reference_type add_component(Entity const &to, const Component &c) {
             auto &array = get_components<Component>();

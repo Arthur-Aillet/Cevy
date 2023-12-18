@@ -61,22 +61,6 @@ class cevy::ecs::Schedule {
         std::list<std::type_index> _schedule;
         std::list<std::type_index> _at_start_schedule;
 
-        void init_default_schedule() {
-            insert_schedule<Startup>();
-            insert_schedule<PreStartup>();
-            insert_schedule<PostStartup>();
-
-            insert_schedule<First>();
-            insert_schedule<Update>();
-            insert_schedule<PreUpdate>();
-            insert_schedule<PostUpdate>();
-            // insert_schedule<StateTransition>();
-            // insert_schedule<RunFixedUpdateLoop>();
-            insert_schedule<Last>();
-
-            // add systems relating to the automatic parts of
-            //StateTransitions and RunFixedUpdateLoop ?
-        }
     public:
         template<typename S, typename std::enable_if_t<std::is_same_v<typename S::is_repeat, std::true_type>, bool> = true>
         bool schedule_defined() {
@@ -127,7 +111,7 @@ class cevy::ecs::Schedule {
         using system_function = std::function<void (World &)>;
         using system = std::tuple<system_function, std::type_index>;
         std::vector<system> _systems;
-        Schedule();
+        Schedule() : _stage(_at_start_schedule.begin()) {};
         ~Schedule() = default;
 
         void quit() const;

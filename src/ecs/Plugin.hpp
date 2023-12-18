@@ -11,5 +11,7 @@
 
 class cevy::ecs::Plugin {
     public:
-        static void build(App&) {};
+        virtual void build(cevy::ecs::App&) = 0;
+        Plugin() = default;
+        ~Plugin() = default;
 };

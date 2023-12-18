@@ -10,10 +10,6 @@
 
 using cevy::ecs::Schedule;
 
-Schedule::Schedule() {
-    init_default_schedule();
-}
-
 void Schedule::runStage(World &world)
 {
     std::vector<std::reference_wrapper<system>> curr_sys;
@@ -34,18 +30,16 @@ void Schedule::runStage(World &world)
 
 void Schedule::runStartStages(World& world) {
     _stage = _at_start_schedule.begin();
-    do {
+    while (_stage != _at_start_schedule.end() && !_abort) {
         runStage(world);
     }
-    while (_stage != _at_start_schedule.end() && !_abort);
 }
 
 void Schedule::runStages(World& world) {
     _stage = _schedule.begin();
-    do {
+    while (_stage != _schedule.end() && !_abort) {
         runStage(world);
     }
-    while (_stage != _schedule.end() && !_abort);
 }
 
 void Schedule::run(World &world) {

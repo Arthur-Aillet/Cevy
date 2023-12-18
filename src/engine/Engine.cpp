@@ -12,6 +12,7 @@
 #include "rlImGui.h"
 #include "Schedule.hpp"
 #include "App.hpp"
+#include "DefaultPlugin.hpp"
 #include "Resource.hpp"
 #include "Camera.hpp"
 #include "Position.hpp"
@@ -26,10 +27,9 @@ void init_window() {
     rlImGuiSetup(true);
 }
 
-void close_game(cevy::ecs::Resource<struct Control> control) {
-    if (WindowShouldClose()) {
+void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
+    if (WindowShouldClose())
         control.get().abort = true;
-    }
 }
 
 void update_window(cevy::ecs::Query<cevy::Camera> cams) {
@@ -56,9 +56,11 @@ void list_pos(cevy::ecs::Query<cevy::Position> pos) {
 }
 
 void cevy::Engine::build(cevy::ecs::App& app) {
+    app.add_plugins(cevy::ecs::DefaultPlugin());
+    app.add_stage<PreStartupRenderStage>();
     app.add_stage<PreRenderStage>();
     app.add_stage<RenderStage>();
-    app.add_system<cevy::ecs::Schedule::PreStartup>(init_window);
+    app.add_system<cevy::PreStartupRenderStage>(init_window);
     app.add_system<cevy::RenderStage>(update_window);
     app.add_system<cevy::RenderStage>(list_pos);
     app.add_system<cevy::PreRenderStage>(close_game);

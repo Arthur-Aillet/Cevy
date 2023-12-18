@@ -7,19 +7,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Plugin.hpp"
 #include "Schedule.hpp"
 #include "World.hpp"
-
-#include <unordered_map>
-#include <any>
-#include <typeindex>
-#include <iostream>
-#include <tuple>
-#include <functional>
-#include <type_traits>
-#include <utility>
-
 #include "ecs.hpp"
 
 class cevy::ecs::App : public cevy::ecs::World {
@@ -31,14 +23,17 @@ class cevy::ecs::App : public cevy::ecs::World {
         // World world;
     private:
         Schedule _schedule;
+        std::vector<std::unique_ptr<Plugin>> _plugins;
 
         template<typename GivenPlugin>
-        void add_plugin(const GivenPlugin &a) {
+        void add_plugin(const GivenPlugin &plugin) {
             static_assert(
                 std::is_base_of_v<Plugin, GivenPlugin>,
                 "Given plugin does not derive from Cevy Plugin class"
             );
-            a.build(*this);
+            auto &p = _plugins.emplace_back(std::make_unique<GivenPlugin>(plugin));
+
+            p->build(*this);
         }
 
     public:

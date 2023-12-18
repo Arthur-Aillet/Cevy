@@ -18,7 +18,6 @@ const SparseVector<Entity>& World::entities() const {
     return _entities;
 }
 
-
 World::EntityWorldRef World::spawn_empty()
 {
     size_t pos = _entities.first_free();
@@ -32,7 +31,7 @@ World::EntityWorldRef World::spawn_empty()
     return ref;
 }
 
-bool  World::despawn(Entity const &e)
+bool World::despawn(Entity const &e)
 {
     for (auto const& [type, data] : _components_arrays) {
         std::get<1>(data)(*this, e);
