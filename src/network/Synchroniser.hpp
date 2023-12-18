@@ -20,7 +20,10 @@
 
 class Synchroniser {
 public:
-    struct SyncId {};
+    struct SyncId {
+        size_t id;
+        cevy::ecs::World::Id type;
+    };
     template<typename Block, typename... Component>
     class SyncBlock;
     using BlockType = std::type_index;

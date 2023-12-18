@@ -62,7 +62,6 @@ class cevy::ecs::World {
             World& world;
             Entity entity;
 
-
             // EntityWorldRef insert(Bundle& b);
 
             template<typename... Ts>
@@ -74,14 +73,18 @@ class cevy::ecs::World {
         using erase_access = std::function<void (World &, Entity const &)>;
         using component_data = std::tuple<std::any, erase_access>;
 
+        using archetype = std::function<void (World &)>;
+
     /* Bevy-compliant */
     public:
         /// @brief Id refering to a specific component
         using ComponentId = std::type_index;
+        using Id = std::type_index;
 
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
         SparseVector<Entity> _entities;
+        std::unordered_map<Id, archetype> _archetypes;
 
     /* Bevy-compliant */
     public:
@@ -206,6 +209,11 @@ class cevy::ecs::World {
         }
 
     public:
+        template<typename T, typename... Component>
+        void init_archetype(const Component&... c) {
+            _archetypes[Id(typeid(T))] = [this, c...](){ this->spawn(c...); };
+        }
+
         Entity spawn_at(std::size_t idx);
 
         template <typename Component>
