@@ -5,7 +5,7 @@
 C++evy Networking uses 2 network protocols:
 
  - **UDP**
-for most exchanges, including instantaneous action, state, and state change information
+for most exchanges, including instantaneous action, state, and event information
  - **TCP/IP**
 for specific metadata and setup: aquiring a connection, negotiation client/server states
 additionnally, TCP/IP may be used for asset streaming, e.g. User Generated content, "Skins", etc.
@@ -28,8 +28,8 @@ The Payload Data itself contains a concatenation of Objects;
 |    Shorthand     |   Emitter   |      Object      |         Type        |                 Composition               |
 |------------------|-------------|------------------|---------------------|-------------------------------------------|
 |      State       |    Server   |   State Update   |      composite      |      `C::State` + Descriptor + Data       |
-|      State?      |    Client   |   State Request  |      composite      |      `C::StateRequest` + Descriptor       |
-|    StateChange   |    Server   |   State Change   |      composite      |`C::StateChange` + Descriptor + Data + Data|
+|      State?      |    Client   |  State Request   |      composite      |      `C::StateRequest` + Descriptor       |
+|      Event       |    Server   |      Event       |      composite      |   `C::Event` + Descriptor + Data + Data   |
 |      Action      |    Client   |  Client Action   |      composite      |      `C::Action` + Descriptor + Data      |
 |      Sucess      |    Server   |  Action Success  |      composite      |   `C::ActionSucess` + Descriptor + Data   |
 |     Failure      |    Server   |  Action Failure  |      composite      | `C::ActionFailure` + Descriptor + Reason  |
@@ -61,7 +61,7 @@ Other actions, particularly security oriented, can not be assumed until the serv
 
 
 ### Server:
-The *server* is responsible for delivering state and state change information to the client,
+The *server* is responsible for delivering state and event information to the client,
 missing state information should be considered to be out of date by the client.
 
 the server can choose to let fail or succeed Client Actions. By default, it must respond.
@@ -75,7 +75,7 @@ A *bot* is a special type of client with no user. It is privy to all information
 
 ---
 
-## States, State Changes and Actions
+## States, Events and Actions
 
 ### State
 
@@ -93,15 +93,15 @@ The client may request the server to specify a State. By default, the server is 
 |-----------|---------------|-------------------|
 |  Client   |  RequestState | {named descritor} |
 
-### State Change
+### Event
 
-A State Change is an event that specifies a State's value was updated. It is defined to have happened at a given timepoint, but neither Pre and Post values are defined to have been true at any given timepoint
+An Event is a trigger. It is defined to have happened at a given timepoint.
 
 #### State Communication
 
-|  Emitter  | Communication |     Component     |     Pre Value     |     Post Value    |
-|-----------|---------------|-------------------|-------------------|-------------------|
-|  Server   |  StateChange  | {named descritor} | {structured data} | {structured data} |
+|  Emitter  | Communication |     Component     |       Value       |
+|-----------|---------------|-------------------|-------------------|
+|  Server   |     Event     | {named descritor} | {structured data} |
 
 ### Client Action
 
@@ -122,12 +122,12 @@ It has one Success response, with an optionnal structured message, and several F
 
 ↘
 
-|   Response    |     Component      |       Value        |                 Meaning                      | Consequence                                                                                                          |
-|---------------|--------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| ActionSuccess |   {named action}   | {optional message} | this action was sucessful                    | the client can operate following this action's sucess                                                                |
-| ActionFailure |   {named action}   | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                        |
-| ActionFailure |   {named action}   |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                          |
-| ActionFailure |   {named action}   |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                         |
-| ActionFailure |   {named action}   |    ActionWaiting   | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                        |
-| ActionFailure |   {named action}   |    ActionDelayed   | this action will succeed at a later time     | the client should consider the action failed. The server will send a State Change regarding the sucess of the Action |
-| ActionFailure |   {named action}   |        BUSY        | the server refused to process the action     | the client should send the action request again after a small delay                                                  |
+|   Response    |     Component      |       Value        |                 Meaning                      | Consequence                                                                                                    |
+|---------------|--------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| ActionSuccess |   {named action}   | {optional message} | this action was sucessful                    | the client can operate following this action's sucess                                                          |
+| ActionFailure |   {named action}   | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                  |
+| ActionFailure |   {named action}   |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                    |
+| ActionFailure |   {named action}   |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                   |
+| ActionFailure |   {named action}   |    ActionWaiting   | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                  |
+| ActionFailure |   {named action}   |    ActionDelayed   | this action will succeed at a later time     | the client should consider the action failed. The server may later send an ActionSuccess regarding this Action |
+| ActionFailure |   {named action}   |        BUSY        | the server refused to process the action     | the client should send the action request again after a small delay                                            |
