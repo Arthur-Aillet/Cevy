@@ -85,13 +85,13 @@ The client may request the server to specify a State. By default, the server is 
 
 #### State Communication
 
-|  Emitter  | Communication |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Server   |    State      | {named descritor} | {structured data} |
+|  Emitter  | Communication |     Component      |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Server   |    State      | {named descriptor} | {structured data} |
 
-|  Emitter  |   Request     |     Component     |
-|-----------|---------------|-------------------|
-|  Client   |  RequestState | {named descritor} |
+|  Emitter  |   Request     |     Component      |
+|-----------|---------------|--------------------|
+|  Client   |  RequestState | {named descriptor} |
 
 ### Event
 
@@ -99,9 +99,9 @@ An Event is a trigger. It is defined to have happened at a given timepoint.
 
 #### State Communication
 
-|  Emitter  | Communication |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Server   |     Event     | {named descritor} | {structured data} |
+|  Emitter  | Communication |     Component      |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Server   |     Event     | {named descriptor} | {structured data} |
 
 ### Client Action
 
