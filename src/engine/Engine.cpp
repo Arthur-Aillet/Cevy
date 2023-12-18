@@ -31,9 +31,6 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
     Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
         fowards = std::get<2>(cam).fowards();
-        std::cout << fowards.x << std::endl;
-        std::cout << fowards.y << std::endl;
-        std::cout << fowards.z << std::endl;
         std::get<0>(cam).camera.position = std::get<1>(cam);
         std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y + fowards.y, std::get<1>(cam).z + fowards.z};
     }
@@ -114,7 +111,7 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.init_component<cevy::Position>();
     app.init_component<cevy::Rotation>();
     app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 1.0, 00.0));
-    app.add_system<cevy::RenderStage>(control_object);
+    // app.add_system<cevy::RenderStage>(control_object);
 }
 
 

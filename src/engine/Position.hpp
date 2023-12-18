@@ -6,15 +6,12 @@
 */
 
 #pragma once
+#include "Vector.hpp"
 
 namespace cevy {
-    class Position {
+    class Position : public Vector {
         public:
-            Position(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {};
+            Position(double x = 0, double y = 0, double z = 0) : Vector(x, y, z) {};
             ~Position() {};
-            double x = 0;
-            double y = 0;
-            double z = 0;
-            operator Vector3 () const {return((Vector3) {x, y, z});}
     };
 }

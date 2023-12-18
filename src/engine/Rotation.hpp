@@ -10,18 +10,16 @@
 #include <array>
 #include <iostream>
 #include "raymath.h"
+#include "Vector.hpp"
 
 #pragma once
 
 namespace cevy {
-    class Rotation {
+    class Rotation : public Vector{
         private:
         public:
-            Rotation(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {};
+            Rotation(double x = 0, double y = 0, double z = 0) : Vector(x, y, z) {};
             ~Rotation() {};
-            double x = 0;
-            double y = 0;
-            double z = 0;
             Rotation fowards() {
                 return(Rotation(0.0, 1.0, 0.0));
             };
