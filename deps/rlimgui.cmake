@@ -1,6 +1,4 @@
-
-find_package(rlimgui ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
-if (NOT rlimgui_FOUND) # If there's none, fetch and build raylib
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/_deps/rlimgui) # If there's none, fetch and build rlimgui
   FetchContent_Declare(
       rlimgui
       DOWNLOAD_EXTRACT_TIMESTAMP OFF
