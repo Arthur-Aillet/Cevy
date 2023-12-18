@@ -25,8 +25,9 @@ class cevy::ecs::Resource {
         Resource(Content& content) : _content(content) {};
     public:
         using value = Content;
-        operator Content () const { return _content; }
-        operator Content&() { return _content; }
+        operator Content () const { return _content; };
+        operator Content&() { return _content; };
+        Content& get() { return _content; };
 };
 
 template<class T>

@@ -28,8 +28,7 @@ void init_window() {
 
 void close_game(cevy::ecs::Resource<struct Control> control) {
     if (WindowShouldClose()) {
-        struct Control& c = control;
-        c.abort = true;
+        control.get().abort = true;
     }
 }
 
