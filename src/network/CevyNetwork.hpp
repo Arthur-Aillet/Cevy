@@ -22,10 +22,13 @@ class CevyNetwork : protected NetworkBase {
         enum class Communication {
             State          = 1,
             StateRequest   = 2,
-            StateChange    = 3,
+            Event          = 3,
             Action         = 4,
             ActionSuccess  = 5,
             ActionFailure  = 6,
+        };
+        enum class Event : unsigned short {
+            Summon         = 1,
         };
 
         CevyNetwork();
@@ -37,7 +40,7 @@ class CevyNetwork : protected NetworkBase {
             const uint8_t* p = (uint8_t*)tp;
 
             return p[n];
-        }
+        };
 
         void sendState(uint16_t id, const std::vector<uint8_t>& block) {
             std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
@@ -56,20 +59,40 @@ class CevyNetwork : protected NetworkBase {
             return std::nullopt;
         }
 
-
-    protected:
+    private:
+        void handle_state(size_t bytes, std::array<uint8_t, 512>& buffer) {
+            uint64_t id;
+            std::memcpy(&id, &buffer[1], sizeof(id));
+            std::vector<uint8_t> vec;
+            vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
+            _states_recv[id] = vec;
+        }
         using error_code = asio::error_code;
 
-        virtual void udp_receive(error_code error, size_t bytes, std::array<uint8_t, 512>& buffer)
-        {
-            if (bytes < 0)
-                return;
-            if (buffer[0] == (uint8_t)Communication::State) {
+
+
+        void handle_events(size_t bytes, std::array<uint8_t, 512>& buffer) {
+            half h = {.b.b0 = buffer[1], .b.b1 = buffer[2]};
+            if (h.h == static_cast<uint16_t>(Event::Summon)) {
                 uint64_t id;
                 std::memcpy(&id, &buffer[1], sizeof(id));
                 std::vector<uint8_t> vec;
                 vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
-                _states_recv[id] = vec;
+                _summon_recv[id] = vec;
+            }
+        }
+
+    protected:
+
+        void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) override
+        {
+            if (bytes < 0)
+                return;
+            if (buffer[0] == (uint8_t)Communication::State) {
+                return handle_state(bytes, buffer);
+            }
+            if (buffer[0] == (uint8_t)Communication::Event) {
+                return handle_events(bytes, buffer);
             }
         }
 
@@ -77,4 +100,6 @@ class CevyNetwork : protected NetworkBase {
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
 
+        std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_recv;
+        std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
 };

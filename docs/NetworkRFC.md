@@ -37,13 +37,13 @@ TODO: metadata objects
 
 Objects are composed of Sub-Objects;
 
-|    Shorthand     |    Sub-Object    |         Type        |                 Composition               |
-|------------------|------------------|---------------------|-------------------------------------------|
-|       Data       |  Structured data |      composite      |         *Short size* + raw data           |
-|       Size       |    Short size    |     single value    |                   1 byte                  |
-|        C         |  Communication   |        Enum         |                   1 byte                  |
-|      Reason      |  Failure reason  |        Enum         |                   1 byte                  |
-|    Descriptor    | Named descriptor |         ID          |                   2 bytes                 |
+|    Shorthand     |    Sub-Object    |         Type        |           Composition       |
+|------------------|------------------|---------------------|-----------------------------|
+|       Data       |  Structured data |      composite      |   *Short size* + raw data   |
+|       Size       |    Short size    |     single value    |            1 byte           |
+|        C         |  Communication   |        Enum         |            1 byte           |
+|      Reason      |  Failure reason  |        Enum         |            1 byte           |
+|    Descriptor    | Named descriptor |         ID          |            2 bytes          |
 
 
 
@@ -85,15 +85,15 @@ The client may request the server to specify a State. By default, the server is 
 
 #### State Communication
 
-|  Emitter  | Communication |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Server   |    State      | {named descritor} | {structured data} |
-|           |    1 byte     |      2 bytes      |   variable size   |
+|  Emitter  | Communication |      Component     |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Server   |    State      | {named descriptor} | {structured data} |
+|           |    1 byte     |       2 bytes      |   variable size   |
 
-|  Emitter  |   Request     |     Component     |
-|-----------|---------------|-------------------|
-|  Client   |  RequestState | {named descritor} |
-|           |    1 byte     |      2 bytes      |
+|  Emitter  |   Request     |      Component     |
+|-----------|---------------|--------------------|
+|  Client   |  RequestState | {named descriptor} |
+|           |    1 byte     |       2 bytes      |
 
 ### Event
 
@@ -101,10 +101,10 @@ An Event is a trigger. It is defined to have happened at a given timepoint.
 
 #### State Communication
 
-|  Emitter  | Communication |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Server   |     Event     | {named descritor} | {structured data} |
-|           |    1 byte     |      2 bytes      |   variable size   |
+|  Emitter  | Communication |      Component     |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Server   |     Event     | {named descriptor} | {structured data} |
+|           |    1 byte     |       2 bytes      |   variable size   |
 
 ### Client Action
 
@@ -114,10 +114,10 @@ It has one Success response, with an optionnal structured message, and several F
 
 #### Client Action Responses
 
-|  Emitter  |   Request     |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Client   |     Action    |   {named action}  | {structured data} |
-|           |    1 byte     |      2 bytes      |   variable size   |
+|  Emitter  |   Request     |      Component     |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Client   |     Action    |   {named action}   | {structured data} |
+|           |    1 byte     |       2 bytes      |   variable size   |
 
 | Emitter |
 |---------|
@@ -128,7 +128,6 @@ It has one Success response, with an optionnal structured message, and several F
 |   Response    |     Component      |       Value        |                 Meaning                      | Consequence                                                                                                    |
 |---------------|--------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------|
 | ActionSuccess |   {named action}   | {optional message} | this action was sucessful                    | the client can operate following this action's sucess                                                          |
-|    1 byte     |      2 bytes       |    variable size   |                                              |                                                                                                                |
 | ActionFailure |   {named action}   | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                  |
 | ActionFailure |   {named action}   |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                    |
 | ActionFailure |   {named action}   |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                   |
@@ -141,7 +140,7 @@ It has one Success response, with an optionnal structured message, and several F
 
 ### Summon Entity
 
-|  Emitter  | Communication |     Component     |       Value       |
-|-----------|---------------|-------------------|-------------------|
-|  Server   |     Event     |       Summon      |    Archetype ID   |
-|           |    1 byte     |      2 bytes      |       1 byte      |
+|  Emitter  | Communication |      Component     |       Value       |
+|-----------|---------------|--------------------|-------------------|
+|  Server   |     Event     |       Summon       |    Archetype ID   |
+|           |    1 byte     |       2 bytes      |       1 byte      |

@@ -76,7 +76,6 @@ class Synchroniser::SyncBlock {
         return 0;
     }
 
-
     void system_send(cevy::ecs::Query<SyncId, Component...>& q) {
         for (auto& e : q) {
             auto sync_id = std::get<SyncId>(e);
@@ -107,6 +106,17 @@ class Synchroniser::SyncBlock {
                 std::memcpy(&std::get<Component>(e), &vec.data(), size);
                 block.erase(block.begin(), block.begin() + size);
             } (), ...);
+        }
+    }
+
+    void system_summon(cevy::ecs::Command command) {
+        auto x = _net.recvSummon();
+        for (auto it: x) {
+            auto e = command.add_empty();
+            e.add_component<SyncId>(it.syncID);
+            for (auto component : x.componets) {
+                e.add_component<???>(component);
+            }
         }
     }
 

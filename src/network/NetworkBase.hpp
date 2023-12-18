@@ -54,6 +54,28 @@ class NetworkBase
         }
 
     public:
+        union half {
+            uint16_t h;
+            struct {
+                uint8_t b0;
+                uint8_t b1;
+            } b;
+        };
+
+        union word {
+            uint16_t q;
+            struct {
+                half b0;
+                half b1;
+            } h;
+            struct {
+                uint8_t b0;
+                uint8_t b1;
+                uint8_t b2;
+                uint8_t b3;
+            } b;
+        };
+
         static void start_server() {
             asio::io_context io_context;
             asio::ip::udp::socket udp(io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), 13));
@@ -102,16 +124,21 @@ class NetworkBase
 
         void readUDP() {
             _udp_socket.async_receive_from(
-                asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes){this->udp_receive(error, bytes, this->_udp_recv); readUDP();}
+                asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes){
+                    this->udp_receive(error, bytes, this->_udp_recv);
+                    readUDP();
+                }
             );
         }
 
         template<typename Function>
         void writeUDP(const std::vector<uint8_t>& data, Function&& func) {
-            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, func);
+            _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, [this](asio::error_code error, size_t bytes) {
+                std::cout << "fonction à remplacer" << std::endl;
+            });
         }
 
-        void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) {
+        virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) {
             if (!error) {
                 std::cout << "revieved " << bytes << " bytes:" << std::endl;
                 for (size_t i = 0; i < bytes; ++i) {
