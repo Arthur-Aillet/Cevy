@@ -40,7 +40,7 @@ add_library(app
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
 add_library(ecs SHARED ${CEVY_HEADERS})
-target_link_libraries(ecs SparseVector world commands entity schedule app)
+target_link_libraries(ecs SparseVector world commands app entity schedule)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/commands)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)

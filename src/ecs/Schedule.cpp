@@ -6,9 +6,13 @@
 */
 
 #include "Schedule.hpp"
+#include "World.hpp"
 
 using cevy::ecs::Schedule;
 
+Schedule::Schedule() {
+    init_default_schedule();
+}
 
 void Schedule::runStage(World &world)
 {
@@ -53,6 +57,9 @@ void Schedule::run(World &world) {
             world._command_queue.pop();
             func(world);
         }
+        auto c = world.get_resource<Control>();
+        if (c && c.value().get().abort)
+            abort();
     }
 }
 

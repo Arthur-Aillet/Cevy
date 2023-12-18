@@ -27,12 +27,11 @@ class cevy::ecs::App : public cevy::ecs::World {
         using World::ComponentId;
         using system = Schedule::system;
 
+        /// TODO: refactor to has-a ?
+        // World world;
     private:
         Schedule _schedule;
-        /// TODO: refactor to has-a ?
-        // World _world;
 
-    private:
         template<typename GivenPlugin>
         void add_plugin(const GivenPlugin &a) {
             static_assert(
@@ -48,16 +47,9 @@ class cevy::ecs::App : public cevy::ecs::World {
             ((add_plugin(std::forward<const GivenPlugin &>(plugins))),...);
         }
 
-        void run() {
-            _schedule.run(*this);
-        }
-
-        void quit() const {
-            _schedule.quit();
-        }
-        void abort() {
-            _schedule.abort();
-        }
+        void run();
+        void quit();
+        void abort();
 
         template<typename T>
         void add_stage() {

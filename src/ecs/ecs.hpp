@@ -19,6 +19,8 @@ namespace cevy::ecs {
     class EntityCommands;
     class World;
 
+    template <typename Content>
+    class Resource;
     template <class... Containers>
     class Query;
 }

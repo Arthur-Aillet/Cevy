@@ -12,6 +12,7 @@
 #include "rlImGui.h"
 #include "Schedule.hpp"
 #include "App.hpp"
+#include "Resource.hpp"
 #include "Camera.hpp"
 #include "Position.hpp"
 #include "Commands.hpp"
@@ -25,8 +26,14 @@ void init_window() {
     rlImGuiSetup(true);
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Commands cmd) {
-    cmd.spawn_empty().insert(cevy::Position());
+void close_game(cevy::ecs::Resource<struct Control> control) {
+    if (WindowShouldClose()) {
+        struct Control& c = control;
+        c.abort = true;
+    }
+}
+
+void update_window(cevy::ecs::Query<cevy::Camera> cams) {
     for (auto cam : cams) {
         UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
@@ -50,10 +57,12 @@ void list_pos(cevy::ecs::Query<cevy::Position> pos) {
 }
 
 void cevy::Engine::build(cevy::ecs::App& app) {
+    app.add_stage<PreRenderStage>();
     app.add_stage<RenderStage>();
     app.add_system<cevy::ecs::Schedule::PreStartup>(init_window);
     app.add_system<cevy::RenderStage>(update_window);
     app.add_system<cevy::RenderStage>(list_pos);
+    app.add_system<cevy::PreRenderStage>(close_game);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
     app.spawn(cevy::Camera());

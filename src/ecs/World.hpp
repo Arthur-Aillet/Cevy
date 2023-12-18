@@ -54,6 +54,10 @@ namespace cevy {
     }
 }
 
+struct Control {
+    bool abort;
+};
+
 template<class T>
 struct is_commands : public std::false_type {};
 
@@ -97,7 +101,7 @@ class cevy::ecs::World {
     private:
         std::unordered_map<std::type_index, component_data> _components_arrays;
         SparseVector<Entity> _entities;
-        ResourceManager _resource_manager;
+        cevy::ecs::ResourceManager _resource_manager;
 
     /* Bevy-compliant */
     public:
@@ -208,12 +212,13 @@ class cevy::ecs::World {
         std::optional<ref<R>> get_resource() {
             return _resource_manager.get_resource<R>();
         }
-
+/* TODO:
         /// access a given Resource, or None if it not in this world
         template<typename R>
         std::optional<ref<const R>> get_resource() const {
             return _resource_manager.get_resource<R>();
         }
+*/
 
         /// send an event TODO: DO
         template<typename E>
@@ -222,6 +227,10 @@ class cevy::ecs::World {
         }
 
     public:
+        World() {
+            insert_resource(Control{ .abort = false });
+        }
+
         template <typename Component>
         typename SparseVector<Component>::reference_type add_component(Entity const &to, const Component &c) {
             auto &array = get_components<Component>();

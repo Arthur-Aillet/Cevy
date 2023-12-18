@@ -11,6 +11,7 @@
 #include <tuple>
 #include <optional>
 #include <algorithm>
+#include <type_traits>
 #include <typeindex>
 
 #include "ecs.hpp"
@@ -60,7 +61,6 @@ class cevy::ecs::Schedule {
         std::list<std::type_index> _schedule;
         std::list<std::type_index> _at_start_schedule;
 
-    public:
         void init_default_schedule() {
             insert_schedule<Startup>();
             insert_schedule<PreStartup>();
@@ -76,6 +76,20 @@ class cevy::ecs::Schedule {
 
             // add systems relating to the automatic parts of
             //StateTransitions and RunFixedUpdateLoop ?
+        }
+    public:
+        template<typename S, typename std::enable_if_t<std::is_same_v<typename S::is_repeat, std::true_type>, bool> = true>
+        bool schedule_defined() {
+            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(S)));
+
+            return (it != _schedule.end());
+        }
+
+        template<typename S, typename std::enable_if_t<std::is_same_v<typename S::is_repeat, std::false_type>, bool> = true>
+        bool schedule_defined() {
+            auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(S)));
+
+            return (it != _at_start_schedule.end());
         }
 
         template<typename T, typename std::enable_if_t<std::is_same_v<typename T::is_repeat, std::true_type>, bool> = true>
@@ -113,9 +127,7 @@ class cevy::ecs::Schedule {
         using system_function = std::function<void (World &)>;
         using system = std::tuple<system_function, std::type_index>;
         std::vector<system> _systems;
-        Schedule() {
-            init_default_schedule();
-        }
+        Schedule();
         ~Schedule() = default;
 
         void quit() const;
@@ -129,6 +141,11 @@ class cevy::ecs::Schedule {
         template<class S, class R, class ...Args>
         void add_system(R(&&func)(Args...)) {
             static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...), "type must be reference to query, world, commands or resource");
+
+            if (!schedule_defined<S>()) {
+                std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+            }
+
             system_function sys = [&func] (World & reg) mutable {
                 func(reg.get_super<Args>()...);
             };
