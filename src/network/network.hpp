@@ -10,6 +10,7 @@
 #include "asio.hpp"
 #include <asio/buffer.hpp>
 #include <asio/error_code.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <sstream>
@@ -42,6 +43,12 @@ class Network
             ActionFailure,
         };
 
+        enum Descriptor : unsigned short {
+            Position,
+            Rotation,
+            Scale,
+        };
+
     private:
         template <typename Component>
         std::stringstream serialization(SparseVector<Component> components) {
@@ -61,7 +68,7 @@ class Network
             return {typeIdName, component};
         }
 
-            public:
+    public:
         static void start_server() {
             asio::io_context io_context;
             asio::ip::udp::socket udp(io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), 13));
@@ -119,16 +126,18 @@ class Network
         }
 
         void udp_receive(asio::error_code error, size_t bytes) {
-            std::cout << "revieved " << bytes << " bytes:" << std::endl;
-            for (auto i = 0; i < bytes; ++i) {
-                std:: cout << std::hex << _udp_recv[i];
+            if (!error) {
+                std::cout << "revieved " << bytes << " bytes:" << std::endl;
+                for (size_t i = 0; i < bytes; ++i) {
+                    std:: cout << std::hex << _udp_recv[i];
+                }
+                std::cout << std::endl << std::endl;
+                readUDP();
             }
-            std::cout << std::endl << std::endl;
-            readUDP();
         }
 
         template <typename Component>
-        void sendComponent(asio::ip::tcp::socket &socket, Component const &component) {
+        void writeTCP(asio::ip::tcp::socket &socket, Component const &component) {
             std::function<void(std::error_code, std::size_t)> handler = [&socket](std::error_code error, std::size_t bytes) {
                 if (error) {
                     std::cerr << "Error: Component of the socket " << &socket << " is not sent.\n"
@@ -140,7 +149,7 @@ class Network
         }
 
         template <typename Component>
-        std::tuple<std::string, Component> getComponent(asio::ip::tcp::socket &socket) {
+        std::tuple<std::string, Component> readTCP(asio::ip::tcp::socket &socket) {
             std::string buffer;
             std::function<void(std::error_code, std::size_t)> handler = [&](std::error_code error, std::size_t bytes) {
                 if (!error) {
