@@ -14,6 +14,8 @@
 #include "App.hpp"
 #include "Camera.hpp"
 #include "Position.hpp"
+#include "Commands.hpp"
+#include "EntityCommands.hpp"
 #include "imgui.h"
 
 void init_window() {

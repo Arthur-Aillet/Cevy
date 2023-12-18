@@ -17,8 +17,6 @@
 
 #include "SparseVector.hpp"
 #include "Entity.hpp"
-#include "Commands.hpp"
-#include "Command.hpp"
 #include "Resource.hpp"
 
 #include <queue>
@@ -288,62 +286,6 @@ class cevy::ecs::World {
         C get_super();
 };
 
-namespace cevy {
-    namespace ecs {
-        class EntityCommands;
-    }
-}
-
-class cevy::ecs::Commands {
-    private:
-        friend class cevy::ecs::World;
-
-        cevy::ecs::World& _world_access;
-        Commands(cevy::ecs::World& world_access) : _world_access(world_access) {};
-    public:
-        template<typename GivenCommand, typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
-        void add(const GivenCommand &a) {
-            auto l = [a] (cevy::ecs::World &w) {
-                a.apply(w);
-            };
-            _world_access._command_queue.push(l);
-        }
-
-        void add(std::function<void (cevy::ecs::World &w)>&& f) {
-            _world_access._command_queue.push(f);
-        }
-
-        template<typename R>
-        void insert_resource(const R& value) {
-            add([value] (cevy::ecs::World &w) {
-                w.insert_resource(value);
-            });
-        }
-
-        cevy::ecs::EntityCommands spawn_empty();
-
-        template<typename... Ts>
-        cevy::ecs::EntityCommands spawn(Ts... a);
-};
-
-
-class cevy::ecs::EntityCommands {
-    private:
-        cevy::ecs::Entity _entity;
-        cevy::ecs::Commands &_commands;
-
-        friend class cevy::ecs::Commands;
-        EntityCommands(cevy::ecs::Commands& commands, cevy::ecs::Entity entity)  : _entity(entity), _commands(commands) {};
-    public:
-        template<typename... Components>
-        cevy::ecs::EntityCommands &insert(Components &&... c) {
-            _commands.add([c..., e = _entity] (cevy::ecs::World &w) mutable {
-                (w.add_component(e, c), ...);
-            });
-            return *this;
-        }
-};
-
 template<typename... Ts>
 cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... args) {
     (world.add_component(entity, std::forward<Ts>(args)), ...);
@@ -353,15 +295,4 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 template<typename...T>
 cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World& w) {
     return Query<T...>(w.get_components<T>()...);
-}
-
-template<typename C,
-    typename std::enable_if_t<is_commands<C>::value, bool>>
-C cevy::ecs::World::get_super() {
-    return cevy::ecs::Commands(*this);
-}
-
-template<typename... Ts>
-cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
-    return spawn_empty().insert(a...);
 }
