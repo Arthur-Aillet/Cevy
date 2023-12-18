@@ -13,8 +13,9 @@
 #include "Schedule.hpp"
 #include "App.hpp"
 #include "Camera.hpp"
-#include "Keyboard.hpp"
+#include "input.hpp"
 #include "Position.hpp"
+#include "Rotation.hpp"
 #include "Commands.hpp"
 #include "EntityCommands.hpp"
 #include "imgui.h"
@@ -26,13 +27,17 @@ void init_window() {
     rlImGuiSetup(true);
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position> cams, cevy::ecs::Commands cmd) {
-    cmd.spawn_empty().insert(cevy::Position());
+void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation> cams, cevy::ecs::Commands cmd) {
+    Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
+        fowards = std::get<2>(cam).fowards();
+        std::cout << fowards.x << std::endl;
+        std::cout << fowards.y << std::endl;
+        std::cout << fowards.z << std::endl;
         std::get<0>(cam).camera.position = std::get<1>(cam);
+        std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y + fowards.y, std::get<1>(cam).z + fowards.z};
     }
     BeginDrawing();
-
 
     ClearBackground(WHITE);
     for (auto cam : cams) {
@@ -44,6 +49,55 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position> cams, cevy::ec
     }
     EndDrawing();
 }
+
+std::array<double, 3> cross(std::array<double, 3> first, std::array<double, 3> second) {
+    std::array<double, 3> result = {
+        second[1] * first[2] - second[2] * first[1],
+        second[2] * first[0] - second[0] * first[2],
+        second[0] * first[1] - second[1] * first[0]
+    };
+    return result;
+}
+
+// void control_object(cevy::ecs::Query<cevy::Position, cevy::Rotation> objs) {
+//     std::array<double, 3> fowards = {0.0, 1.0, 0.0};
+//     std::array<double, 3> right = {1.0, 0.0, 0.0};
+//     std::array<double, 3> up = {0.0, 0.0, 1.0};
+//     for (auto obj : objs) {
+//         fowards = {std::get<1>(obj).x, std::get<1>(obj).y, std::get<1>(obj).z};
+//         right = cross(fowards, up);
+//         if (cevy::Keyboard::keyDown(KEY_Q)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x + up[0], std::get<0>(obj).y + up[1], std::get<0>(obj).z + up[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_W)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x + fowards[0], std::get<0>(obj).y + fowards[1], std::get<0>(obj).z + fowards[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_A)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x + right[0], std::get<0>(obj).y + right[1], std::get<0>(obj).z + right[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_E)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x - up[0], std::get<0>(obj).y - up[1], std::get<0>(obj).z - up[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_S)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x - fowards[0], std::get<0>(obj).y - fowards[1], std::get<0>(obj).z - fowards[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_D)) {
+//             std::get<0>(obj) = {std::get<0>(obj).x - right[0], std::get<0>(obj).y - right[1], std::get<0>(obj).z - right[2]};
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_RIGHT)) {
+//             std::get<1>(obj).z += 1.0;
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_DOWN)) {
+//             std::get<1>(obj).x += 1.0;
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_LEFT)) {
+//             std::get<1>(obj).z += -1.0;
+//         }
+//         if (cevy::Keyboard::keyDown(KEY_UP)) {
+//             std::get<1>(obj).x += -1.0;
+//         }
+//     }
+// }
 
 void list_pos(cevy::ecs::Query<cevy::Position> pos) {
     for (auto po : pos) {
@@ -58,7 +112,9 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_system<cevy::RenderStage>(list_pos);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
-    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0));
+    app.init_component<cevy::Rotation>();
+    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 1.0, 00.0));
+    app.add_system<cevy::RenderStage>(control_object);
 }
 
 
