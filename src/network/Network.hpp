@@ -10,6 +10,7 @@
 #include "asio.hpp"
 #include <asio/buffer.hpp>
 #include <asio/error_code.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <sstream>
@@ -52,7 +53,7 @@ class NetworkBase
             return {typeIdName, component};
         }
 
-            public:
+    public:
         static void start_server() {
             asio::io_context io_context;
             asio::ip::udp::socket udp(io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), 13));
@@ -110,10 +111,19 @@ class NetworkBase
             _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, func);
         }
 
-        virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) = 0;
+        void udp_receive(asio::error_code error, size_t bytes) {
+            if (!error) {
+                std::cout << "revieved " << bytes << " bytes:" << std::endl;
+                for (size_t i = 0; i < bytes; ++i) {
+                    std:: cout << std::hex << _udp_recv[i];
+                }
+                std::cout << std::endl << std::endl;
+                readUDP();
+            }
+        }
 
         template <typename Component>
-        void sendComponent(asio::ip::tcp::socket &socket, Component const &component) {
+        void writeTCP(asio::ip::tcp::socket &socket, Component const &component) {
             std::function<void(std::error_code, std::size_t)> handler = [&socket](std::error_code error, std::size_t bytes) {
                 if (error) {
                     std::cerr << "Error: Component of the socket " << &socket << " is not sent.\n"
@@ -125,7 +135,7 @@ class NetworkBase
         }
 
         template <typename Component>
-        std::tuple<std::string, Component> getComponent(asio::ip::tcp::socket &socket) {
+        std::tuple<std::string, Component> readTCP(asio::ip::tcp::socket &socket) {
             std::string buffer;
             std::function<void(std::error_code, std::size_t)> handler = [&](std::error_code error, std::size_t bytes) {
                 if (!error) {
