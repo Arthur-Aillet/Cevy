@@ -25,9 +25,10 @@ void init_window() {
     rlImGuiSetup(true);
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Commands cmd) {
+void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position> cams, cevy::ecs::Commands cmd) {
     cmd.spawn_empty().insert(cevy::Position());
     for (auto cam : cams) {
+        std::get<0>(cam).camera.position = std::get<1>(cam);
         UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
     BeginDrawing();
@@ -56,7 +57,7 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_system<cevy::RenderStage>(list_pos);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
-    app.spawn(cevy::Camera());
+    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0));
 }
 
 
