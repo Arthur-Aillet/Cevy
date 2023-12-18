@@ -301,19 +301,14 @@ class cevy::ecs::Commands {
         cevy::ecs::World& _world_access;
         Commands(cevy::ecs::World& world_access) : _world_access(world_access) {};
     public:
-    /*
-        template<typename GivenCommand>
+        template<typename GivenCommand, typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
         void add(const GivenCommand &a) {
-            static_assert(
-                std::is_base_of_v<Command, GivenCommand>,
-                "Given command does not derive from Cevy command class"
-            );
             auto l = [a] (cevy::ecs::World &w) {
                 a.apply(w);
             };
             _world_access._command_queue.push(l);
         }
-    */
+
         void add(std::function<void (cevy::ecs::World &w)>&& f) {
             _world_access._command_queue.push(f);
         }

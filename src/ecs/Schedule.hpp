@@ -149,6 +149,4 @@ class cevy::ecs::Schedule {
         /* Bevy-compliant */
     public:
         void run(World& world);
-
-        // Schedule& add_systems();
 };
