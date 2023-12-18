@@ -6,9 +6,9 @@
 */
 
 #include "Schedule.hpp"
+#include "World.hpp"
 
 using cevy::ecs::Schedule;
-
 
 void Schedule::runStage(World &world)
 {
@@ -30,24 +30,30 @@ void Schedule::runStage(World &world)
 
 void Schedule::runStartStages(World& world) {
     _stage = _at_start_schedule.begin();
-    do {
+    while (_stage != _at_start_schedule.end() && !_abort) {
         runStage(world);
     }
-    while (_stage != _at_start_schedule.end() && !_abort);
 }
 
 void Schedule::runStages(World& world) {
     _stage = _schedule.begin();
-    do {
+    while (_stage != _schedule.end() && !_abort) {
         runStage(world);
     }
-    while (_stage != _schedule.end() && !_abort);
 }
 
 void Schedule::run(World &world) {
     runStartStages(world);
     while (!_stop) {
         runStages(world);
+        while(!world._command_queue.empty()) {
+            std::function<void(World &)> func = world._command_queue.front();
+            world._command_queue.pop();
+            func(world);
+        }
+        auto c = world.get_resource<Control>();
+        if (c && c.value().get().abort)
+            abort();
     }
 }
 

@@ -11,9 +11,8 @@
 #include <tuple>
 #include <optional>
 #include <algorithm>
+#include <type_traits>
 #include <typeindex>
-#include <variant>
-#include <any>
 
 #include "ecs.hpp"
 #include "World.hpp"
@@ -63,21 +62,18 @@ class cevy::ecs::Schedule {
         std::list<std::type_index> _at_start_schedule;
 
     public:
-        void init_default_schedule() {
-            insert_schedule<Startup>();
-            insert_schedule<PreStartup>();
-            insert_schedule<PostStartup>();
+        template<typename S, typename std::enable_if_t<std::is_same_v<typename S::is_repeat, std::true_type>, bool> = true>
+        bool schedule_defined() {
+            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(S)));
 
-            insert_schedule<First>();
-            insert_schedule<Update>();
-            insert_schedule<PreUpdate>();
-            insert_schedule<PostUpdate>();
-            // insert_schedule<StateTransition>();
-            // insert_schedule<RunFixedUpdateLoop>();
-            insert_schedule<Last>();
+            return (it != _schedule.end());
+        }
 
-            // add systems relating to the automatic parts of
-            //StateTransitions and RunFixedUpdateLoop ?
+        template<typename S, typename std::enable_if_t<std::is_same_v<typename S::is_repeat, std::false_type>, bool> = true>
+        bool schedule_defined() {
+            auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(S)));
+
+            return (it != _at_start_schedule.end());
         }
 
         template<typename T, typename std::enable_if_t<std::is_same_v<typename T::is_repeat, std::true_type>, bool> = true>
@@ -115,40 +111,26 @@ class cevy::ecs::Schedule {
         using system_function = std::function<void (World &)>;
         using system = std::tuple<system_function, std::type_index>;
         std::vector<system> _systems;
-        Schedule() {
-            init_default_schedule();
-        }
+        Schedule() : _stage(_at_start_schedule.begin()) {};
         ~Schedule() = default;
 
         void quit() const;
         void abort();
 
-        template <typename S, class... Components, typename Function>
-        void add_system(Function const &f) {
-            system_function sys = [&f] (World & world) {
-                f(world, world.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function &&f) {
-            system_function sys = [&f] (World & world) {
-                f(world, world.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-        }
-
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            add_super_system<Update>(func);
+        void add_system(R(&&func)(Args...)) {
+            add_system<Update>(func);
         }
 
         template<class S, class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            static_assert(all(Or<is_query<Args>, is_world<Args>>()...), "type must be reference to super, or query");
-            system_function sys = [&func] (World & reg) {
+        void add_system(R(&&func)(Args...)) {
+            static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...), "type must be reference to query, world, commands or resource");
+
+            if (!schedule_defined<S>()) {
+                std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+            }
+
+            system_function sys = [&func] (World & reg) mutable {
                 func(reg.get_super<Args>()...);
             };
             _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
@@ -168,6 +150,4 @@ class cevy::ecs::Schedule {
         /* Bevy-compliant */
     public:
         void run(World& world);
-
-        // Schedule& add_systems();
 };

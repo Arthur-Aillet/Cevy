@@ -17,6 +17,7 @@ class cevy::ecs::Entity {
         explicit Entity(std::size_t new_id);
     public:
         friend class ecs::World;
+        friend class ecs::Commands;
         operator std::size_t&();
         operator std::size_t() const;
 };

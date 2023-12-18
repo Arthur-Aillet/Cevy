@@ -7,18 +7,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Plugin.hpp"
 #include "Schedule.hpp"
 #include "World.hpp"
-
-#include <unordered_map>
-#include <any>
-#include <typeindex>
-#include <iostream>
-#include <tuple>
-#include <functional>
-#include <type_traits>
-
 #include "ecs.hpp"
 
 class cevy::ecs::App : public cevy::ecs::World {
@@ -26,61 +19,32 @@ class cevy::ecs::App : public cevy::ecs::World {
         using World::ComponentId;
         using system = Schedule::system;
 
+        /// TODO: refactor to has-a ?
+        // World world;
     private:
         Schedule _schedule;
-        /// TODO: refactor to has-a ?
-        // World _world;
+        std::vector<std::unique_ptr<Plugin>> _plugins;
 
-    private:
         template<typename GivenPlugin>
-        void add_plugin() {
+        void add_plugin(const GivenPlugin &plugin) {
             static_assert(
                 std::is_base_of_v<Plugin, GivenPlugin>,
                 "Given plugin does not derive from Cevy Plugin class"
             );
-            GivenPlugin plugin;
-            plugin.build(*this);
+            auto &p = _plugins.emplace_back(std::make_unique<GivenPlugin>(plugin));
+
+            p->build(*this);
         }
 
     public:
         template<typename ...GivenPlugin>
-        void add_plugins() {
-            ((add_plugin<GivenPlugin>()),...);
+        void add_plugins(const GivenPlugin &...plugins) {
+            ((add_plugin(std::forward<const GivenPlugin &>(plugins))),...);
         }
 
-        void run() {
-            _schedule.run(*this);
-        }
-
-        void quit() const {
-            _schedule.quit();
-        }
-        void abort() {
-            _schedule.abort();
-        }
-
-        template <typename Function>
-        void add_system(Function &&f) {
-            _schedule.add_system<Schedule::Update>(f);
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function &&f) {
-            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
-                _schedule.add_system<S, Components...>(f);
-            } else {
-                _schedule.add_system<Schedule::Update, S, Components...>(f);
-            }
-        }
-
-        template <typename S, class... Components, typename Function>
-        void add_system(Function const &f) {
-            if constexpr (std::is_base_of_v<Schedule::IsStage, S>) {
-                _schedule.add_system<S, Components...>(f);
-            } else {
-                _schedule.add_system<Schedule::Update, S, Components...>(f);
-            }
-        }
+        void run();
+        void quit();
+        void abort();
 
         template<typename T>
         void add_stage() {
@@ -88,13 +52,13 @@ class cevy::ecs::App : public cevy::ecs::World {
         }
 
         template<class S, class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            _schedule.add_super_system<S>(func);
+        void add_system(R(&&func)(Args...)) {
+            _schedule.add_system<S>(func);
         }
 
         template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            _schedule.add_super_system(func);
+        void add_system(R(&&func)(Args...)) {
+            _schedule.add_system(func);
         }
 
 };
