@@ -48,8 +48,8 @@ namespace cevy::ecs {
             }
 
             template <typename Content>
-            void insert_resource(Content &value) {
-                std::any a = std::make_any<Content>(value);
+            void insert_resource(const Content& value) {
+                auto a = std::make_any<Content>(value);
 
                 _resources_map[std::type_index(typeid(Content))] = a;
             }

@@ -1,3 +1,10 @@
+/*
+** Agartha-Software, 2023
+** Cevy
+** File description:
+** Camera
+*/
+
 #pragma once
 
 #include "raylib.h"

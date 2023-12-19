@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "ecs.hpp"
 #include <chrono>
 
 using namespace std::chrono;

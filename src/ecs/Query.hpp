@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <vector>
 #include <cstddef>
 #include <optional>
 #include <utility>
-#include <iostream>
 
 #include "ecs.hpp"
 #include "SparseVector.hpp"
