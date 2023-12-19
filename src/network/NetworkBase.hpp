@@ -23,6 +23,7 @@
 
 // #include "../entity.hpp"
 #include "../ecs/SparseVector.hpp"
+#include "network.hpp"
 
 /**NOTE - Utiliser des templates pour envoyer les données
  * prend donc n'importe qu'elle type en entré (on doit créer un prototype de la fonction pour chaque type possible)
@@ -33,7 +34,7 @@
  * deserialzer l'objet dans le type trouvée
 */
 
-class NetworkBase
+class cevy::NetworkBase
 {
     private:
         template <typename Component>

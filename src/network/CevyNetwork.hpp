@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "NetworkBase.hpp"
 #include <asio/error_code.hpp>
 #include <cstdint>
 #include <cstring>
@@ -17,7 +16,10 @@
 #include <unordered_map>
 #include <vector>
 
-class CevyNetwork : protected NetworkBase {
+#include "network.hpp"
+#include "NetworkBase.hpp"
+
+class cevy::CevyNetwork : protected cevy::NetworkBase {
     public:
         enum class Communication {
             State          = 1,

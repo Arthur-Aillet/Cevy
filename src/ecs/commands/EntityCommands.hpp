@@ -31,3 +31,15 @@ cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
     return spawn_empty().insert(a...);
 }
 
+
+template<typename T>
+cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype() {
+    add([] (cevy::ecs::World &w) {
+        w.spawn_archetype<T>();
+    });
+};
+cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype(std::type_index type) {
+    add([type] (cevy::ecs::World &w) {
+        w.spawn_archetype(type);
+    });
+};

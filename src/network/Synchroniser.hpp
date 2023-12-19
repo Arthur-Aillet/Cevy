@@ -21,8 +21,9 @@
 #include "../ecs/Query.hpp"
 #include "../ecs/commands/Commands.hpp"
 #include "../ecs/commands/EntityCommands.hpp"
+#include "network.hpp"
 
-class Synchroniser {
+class cevy::Synchroniser {
 public:
     struct SyncId {
         size_t id = -1;
@@ -75,7 +76,7 @@ private:
 };
 
 template<typename Block, typename... Component>
-class Synchroniser::SyncBlock {
+class cevy::Synchroniser::SyncBlock {
     SyncBlock(Synchroniser::Mode mode, Synchroniser& sync, CevyNetwork& net) : mode(mode), _sync(sync), _net(sync._net) {};
     Synchroniser& _sync;
     CevyNetwork& _net;

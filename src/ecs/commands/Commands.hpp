@@ -46,18 +46,10 @@ class cevy::ecs::Commands {
         template<typename... Ts>
         cevy::ecs::EntityCommands spawn(Ts... a);
 
-        template<typename... Ts>
-        cevy::ecs::EntityCommands spawn_archetype() {
-            add([] (cevy::ecs::World &w) {
-                w.spawn_archetype<T>();
-            });
-        };
+        template<typename T>
+        cevy::ecs::EntityCommands spawn_archetype();
 
-        cevy::ecs::EntityCommands spawn_archetype(std::type_index type) {
-            add([] (cevy::ecs::World &w) {
-                w.spawn_archetype(type);
-            });
-        };
+        cevy::ecs::EntityCommands spawn_archetype(std::type_index type);
 };
 
 template<typename C,

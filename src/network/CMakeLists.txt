@@ -9,7 +9,7 @@ add_library(network
   STATIC
   NetworkBase.hpp
   CevyNetwork.hpp
-  network.cpp
+  # network.cpp
 )
 
 set(ASIO_FOLDER ${CMAKE_BINARY_DIR}/_deps/asio)
