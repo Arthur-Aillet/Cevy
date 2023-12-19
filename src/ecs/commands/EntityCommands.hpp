@@ -18,7 +18,7 @@ class cevy::ecs::EntityCommands {
         EntityCommands(cevy::ecs::Commands& commands, cevy::ecs::Entity entity)  : _entity(entity), _commands(commands) {};
     public:
         template<typename... Components>
-        cevy::ecs::EntityCommands &insert(Components &&... c) {
+        cevy::ecs::EntityCommands &insert(const Components &... c) {
             _commands.add([c..., e = _entity] (cevy::ecs::World &w) mutable {
                 (w.add_component(e, c), ...);
             });

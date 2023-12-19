@@ -23,7 +23,7 @@ class cevy::ecs::App : public cevy::ecs::World {
         // World world;
     private:
         Schedule _schedule;
-        std::vector<std::unique_ptr<Plugin>> _plugins;
+        std::vector<std::shared_ptr<Plugin>> _plugins;
 
         template<typename GivenPlugin>
         void add_plugin(const GivenPlugin &plugin) {
@@ -31,7 +31,7 @@ class cevy::ecs::App : public cevy::ecs::World {
                 std::is_base_of_v<Plugin, GivenPlugin>,
                 "Given plugin does not derive from Cevy Plugin class"
             );
-            auto &p = _plugins.emplace_back(std::make_unique<GivenPlugin>(plugin));
+            auto &p = _plugins.emplace_back(std::make_shared<GivenPlugin>(plugin));
 
             p->build(*this);
         }

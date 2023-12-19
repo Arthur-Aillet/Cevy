@@ -9,7 +9,6 @@
 
 #include "ecs.hpp"
 #include "Plugin.hpp"
-#include "Schedule.hpp"
 
 namespace cevy::ecs {
     class DefaultPlugin : public cevy::ecs::Plugin {
