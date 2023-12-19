@@ -89,7 +89,7 @@ class cevy::ecs::World {
         using command = std::function<void (World &)>;
         using component_data = std::tuple<std::any, erase_access>;
 
-        using archetype = std::function<void (World &)>;
+        using archetype = std::function<EntityWorldRef ()>;
 
         friend class cevy::ecs::Schedule;
         friend class cevy::ecs::Commands;
@@ -232,7 +232,16 @@ class cevy::ecs::World {
     public:
         template<typename T, typename... Component>
         void init_archetype(const Component&... c) {
-            _archetypes[Id(typeid(T))] = [this, c...](){ this->spawn(c...); };
+            _archetypes[Id(typeid(T))] = [this, c...](){ return this->spawn(c...); };
+        }
+
+        template<typename T>
+        EntityWorldRef spawn_archetype() {
+            return _archetypes[Id(typeid(T))]();
+        }
+
+        EntityWorldRef spawn_archetype(Id id) {
+            return _archetypes[id]();
         }
 
         Entity spawn_at(std::size_t idx);

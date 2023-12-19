@@ -9,6 +9,7 @@
 
 #include "World.hpp"
 #include "Command.hpp"
+#include <typeindex>
 
 namespace cevy {
     namespace ecs {
@@ -44,6 +45,19 @@ class cevy::ecs::Commands {
 
         template<typename... Ts>
         cevy::ecs::EntityCommands spawn(Ts... a);
+
+        template<typename... Ts>
+        cevy::ecs::EntityCommands spawn_archetype() {
+            add([] (cevy::ecs::World &w) {
+                w.spawn_archetype<T>();
+            });
+        };
+
+        cevy::ecs::EntityCommands spawn_archetype(std::type_index type) {
+            add([] (cevy::ecs::World &w) {
+                w.spawn_archetype(type);
+            });
+        };
 };
 
 template<typename C,

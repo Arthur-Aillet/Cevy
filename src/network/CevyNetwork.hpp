@@ -45,7 +45,7 @@ class CevyNetwork : protected NetworkBase {
         void sendState(uint16_t id, const std::vector<uint8_t>& block) {
             std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
             fullblock.insert(fullblock.end(), block.begin(), block.end());
-            _states_send[id] = block;
+            _states_send[id] = fullblock;
             writeUDP(_states_send[id], [this, id](){_states_send.erase(id);});
         }
 
@@ -59,6 +59,17 @@ class CevyNetwork : protected NetworkBase {
             return std::nullopt;
         }
 
+        std::unordered_map<uint16_t, uint8_t>& recvSummon() {
+            return _summon_recv;
+        }
+
+        void sendSummon(uint16_t id, uint8_t archetype) {
+            half h = {.h = id};
+            std::vector<uint8_t> fullblock = { h.b.b0, h.b.b1, archetype};
+            _summon_send[id] = fullblock;
+            writeUDP(_summon_send[id], [this, id](){_summon_send.erase(id);});
+        }
+
     private:
         void handle_state(size_t bytes, std::array<uint8_t, 512>& buffer) {
             uint64_t id;
@@ -67,18 +78,15 @@ class CevyNetwork : protected NetworkBase {
             vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
             _states_recv[id] = vec;
         }
+
         using error_code = asio::error_code;
 
-
-
         void handle_events(size_t bytes, std::array<uint8_t, 512>& buffer) {
-            half h = {.b.b0 = buffer[1], .b.b1 = buffer[2]};
+            half h = {.b  = {buffer[1], buffer[2]}};
             if (h.h == static_cast<uint16_t>(Event::Summon)) {
-                uint64_t id;
-                std::memcpy(&id, &buffer[1], sizeof(id));
-                std::vector<uint8_t> vec;
-                vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
-                _summon_recv[id] = vec;
+                uint16_t id = h.h;
+                uint8_t archetype = buffer[3];
+                _summon_recv[id] = archetype;
             }
         }
 
@@ -100,6 +108,6 @@ class CevyNetwork : protected NetworkBase {
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
         std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
 
-        std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_recv;
+        std::unordered_map<uint16_t, uint8_t> _summon_recv;
         std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
 };
