@@ -9,4 +9,4 @@
 
 using cevy::ecs::Time;
 
-Time::Time() : _start(std::chrono::high_resolution_clock::now()) {}
+Time::Time() : _start(std::chrono::system_clock::now()) {}
