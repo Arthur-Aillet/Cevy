@@ -39,7 +39,7 @@ public:
 
     virtual void build(cevy::ecs::World& world) = 0;
 
-    Synchroniser(CevyNetwork& net, Mode mode) : mode(mode), _net(net) {};
+    Synchroniser(Mode mode, const std::string& host = std::string("")) : mode(mode), _net(host, 4995) {};
     ~Synchroniser() {};
 
     template<typename Stage, typename Block, typename... Component>
@@ -62,7 +62,7 @@ protected:
         throw std::out_of_range("Trying to create more than 1023 synced entities");
     }
 
-    CevyNetwork& _net;
+    CevyNetwork _net;
     std::unordered_map<BlockType, uint8_t> _blocks;
     uint8_t _blockCount;
     std::unordered_map<uint8_t, std::type_index> _archetypes;

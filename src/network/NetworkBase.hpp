@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include <sys/types.h>
+#include <thread>
 #include <typeinfo>
 #include <asio/ip/udp.hpp>
 #include <vector>
@@ -109,11 +110,16 @@ class NetworkBase
         }
 
     protected:
-        asio::ip::udp::socket _udp_socket;
-        asio::ip::tcp::socket _tcp_socket;
+        bool quit = 0;
+        asio::io_context _io_context;
+        std::thread _nw_thread;
 
         asio::ip::udp::endpoint _udp_endpoint;
         asio::ip::tcp::endpoint _tcp_endpoint;
+
+        asio::ip::udp::socket _udp_socket;
+        asio::ip::tcp::socket _tcp_socket;
+
 
 
         std::array<uint8_t, 512> _udp_recv;
@@ -121,6 +127,32 @@ class NetworkBase
 
         NetworkBase(asio::ip::udp::socket&& udp_socket, asio::ip::tcp::socket&& tcp_socket)
          : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
+
+        NetworkBase(const std::string& endpoint, size_t port)
+            :   _udp_endpoint(asio::ip::udp::v4(), port),
+                _tcp_endpoint(asio::ip::tcp::v4(), port),
+                _udp_socket(_io_context),
+                _tcp_socket(_io_context)
+        {
+            _udp_socket.open(asio::ip::udp::v4());
+            _tcp_socket.open(asio::ip::tcp::v4());
+
+
+            _nw_thread = std::thread([this](){while (!this->quit) this->_io_context.run();});
+        }
+
+        NetworkBase(size_t port)
+            :   _udp_endpoint(asio::ip::udp::v4(), port),
+                _tcp_endpoint(asio::ip::tcp::v4(), port),
+                _udp_socket(_io_context),
+                _tcp_socket(_io_context)
+        {
+            _udp_socket.open(asio::ip::udp::v4());
+            _tcp_socket.open(asio::ip::tcp::v4());
+
+
+            _nw_thread = std::thread([this](){while (!this->quit) this->_io_context.run();});
+        }
 
         void readUDP() {
             _udp_socket.async_receive_from(

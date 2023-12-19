@@ -31,7 +31,8 @@ class CevyNetwork : protected NetworkBase {
             Summon         = 1,
         };
 
-        CevyNetwork();
+        CevyNetwork(const std::string& endpoint, size_t port) : NetworkBase(endpoint, port) {};
+        CevyNetwork(size_t port) : NetworkBase(port) {};
         ~CevyNetwork();
 
         template<typename T>
