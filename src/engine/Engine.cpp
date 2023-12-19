@@ -82,7 +82,7 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
     app.init_component<cevy::Rotation>();
-    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 1.0, 0.0));
+    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 0.6, 1.0));
     // app.add_system<cevy::RenderStage>(control_object);
 }
 
