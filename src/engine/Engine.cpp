@@ -33,10 +33,7 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
         control.get().abort = true;
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera> cams) {
-    static Model model = LoadModel("resources/church.obj");                 // Load OBJ model
-    static Texture2D texture = LoadTexture("resources/church_diffuse.png"); // Load model texture (diffuse map)
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Query<cevy::Position, cevy::Handle<cevy::Model3D>> models) {
     for (auto cam : cams) {
         UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
@@ -45,8 +42,12 @@ void update_window(cevy::ecs::Query<cevy::Camera> cams) {
     ClearBackground(WHITE);
     for (auto cam : cams) {
         BeginMode3D(std::get<0>(cam));
+        for (auto model : models) {
+            cevy::Position &pos = std::get<0>(model);
+            cevy::Handle<cevy::Model3D> handle = std::get<1>(model);
 
-        DrawModel(model, Vector3 {0, 0, 0}, 0.1, WHITE);   // Draw 3d model with texture
+            DrawModel(handle.get().model, Vector3 {(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
+        }
         DrawGrid(100, 1.0f);
 
         EndMode3D();
@@ -54,26 +55,18 @@ void update_window(cevy::ecs::Query<cevy::Camera> cams) {
     EndDrawing();
 }
 
-void list_pos(cevy::ecs::Query<cevy::Position> pos) {
-    for (auto po : pos) {
-        std::cout << std::get<0>(po).x << std::endl;
-    }
-}
-
 void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_plugins(cevy::ecs::DefaultPlugin());
-    app.add_plugins(cevy::AssetManagerPlugin());
-    app.add_plugins();
     app.add_stage<StartupRenderStage>();
     app.add_stage<PreStartupRenderStage>();
     app.add_stage<PostStartupRenderStage>();
     app.add_stage<RenderStage>();
     app.add_stage<PreRenderStage>();
     app.add_stage<PostRenderStage>();
+    app.add_plugins(cevy::AssetManagerPlugin());
     app.add_system<cevy::PreStartupRenderStage>(init_window);
-    app.add_system<cevy::RenderStage>(update_window);
-    app.add_system<cevy::RenderStage>(list_pos);
     app.add_system<cevy::PreRenderStage>(close_game);
+    app.add_system<cevy::RenderStage>(update_window);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
     app.spawn(cevy::Camera());
