@@ -8,6 +8,8 @@
 #include <math.h>
 #include <vector>
 
+#include "Vector.hpp"
+
 #pragma once
 
 namespace cevy {
@@ -18,6 +20,9 @@ namespace cevy {
             ~Rotation() {};
             Rotation fowards() {
                 return(Rotation(0.0, 1.0, 0.0));
+            };
+            Rotation up() {
+                return(Rotation(0.0, 0.0, 1.0));
             };
             Rotation to_rad() {return Rotation(x * (M_PI / 180.0), y * (M_PI / 180.0), z * (M_PI / 180.0));};
     };
