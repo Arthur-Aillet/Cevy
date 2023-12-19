@@ -16,7 +16,9 @@
 #include "DefaultPlugin.hpp"
 #include "Resource.hpp"
 #include "Camera.hpp"
+#include "input.hpp"
 #include "Position.hpp"
+#include "Rotation.hpp"
 #include "Commands.hpp"
 #include "EntityCommands.hpp"
 #include "imgui.h"
@@ -33,9 +35,13 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
         control.get().abort = true;
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Query<cevy::Position, cevy::Handle<cevy::Model3D>> models) {
+void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation> cams, cevy::ecs::Query<cevy::Position, cevy::Rotation, cevy::Handle<cevy::Model3D>> models) {
+    Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
-        UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
+        // fowards = std::get<2>(cam).fowards();
+        std::get<0>(cam).camera.position = std::get<1>(cam);
+        // std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y + fowards.y, std::get<1>(cam).z + fowards.z};
+        // UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
     BeginDrawing();
 
@@ -44,7 +50,7 @@ void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Query<cevy::P
         BeginMode3D(std::get<0>(cam));
         for (auto model : models) {
             cevy::Position &pos = std::get<0>(model);
-            cevy::Handle<cevy::Model3D> handle = std::get<1>(model);
+            cevy::Handle<cevy::Model3D> handle = std::get<2>(model);
 
             DrawModel(handle.get().model, Vector3 {(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
         }
@@ -53,6 +59,12 @@ void update_window(cevy::ecs::Query<cevy::Camera> cams, cevy::ecs::Query<cevy::P
         EndMode3D();
     }
     EndDrawing();
+}
+
+void list_pos(cevy::ecs::Query<cevy::Position> pos) {
+    for (auto po : pos) {
+        std::cout << std::get<0>(po).x << std::endl;
+    }
 }
 
 void cevy::Engine::build(cevy::ecs::App& app) {
@@ -69,7 +81,9 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_system<cevy::RenderStage>(update_window);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
-    app.spawn(cevy::Camera());
+    app.init_component<cevy::Rotation>();
+    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 1.0, 0.0));
+    // app.add_system<cevy::RenderStage>(control_object);
 }
 
 
