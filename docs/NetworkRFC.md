@@ -140,7 +140,7 @@ It has one Success response, with an optionnal structured message, and several F
 
 ### Summon Entity
 
-|  Emitter  | Communication |      Component     |       Value       |
-|-----------|---------------|--------------------|-------------------|
-|  Server   |     Event     |       Summon       |    Archetype ID   |
-|           |    1 byte     |       2 bytes      |       1 byte      |
+|  Emitter  | Communication |      Component     |         Value         |
+|-----------|---------------|--------------------|-----------------------|
+|  Server   |     Event     |       Summon       | SyncId + Archetype ID |
+|           |    1 byte     |       2 bytes      |   2 bytes + 1 byte    |
