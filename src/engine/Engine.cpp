@@ -38,7 +38,7 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation> cams, cevy::ecs::Query<cevy::Position, cevy::Rotation, cevy::Handle<cevy::Model3D>> models) {
     Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
-        // fowards = std::get<2>(cam).fowards();
+        fowards = std::get<2>(cam).fowards();
         std::get<0>(cam).camera.position = std::get<1>(cam);
         // std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y + fowards.y, std::get<1>(cam).z + fowards.z};
         // UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
