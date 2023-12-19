@@ -38,8 +38,3 @@ cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype() {
         w.spawn_archetype<T>();
     });
 };
-cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype(std::type_index type) {
-    add([type] (cevy::ecs::World &w) {
-        w.spawn_archetype(type);
-    });
-};

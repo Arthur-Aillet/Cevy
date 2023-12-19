@@ -88,7 +88,8 @@ namespace cevy {
     class AssetManagerPlugin : public ecs::Plugin {
         public:
             void build(ecs::App &app) {
-                app.add_system<cevy::PostStartupRenderStage>(init_asset_manager);
+                init_asset_manager(app);
+                // app.add_system<cevy::PostStartupRenderStage>(init_asset_manager);
                 app.init_component<cevy::Handle<cevy::Model3D>>();
             }
     };

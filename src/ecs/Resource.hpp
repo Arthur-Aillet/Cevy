@@ -72,8 +72,8 @@ namespace cevy::ecs {
             }
 
             template <typename Content>
-            const Content& resource() {
-                return std::any_cast<const Content&>(_resources_map[std::type_index(typeid(Content))]);
+            const Content& resource() const {
+                return std::any_cast<const Content&>(_resources_map.at(std::type_index(typeid(Content))));
             }
 
             template <typename Content>

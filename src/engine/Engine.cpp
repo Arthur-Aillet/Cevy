@@ -22,6 +22,7 @@
 #include "Commands.hpp"
 #include "EntityCommands.hpp"
 #include "imgui.h"
+#include "../network/Synchroniser.hpp"
 
 void init_window() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -82,6 +83,7 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
     app.init_component<cevy::Rotation>();
+    app.init_component<Synchroniser::SyncId>();
     app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 0.6, 1.0));
     // app.add_system<cevy::RenderStage>(control_object);
 }
