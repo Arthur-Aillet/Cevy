@@ -12,7 +12,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y libxrandr-dev libxinerama
+      - run: sudo apt-get install -y libxrandr-dev libxinerama-dev
       - name: Build
         run: cmake -DTESTS=on -S . -B ./build
       - name: Test
