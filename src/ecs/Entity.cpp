@@ -5,8 +5,6 @@
 ** Entity
 */
 
-#include <string>
-#include <iostream>
 #include "Entity.hpp"
 
 using cevy::ecs::Entity;
