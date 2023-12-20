@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "dev"
+      - "feat/CI/CD"
 
 jobs:
   test:
