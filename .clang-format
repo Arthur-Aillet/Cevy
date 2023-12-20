@@ -1,7 +1,7 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  LLVM
-AccessModifierOffset: -2
+AccessModifierOffset: 0
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
 AlignConsecutiveMacros: None
@@ -57,7 +57,7 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
-ColumnLimit:     80
+ColumnLimit:     100
 CommentPragmas:  '^ IWYU pragma:'
 QualifierAlignment: Leave
 CompactNamespaces: false
@@ -97,7 +97,7 @@ IncludeCategories:
     CaseSensitive:   false
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
-IndentAccessModifiers: true
+IndentAccessModifiers: false
 IndentCaseLabels: false
 IndentCaseBlocks: false
 IndentGotoLabels: true
@@ -106,7 +106,7 @@ IndentExternBlock: AfterExternBlock
 IndentRequires:  false
 IndentWidth:     2
 IndentWrappedFunctionNames: false
-InsertTrailingCommas: Wrapped
+InsertTrailingCommas: None
 JavaScriptQuotes: Double
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: true
@@ -115,7 +115,7 @@ MacroBlockBegin: ''
 MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
-ObjCBinPackProtocolList: Auto
+ObjCBinPackProtocolList: Never
 ObjCBlockIndentWidth: 2
 ObjCBreakBeforeNestedBlockParam: true
 ObjCSpaceAfterProperty: false
