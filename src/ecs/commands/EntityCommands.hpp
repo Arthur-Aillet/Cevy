@@ -19,13 +19,15 @@ class cevy::ecs::EntityCommands {
       : _entity(entity), _commands(commands){};
 
   public:
-  template <typename... Components> cevy::ecs::EntityCommands &insert(const Components &...c) {
+  template <typename... Components>
+  cevy::ecs::EntityCommands &insert(const Components &...c) {
     _commands.add(
         [c..., e = _entity](cevy::ecs::World &w) mutable { (w.add_component(e, c), ...); });
     return *this;
   }
 };
 
-template <typename... Ts> cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
+template <typename... Ts>
+cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
   return spawn_empty().insert(a...);
 }

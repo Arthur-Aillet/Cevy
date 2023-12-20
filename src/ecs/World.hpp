@@ -30,17 +30,27 @@
 #include "Query.hpp"
 #include "ecs.hpp"
 
-template <class T> struct is_world : public std::false_type {};
+template <class T>
+struct is_world : public std::false_type {};
 
-template <> struct is_world<cevy::ecs::World &> : public std::true_type {};
+template <>
+struct is_world<cevy::ecs::World &> : public std::true_type {};
 
-template <> struct is_world<const cevy::ecs::World &> : public std::true_type {};
+template <>
+struct is_world<const cevy::ecs::World &> : public std::true_type {};
 
-template <typename... Args> constexpr bool all(Args... args) { return (... && args); }
+template <typename... Args>
+constexpr bool all(Args... args) {
+  return (... && args);
+}
 
-template <typename... Args> constexpr bool any() { return (... || Args::value); };
+template <typename... Args>
+constexpr bool any() {
+  return (... || Args::value);
+};
 
-template <typename... T> struct Or : std::integral_constant<bool, any<T...>()> {};
+template <typename... T>
+struct Or : std::integral_constant<bool, any<T...>()> {};
 
 namespace cevy {
 namespace ecs {
@@ -52,9 +62,11 @@ struct Control {
 } // namespace ecs
 } // namespace cevy
 
-template <class T> struct is_commands : public std::false_type {};
+template <class T>
+struct is_commands : public std::false_type {};
 
-template <> struct is_commands<cevy::ecs::Commands> : public std::true_type {};
+template <>
+struct is_commands<cevy::ecs::Commands> : public std::true_type {};
 
 /**
  * Stores Entities, Components (and resources), and exposes operations
@@ -72,7 +84,8 @@ class cevy::ecs::World {
 
     // EntityWorldRef insert(Bundle& b);
 
-    template <typename... Ts> EntityWorldRef insert(Ts... args);
+    template <typename... Ts>
+    EntityWorldRef insert(Ts... args);
 
     operator Entity &() { return entity; };
   };
@@ -118,13 +131,15 @@ class cevy::ecs::World {
   void clear_resources();
 
   /// spawn an entity with defined components
-  template <typename... Components> EntityWorldRef spawn(Components... c) {
+  template <typename... Components>
+  EntityWorldRef spawn(Components... c) {
     return spawn_empty().insert(c...);
   }
 
   /// get a Component T associated with a given Entity, or Nothing if no such
   /// Component
-  template <typename T> std::optional<ref<T>> get(Entity entity) {
+  template <typename T>
+  std::optional<ref<T>> get(Entity entity) {
     SparseVector<T> &v = std::any_cast<SparseVector<T> &>(
         std::get<0>(_components_arrays[std::type_index(typeid(T))]));
     std::optional<T> optional = v[entity];
@@ -137,7 +152,8 @@ class cevy::ecs::World {
 
   /// get a Component T associated with a given Entity, or Nothing if no such
   /// Component
-  template <typename T> std::optional<ref<const T>> get(Entity entity) const {
+  template <typename T>
+  std::optional<ref<const T>> get(Entity entity) const {
     const SparseVector<T> &v = std::any_cast<SparseVector<T> &>(
         std::get<0>(_components_arrays.at(std::type_index(typeid(T)))));
     std::optional<const T> optional = v[entity];
@@ -149,7 +165,8 @@ class cevy::ecs::World {
   }
 
   /// register a component to the world
-  template <typename T> ComponentId init_component() {
+  template <typename T>
+  ComponentId init_component() {
     erase_access f_e = [](World &reg, Entity const &Entity) {
       auto &cmpnts = reg.get_components<T>();
       if (Entity < cmpnts.size())
@@ -163,33 +180,44 @@ class cevy::ecs::World {
   };
 
   /// emplace a resource to the world by calling the
-  template <typename R, typename... Params> void init_resource(Params &&...p) {
+  template <typename R, typename... Params>
+  void init_resource(Params &&...p) {
     _resource_manager.insert_resource(R(p...));
   }
 
   /// insert a resource to the world
-  template <typename R> void insert_resource(const R &value) {
+  template <typename R>
+  void insert_resource(const R &value) {
     _resource_manager.insert_resource(value);
   }
 
   /// remove a resource from this world
-  template <typename R> std::optional<R> remove_resource() {
+  template <typename R>
+  std::optional<R> remove_resource() {
     return _resource_manager.remove_resource<R>();
   }
 
   /// true if the world holds this Resource
-  template <typename R> bool contains_resource() {
+  template <typename R>
+  bool contains_resource() {
     return _resource_manager.contains_resource<R>();
   }
 
   /// access a given Resource
-  template <typename R> R &resource() { return _resource_manager.resource<R>(); }
+  template <typename R>
+  R &resource() {
+    return _resource_manager.resource<R>();
+  }
 
   /// access a given Resource
-  template <typename R> const R &resource() const { return _resource_manager.resource<R>(); }
+  template <typename R>
+  const R &resource() const {
+    return _resource_manager.resource<R>();
+  }
 
   /// access a given Resource, or None if it not in this world
-  template <typename R> std::optional<ref<R>> get_resource() {
+  template <typename R>
+  std::optional<ref<R>> get_resource() {
     return _resource_manager.get_resource<R>();
   }
   /* TODO:
@@ -201,7 +229,8 @@ class cevy::ecs::World {
   */
 
   /// send an event TODO: DO
-  template <typename E> void send_event(const E &event) {}
+  template <typename E>
+  void send_event(const E &event) {}
 
   public:
   template <typename Component>
@@ -219,13 +248,15 @@ class cevy::ecs::World {
     return array.emplace_at(to, p...);
   }
 
-  template <typename Component> void remove_component(Entity const &from) {
+  template <typename Component>
+  void remove_component(Entity const &from) {
     auto &array = get_components<Component>();
     if (from < array.size())
       array.erase(from);
   }
 
-  template <class Component> SparseVector<Component> &get_components() {
+  template <class Component>
+  SparseVector<Component> &get_components() {
     auto id = std::type_index(typeid(Component));
     auto it = _components_arrays.find(id);
 
@@ -234,7 +265,8 @@ class cevy::ecs::World {
     }
     throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
   }
-  template <class Component> SparseVector<Component> const &get_components() const {
+  template <class Component>
+  SparseVector<Component> const &get_components() const {
     auto id = std::type_index(typeid(Component));
     auto it = _components_arrays.find(id);
 
@@ -249,7 +281,8 @@ class cevy::ecs::World {
     return *this;
   }
 
-  template <typename Q, typename std::enable_if_t<is_query<Q>::value, bool> = true> Q get_super() {
+  template <typename Q, typename std::enable_if_t<is_query<Q>::value, bool> = true>
+  Q get_super() {
     return Q::query(*this);
   }
 
@@ -268,6 +301,7 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
   return *this;
 }
 
-template <typename... T> cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
+template <typename... T>
+cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
   return Query<T...>(w.get_components<T>()...);
 }

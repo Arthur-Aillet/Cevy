@@ -14,19 +14,24 @@
 #include "SparseVector.hpp"
 #include "ecs.hpp"
 
-template <class T> struct is_query : public std::false_type {};
+template <class T>
+struct is_query : public std::false_type {};
 
-template <typename... T> struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
+template <typename... T>
+struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
 
-template <class... T> class cevy::ecs::Query {
+template <class... T>
+class cevy::ecs::Query {
   using Containers = std::tuple<SparseVector<T>...>;
   // template<template<typename> typename Containers>
   // using Containers = SparseVector<T>;
   public:
   class iterator {
-    template <class Container> using iterator_t = typename Container::iterator;
+    template <class Container>
+    using iterator_t = typename Container::iterator;
 
-    template <class Container> using it_reference_t = typename iterator_t<Container>::reference;
+    template <class Container>
+    using it_reference_t = typename iterator_t<Container>::reference;
 
     public:
     using value_type = std::tuple<T &...>;
@@ -36,7 +41,8 @@ template <class... T> class cevy::ecs::Query {
     using iterator_category = std::bidirectional_iterator_tag;
     using iterator_tuple = std::tuple<iterator_t<SparseVector<T>>...>;
 
-    template <typename...> class zipper;
+    template <typename...>
+    class zipper;
     friend class zipper<T...>; // FIXME - reactivate
     iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0)
         : current(it_tuple), _max(max), _idx(idx) {
