@@ -1,7 +1,7 @@
 on:
   workflow_dispatch:
 
-name: Upload Release Asset
+name: Create Release Major Asset
 
 jobs:
   build:
@@ -15,8 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build project # This would actually build your project, using zip for an example artifact
-        run: |
-          make
+        run: cmake -DTESTS=on -S . -B ./build
+
 # ==============================
       - name: Create Release
         id: create_release
@@ -25,6 +25,7 @@ jobs:
           config-name: release-drafter-major.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 # ===========================
       - name: Upload Release Asset
         id: upload-release-asset
