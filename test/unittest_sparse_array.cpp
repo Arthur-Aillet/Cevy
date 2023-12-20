@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 
-#include "../src/SparseVector.hpp"
+#include "../src/ecs/SparseVector.hpp"
 
 Test(SparseVector, constructors) {
     SparseVector<int> test = SparseVector<int>();
