@@ -12,6 +12,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
+      - run: apt-get install xorg-dev libglu1-mesa-dev
       - name: Build
         run: cmake -DTESTS=on -S . -B ./build
       - name: Test
