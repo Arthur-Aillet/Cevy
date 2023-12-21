@@ -11,13 +11,37 @@ jobs:
     # runs-on: [ubuntu-latest, windows-latest]
     runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v4
-      - run: sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev
-      - run: sudo apt install libglfw3-dev
-      - run: sudo apt install libcriterion-dev
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies from raylib
+        run: sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev
+      - name: Install dependencies from OpenGL
+        run: sudo apt install libglfw3-dev
+      - name: Install dependencies for Units Tests
+        run: sudo apt install libcriterion-dev
       - name: Build
         run: cmake -DTESTS=on -S . -B ./build
       - name: Test
         run: make -j --no-print-directory -C build tests-run-cevy
-      # - name: format
-      #   run: 
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Clang-format
+        run: |
+          for src in $(find ./src -name "*.cpp" -o -name "*.hpp") ; do
+            echo "Formatting [$$src]..."
+            clang-format -i "$$src" -style=file
+          done
+          echo "Done"
+      - name: Check for modified files
+        id: git-check
+        run: echo "modified=$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)" >> $GITHUB_ENV
+      - name: Push changes
+        if: env.modified == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email '[email protected]'
+          git commit -am "Automated formatting"
+          git push
