@@ -10,6 +10,6 @@
 #include "ecs.hpp"
 
 class cevy::ecs::Command {
-    public:
-        static void apply(cevy::ecs::World &) {};
+  public:
+  static void apply(cevy::ecs::World &){};
 };
