@@ -6,11 +6,21 @@
 */
 
 #include "AssetManager.hpp"
+#include "Asset.hpp"
+#include "Diffuse.hpp"
+#include "Mesh.hpp"
 
 void init_asset_manager(cevy::ecs::World &w) {
   w.insert_resource(cevy::engine::AssetManager());
   auto val = w.get_resource<cevy::engine::AssetManager>();
   if (val) {
-    w.insert_resource(cevy::engine::Asset<cevy::engine::Model3D>(val->get()));
+    w.insert_resource(cevy::engine::Asset<cevy::engine::Mesh>(val->get()));
+    w.insert_resource(cevy::engine::Asset<cevy::engine::Diffuse>(val->get()));
   }
+}
+
+void cevy::engine::AssetManagerPlugin::build(ecs::App &app) {
+  app.add_system<PostStartupRenderStage>(init_asset_manager);
+  app.init_component<Handle<cevy::engine::Mesh>>();
+  app.init_component<Handle<cevy::engine::Diffuse>>();
 }

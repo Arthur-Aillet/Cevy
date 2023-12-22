@@ -8,6 +8,8 @@
 add_library(assets
   STATIC
   AssetManager.cpp
+  Asset.hpp
+  Handle.hpp
   AssetManager.hpp
   )
 

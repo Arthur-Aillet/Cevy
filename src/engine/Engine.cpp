@@ -22,6 +22,7 @@
 #include "input.hpp"
 #include "raylib.h"
 #include "rlImGui.h"
+#include <cstddef>
 
 void init_window() {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -36,11 +37,12 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 }
 
 // void update_window(Query<Camera, Position, Rotation> cams, Query<Position, Rotation,
-// Handle<Model3D>> models) {
+// Handle<Mesh>> models) {
 void update_window(
     cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams,
     cevy::ecs::Query<cevy::engine::Position, cevy::engine::Rotation,
-                     cevy::engine::Handle<cevy::engine::Model3D>>
+                     cevy::engine::Handle<cevy::engine::Mesh>,
+                     cevy::engine::Handle<cevy::engine::Diffuse>>
         models) {
   Vector3 fowards = {0, 0, 0};
   for (auto cam : cams) {
@@ -57,9 +59,14 @@ void update_window(
     BeginMode3D(std::get<0>(cam));
     for (auto model : models) {
       cevy::engine::Position &pos = std::get<0>(model);
-      cevy::engine::Handle<cevy::engine::Model3D> handle = std::get<2>(model);
-
-      DrawModel(handle.get().model, Vector3{(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
+      auto handle = std::get<2>(model).get();
+      cevy::engine::Handle<cevy::engine::Diffuse> difs = std::get<3>(model);
+      SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.get().texture);
+      DrawModel(handle.mesh, Vector3{(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
+      SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.get().texture);
+      handle.mesh.materialCount = 1;
+      handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));
+      handle.mesh.materials[0] = LoadMaterialDefault();
     }
     DrawGrid(100, 1.0f);
 
