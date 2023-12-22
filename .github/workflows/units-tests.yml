@@ -34,7 +34,7 @@ jobs:
       - name: Clang-format
         run: |
           for file in $(find . -path './src/*' -type f \( -name '*.cpp' -o -name '*.hpp' \)); do
-            echo "Formatting [$$file]..."
+            echo "Formatting [$file]..."
             clang-format -i "$file"
           done
           echo "Done"
