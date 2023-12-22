@@ -31,7 +31,8 @@ jobs:
       - name: Clang-format
         run: |
           files=$(find . -path './src/*' -type f \( -name '*.cpp' -o -name '*.hpp' \))
-          for file in "${files[@]}"; do
+          IFS=$'\n' read -rd '' -a lines <<<"$files"
+          for file in "${lines[@]}"; do
             echo "Formatting [$$file]..."
             clang-format -i "$$file" -style=file
           done
