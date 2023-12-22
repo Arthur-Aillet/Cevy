@@ -9,7 +9,7 @@
 
 #include "raylib.h"
 
-namespace cevy {
+namespace cevy::engine {
     class Camera {
         private:
             /* data */

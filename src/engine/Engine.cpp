@@ -35,7 +35,8 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
         control.get().abort = true;
 }
 
-void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation> cams, cevy::ecs::Query<cevy::Position, cevy::Rotation, cevy::Handle<cevy::Model3D>> models) {
+//void update_window(Query<Camera, Position, Rotation> cams, Query<Position, Rotation, Handle<Model3D>> models) {
+void update_window(cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams, cevy::ecs::Query<cevy::engine::Position, cevy::engine::Rotation, cevy::engine::Handle<cevy::engine::Model3D>> models) {
     Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
         fowards = std::get<2>(cam).fowards();
@@ -49,8 +50,8 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
     for (auto cam : cams) {
         BeginMode3D(std::get<0>(cam));
         for (auto model : models) {
-            cevy::Position &pos = std::get<0>(model);
-            cevy::Handle<cevy::Model3D> handle = std::get<2>(model);
+            cevy::engine::Position &pos = std::get<0>(model);
+            cevy::engine::Handle<cevy::engine::Model3D> handle = std::get<2>(model);
 
             DrawModel(handle.get().model, Vector3 {(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
         }
@@ -61,13 +62,13 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
     EndDrawing();
 }
 
-void list_pos(cevy::ecs::Query<cevy::Position> pos) {
+void list_pos(cevy::ecs::Query<cevy::engine::Position> pos) {
     for (auto po : pos) {
         std::cout << std::get<0>(po).x << std::endl;
     }
 }
 
-void cevy::Engine::build(cevy::ecs::App& app) {
+void cevy::engine::Engine::build(cevy::ecs::App& app) {
     app.add_plugins(cevy::ecs::DefaultPlugin());
     app.add_stage<StartupRenderStage>();
     app.add_stage<PreStartupRenderStage>();
@@ -75,14 +76,14 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_stage<RenderStage>();
     app.add_stage<PreRenderStage>();
     app.add_stage<PostRenderStage>();
-    app.add_plugins(cevy::AssetManagerPlugin());
-    app.add_system<cevy::PreStartupRenderStage>(init_window);
-    app.add_system<cevy::PreRenderStage>(close_game);
-    app.add_system<cevy::RenderStage>(update_window);
-    app.init_component<cevy::Camera>();
-    app.init_component<cevy::Position>();
-    app.init_component<cevy::Rotation>();
-    app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 0.6, 1.0));
+    app.add_plugins(cevy::engine::AssetManagerPlugin());
+    app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
+    app.add_system<cevy::engine::PreRenderStage>(close_game);
+    app.add_system<cevy::engine::RenderStage>(update_window);
+    app.init_component<cevy::engine::Camera>();
+    app.init_component<cevy::engine::Position>();
+    app.init_component<cevy::engine::Rotation>();
+    app.spawn(cevy::engine::Camera(), cevy::engine::Position(10.0, 10.0, 10.0), cevy::engine::Rotation(0.0, 0.6, 1.0));
     // app.add_system<cevy::RenderStage>(control_object);
 }
 

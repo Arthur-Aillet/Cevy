@@ -24,7 +24,7 @@
 
 void init_asset_manager(cevy::ecs::World &w);
 
-namespace cevy {
+namespace cevy::engine {
     struct Model3D {
         Model model;
         Texture2D diffuse;
@@ -84,12 +84,12 @@ namespace cevy {
     };
 }
 
-namespace cevy {
+namespace cevy::engine {
     class AssetManagerPlugin : public ecs::Plugin {
         public:
             void build(ecs::App &app) {
-                app.add_system<cevy::PostStartupRenderStage>(init_asset_manager);
-                app.init_component<cevy::Handle<cevy::Model3D>>();
+                app.add_system<PostStartupRenderStage>(init_asset_manager);
+                app.init_component<Handle<Model3D>>();
             }
     };
 }

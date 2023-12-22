@@ -11,7 +11,7 @@
 
 #pragma once
 
-namespace cevy {
+namespace cevy::engine {
     class Rotation : public Vector{
         private:
             int direction = 0;
