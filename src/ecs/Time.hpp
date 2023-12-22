@@ -12,10 +12,11 @@
 using namespace std::chrono;
 
 namespace cevy::ecs {
-    class Time {
-        private:
-            time_point<system_clock, nanoseconds> _start;
-        public:
-            Time();
-    };
-}
+class Time {
+  private:
+  time_point<system_clock, nanoseconds> _start;
+
+  public:
+  Time();
+};
+} // namespace cevy::ecs
