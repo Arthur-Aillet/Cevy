@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Clang-format
         run: |
-          files=$(find ../../src -name "*.cpp" -o -name "*.hpp")
+          files=$(find . -path './src/*' -type f \( -name '*.cpp' -o -name '*.hpp' \))
           for file in "${files[@]}"; do
             echo "Formatting [$$file]..."
             clang-format -i "$$file" -style=file
