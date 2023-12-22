@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "ecs.hpp"
 #include "Plugin.hpp"
+#include "ecs.hpp"
 
 namespace cevy::ecs {
-    class DefaultPlugin : public cevy::ecs::Plugin {
-        public:
-            void build(cevy::ecs::App&);
-    };
-}
+class DefaultPlugin : public cevy::ecs::Plugin {
+  public:
+  void build(cevy::ecs::App &);
+};
+} // namespace cevy::ecs
