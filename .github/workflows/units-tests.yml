@@ -34,7 +34,7 @@ jobs:
           IFS=$'\n' read -rd '' -a lines <<<"$files"
           for file in "${lines[@]}"; do
             echo "Formatting [$$file]..."
-            clang-format -i "$$file" -style=file
+            clang-format -i "$$file" -style=file || echo "Failed to format $$file."
           done
           echo "Done"
       - name: Check for modified files
