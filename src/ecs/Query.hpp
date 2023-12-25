@@ -20,6 +20,15 @@ struct is_query : public std::false_type {};
 template <typename... T>
 struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
 
+template <typename Type>
+struct is_optional : std::false_type {};
+
+template <typename Type>
+struct is_optional<std::optional<Type>> : std::true_type {};
+
+template<typename Type>
+using remove_optional = std::conditional_t<is_optional<Type>::value, typename Type::value_type, Type>;
+
 template <class... T>
 class cevy::ecs::Query {
   using Containers = std::tuple<SparseVector<T>...>;
@@ -74,21 +83,24 @@ class cevy::ecs::Query {
 
     private:
     static constexpr std::index_sequence_for<T...> _seq() {
+      std::cout << "Here! 5" << std::endl;
       return std::index_sequence_for<T...>();
     };
     // template <size_t... Is>
     void incr_all(/* std::index_sequence<Is...> */) {
       if (_idx == _max)
         return;
-      do {
+      std::cout << "Here! 1" << std::endl;
+      while (_idx < _max && !all_set()) {// NOTE - check to choose <= or <
         _idx++;
-        ([&] { (std::get<iterator_t<SparseVector<T>>>(current)++); }(), ...);
-      } while (_idx < _max && !all_set()); // NOTE - check to choose <= or <
+        ((std::get<iterator_t<SparseVector<T>>>(current)++), ...);
+      }
     }
 
     void sync() {
       if (_idx == _max)
         return;
+      std::cout << "Here! 2" << std::endl;
       while (_idx < _max && !all_set()) { // NOTE - check to choose <= or <
         _idx++;
         ([&] { (std::get<iterator_t<SparseVector<T>>>(current)++); }(), ...);
@@ -97,6 +109,8 @@ class cevy::ecs::Query {
 
     // template <size_t... Is>
     bool all_set(/* std::index_sequence<Is...> */) {
+      // TODO: Static Assert
+      std::cout << "Here! 3" << std::endl;
       return ((std::nullopt != (*std::get<iterator_t<SparseVector<T>>>(current))) && ...);
     }
 
@@ -106,7 +120,6 @@ class cevy::ecs::Query {
     }
 
     private:
-    public:
     iterator_tuple current;
     size_t _max;
     size_t _idx;
@@ -114,11 +127,14 @@ class cevy::ecs::Query {
   };
   using iterator_tuple = typename iterator::iterator_tuple;
 
-  static Query query(World &);
+  static Query<remove_optional<T>...> query(World &);
 
   Query(SparseVector<T> &...cs)
       : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
-        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){};
+        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){
+      std::cout << "Here! 4" << std::endl;
+
+        };
 
   iterator begin() { return _begin; };
   iterator end() { return _end; };

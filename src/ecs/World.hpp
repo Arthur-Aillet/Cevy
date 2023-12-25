@@ -255,7 +255,18 @@ class cevy::ecs::World {
       array.erase(from);
   }
 
-  template <class Component>
+  template <class Component, typename std::enable_if_t<is_optional<Component>::value, bool> = true>
+  SparseVector<typename Component::value_type> &get_components() {
+    auto id = std::type_index(typeid(Component));
+    auto it = _components_arrays.find(id);
+
+    if (it != _components_arrays.end()) {
+      return std::any_cast<SparseVector<typename Component::value_type> &>(std::get<0>(_components_arrays[id]));
+    }
+    throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
+  }
+
+  template <class Component, typename std::enable_if_t<is_optional<Component>::value, bool> = false>
   SparseVector<Component> &get_components() {
     auto id = std::type_index(typeid(Component));
     auto it = _components_arrays.find(id);
@@ -265,6 +276,7 @@ class cevy::ecs::World {
     }
     throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
   }
+
   template <class Component>
   SparseVector<Component> const &get_components() const {
     auto id = std::type_index(typeid(Component));
@@ -302,6 +314,6 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 }
 
 template <typename... T>
-cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
-  return Query<T...>(w.get_components<T>()...);
+cevy::ecs::Query<remove_optional<T>...> cevy::ecs::Query<T...>::query(World &w) {
+  return Query<remove_optional<T>...>(w.get_components<T>()...);
 }
