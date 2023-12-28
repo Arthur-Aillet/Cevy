@@ -18,8 +18,17 @@ template <class T> struct is_query : public std::false_type {};
 
 template <typename... T> struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
 
+template <typename Type>
+struct is_optional : std::false_type {};
+
+template <typename Type>
+struct is_optional<std::optional<Type>> : std::true_type {};
+
+template<typename Type>
+using remove_optional = std::conditional_t<is_optional<Type>::value, typename Type::value_type, Type>;
+
 template <class... T> class cevy::ecs::Query {
-  using Containers = std::tuple<SparseVector<T>...>;
+  using Containers = std::tuple<SparseVector<remove_optional<T>>...>;
   // template<template<typename> typename Containers>
   // using Containers = SparseVector<T>;
   public:
@@ -29,12 +38,12 @@ template <class... T> class cevy::ecs::Query {
     template <class Container> using it_reference_t = typename iterator_t<Container>::reference;
 
     public:
-    using value_type = std::tuple<T &...>;
+    using value_type = std::tuple<remove_optional<T> &...>;
     using reference = value_type;
     using pointer = void;
     using difference_type = size_t;
     using iterator_category = std::bidirectional_iterator_tag;
-    using iterator_tuple = std::tuple<iterator_t<SparseVector<T>>...>;
+    using iterator_tuple = std::tuple<iterator_t<SparseVector<remove_optional<T>>>...>;
 
     template <typename...> class zipper;
     friend class zipper<T...>; // FIXME - reactivate
@@ -78,7 +87,7 @@ template <class... T> class cevy::ecs::Query {
       std::cout << "Here! 1" << std::endl;
       while (_idx < _max && !all_set()) {// NOTE - check to choose <= or <
         _idx++;
-        ((std::get<iterator_t<SparseVector<T>>>(current)++), ...);
+        ((std::get<iterator_t<SparseVector<remove_optional<T>>>>(current)++), ...);
       }
     }
 
@@ -88,7 +97,7 @@ template <class... T> class cevy::ecs::Query {
       std::cout << "Here! 2" << std::endl;
       while (_idx < _max && !all_set()) { // NOTE - check to choose <= or <
         _idx++;
-        ([&] { (std::get<iterator_t<SparseVector<T>>>(current)++); }(), ...);
+        ([&] { (std::get<iterator_t<SparseVector<remove_optional<T>>>>(current)++); }(), ...);
       }
     }
 
@@ -96,12 +105,12 @@ template <class... T> class cevy::ecs::Query {
     bool all_set(/* std::index_sequence<Is...> */) {
       // TODO: Static Assert
       std::cout << "Here! 3" << std::endl;
-      return ((std::nullopt != (*std::get<iterator_t<SparseVector<T>>>(current))) && ...);
+      return ((std::nullopt != (*std::get<iterator_t<SparseVector<remove_optional<T>>>>(current))) && ...);
     }
 
     // template <size_t... Is>
     const value_type to_value(/* std::index_sequence<Is...> */) {
-      return std::tuple<T &...>{std::get<iterator_t<SparseVector<T>>>(current)->value()...};
+      return std::tuple<remove_optional<T> &...>{std::get<iterator_t<SparseVector<remove_optional<T>>>>(current)->value()...};
     }
 
     private:
@@ -112,9 +121,9 @@ template <class... T> class cevy::ecs::Query {
   };
   using iterator_tuple = typename iterator::iterator_tuple;
 
-  static Query<remove_optional<T>...> query(World &);
+  static Query<T...> query(World &);
 
-  Query(SparseVector<T> &...cs)
+  Query(SparseVector<remove_optional<T>> &...cs)
       : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
         _end(iterator(std::make_tuple(cs.end()...), _size, _size)){
       std::cout << "Here! 4" << std::endl;
@@ -128,7 +137,7 @@ template <class... T> class cevy::ecs::Query {
   const iterator end() const { return _end; };
 
   private:
-  static size_t _compute_size(SparseVector<T> &...containers) {
+  static size_t _compute_size(SparseVector<remove_optional<T>> &...containers) {
     return std::min({containers.size()...});
   }
 
