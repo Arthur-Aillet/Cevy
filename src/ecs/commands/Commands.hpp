@@ -33,15 +33,13 @@ class cevy::ecs::Commands {
 
   void add(std::function<void(cevy::ecs::World &w)> &&f);
 
-  template <typename R>
-  void insert_resource(const R &value) {
+  template <typename R> void insert_resource(const R &value) {
     add([value](cevy::ecs::World &w) { w.insert_resource(value); });
   }
 
   cevy::ecs::EntityCommands spawn_empty();
 
-  template <typename... Ts>
-  cevy::ecs::EntityCommands spawn(Ts... a);
+  template <typename... Ts> cevy::ecs::EntityCommands spawn(Ts... a);
 };
 
 template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>

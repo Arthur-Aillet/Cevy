@@ -9,8 +9,7 @@
 
 #include <functional>
 
-template <typename T>
-using ref = std::reference_wrapper<T>;
+template <typename T> using ref = std::reference_wrapper<T>;
 
 /// @brief contains all of the engine bits
 namespace cevy {

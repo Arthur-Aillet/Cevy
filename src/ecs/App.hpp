@@ -25,8 +25,7 @@ class cevy::ecs::App : public cevy::ecs::World {
   Schedule _schedule;
   std::vector<std::shared_ptr<Plugin>> _plugins;
 
-  template <typename GivenPlugin>
-  void add_plugin(const GivenPlugin &plugin) {
+  template <typename GivenPlugin> void add_plugin(const GivenPlugin &plugin) {
     static_assert(std::is_base_of_v<Plugin, GivenPlugin>,
                   "Given plugin does not derive from Cevy Plugin class");
     auto &p = _plugins.emplace_back(std::make_shared<GivenPlugin>(plugin));
@@ -35,8 +34,7 @@ class cevy::ecs::App : public cevy::ecs::World {
   }
 
   public:
-  template <typename... GivenPlugin>
-  void add_plugins(const GivenPlugin &...plugins) {
+  template <typename... GivenPlugin> void add_plugins(const GivenPlugin &...plugins) {
     ((add_plugin(std::forward<const GivenPlugin &>(plugins))), ...);
   }
 
@@ -44,18 +42,13 @@ class cevy::ecs::App : public cevy::ecs::World {
   void quit();
   void abort();
 
-  template <typename T>
-  void add_stage() {
-    _schedule.insert_schedule<T>();
-  }
+  template <typename T> void add_stage() { _schedule.insert_schedule<T>(); }
 
-  template <class S, class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  template <class S, class R, class... Args> void add_system(R (&&func)(Args...)) {
     _schedule.add_system<S>(func);
   }
 
-  template <class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  template <class R, class... Args> void add_system(R (&&func)(Args...)) {
     _schedule.add_system(func);
   }
 };

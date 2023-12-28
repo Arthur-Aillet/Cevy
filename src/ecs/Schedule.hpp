@@ -29,16 +29,12 @@ class cevy::ecs::Schedule {
     using previous = Before;
     using next = After;
 
-    template <typename T>
-    using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
+    template <typename T> using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
 
-    template <typename T>
-    using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
+    template <typename T> using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
   };
-  template <typename T>
-  using before = Stage<>::before<T>;
-  template <typename T>
-  using after = Stage<>::after<T>;
+  template <typename T> using before = Stage<>::before<T>;
+  template <typename T> using after = Stage<>::after<T>;
 
   using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
 
@@ -126,13 +122,11 @@ class cevy::ecs::Schedule {
   void quit() const;
   void abort();
 
-  template <class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  template <class R, class... Args> void add_system(R (&&func)(Args...)) {
     add_system<Update>(func);
   }
 
-  template <class S, class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  template <class S, class R, class... Args> void add_system(R (&&func)(Args...)) {
     static_assert(
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
         "type must be reference to query, world, commands or resource");
