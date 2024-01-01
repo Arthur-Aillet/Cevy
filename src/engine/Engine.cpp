@@ -24,6 +24,11 @@
 #include "rlImGui.h"
 
 void init_window() {
+#ifdef DEBUG
+  SetTraceLogLevel(LOG_ALL);
+#else
+  SetTraceLogLevel(LOG_ERROR);
+#endif
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(800, 450, "raylib [core] example - basic window");
   SetTargetFPS(60);
