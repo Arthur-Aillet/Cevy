@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <optional>
 
@@ -107,8 +108,7 @@ template <class... T> class cevy::ecs::Query {
       if constexpr (is_optional<Current>::value) {
         return true;
       } else {
-        return std::nullopt !=
-               (*std::get<iterator_t<SparseVector<remove_optional<Current>>>>(current));
+        return std::get<iterator_t<SparseVector<Current>>>(current)->has_value();
       }
     }
 
@@ -137,7 +137,6 @@ template <class... T> class cevy::ecs::Query {
   Query(SparseVector<remove_optional<T>> &...cs)
       : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
         _end(iterator(std::make_tuple(cs.end()...), _size, _size)){
-
         };
 
   iterator begin() { return _begin; };
@@ -147,8 +146,25 @@ template <class... T> class cevy::ecs::Query {
   const iterator end() const { return _end; };
 
   private:
+  template<typename Current>
+  static void _compute_a_size(SparseVector<Current>& container, size_t &current_size, bool &is_first, size_t &idx, std::vector<bool> &opts) {
+    if (is_first) {
+      is_first = false;
+      current_size = container.size();
+    } else if (!opts[idx])
+      current_size = std::min(current_size, container.size());
+    idx += 1;
+  }
+
   static size_t _compute_size(SparseVector<remove_optional<T>> &...containers) {
-    return std::max({containers.size()...}); // TODO: Optimize, was std::min before optional
+    std::vector<bool> opts {};
+    size_t current_size = 0;
+    size_t idx = 0;
+    bool is_first = true;
+
+    (opts.push_back(is_optional<T>::value), ...);
+    (_compute_a_size(containers, current_size, is_first, idx, opts), ...);
+    return current_size;
   }
 
   private:

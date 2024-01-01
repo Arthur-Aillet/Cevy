@@ -8,18 +8,12 @@
 #pragma once
 
 #include "App.hpp"
-#include "AssetManager.hpp"
 #include "Engine.hpp"
 #include "Plugin.hpp"
 #include "ecs.hpp"
 #include "raylib.h"
 
-#include <algorithm>
-#include <any>
 #include <filesystem>
-#include <memory>
-#include <typeindex>
-#include <unordered_map>
 #include <vector>
 
 void init_asset_manager(cevy::ecs::World &w);
