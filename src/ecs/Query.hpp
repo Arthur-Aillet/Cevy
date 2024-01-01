@@ -15,9 +15,6 @@
 #include "ecs.hpp"
 
 template <class T>
-using Option = std::optional<T>;
-
-template <class T>
 struct is_query : public std::false_type {};
 
 template <typename... T>
