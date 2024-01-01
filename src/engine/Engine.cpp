@@ -40,9 +40,9 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 // Handle<Mesh>> models) {
 void update_window(
     cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams,
-    cevy::ecs::Query<cevy::engine::Position, cevy::engine::Rotation,
+    cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
                      cevy::engine::Handle<cevy::engine::Mesh>,
-                     cevy::engine::Handle<cevy::engine::Diffuse>>
+                     option<cevy::engine::Handle<cevy::engine::Diffuse>>>
         models) {
   Vector3 fowards = {0, 0, 0};
   for (auto cam : cams) {
@@ -58,15 +58,18 @@ void update_window(
   for (auto cam : cams) {
     BeginMode3D(std::get<0>(cam));
     for (auto model : models) {
-      cevy::engine::Position &pos = std::get<0>(model);
-      auto handle = std::get<2>(model).get();
-      cevy::engine::Handle<cevy::engine::Diffuse> difs = std::get<3>(model);
-      SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.get().texture);
+      const cevy::engine::Position &pos = std::get<0>(model).value_or(cevy::engine::Position {0, 0, 0});
+      auto &handle = std::get<2>(model).get();
+      auto difs = std::get<3>(model);
+      if (difs) {
+        SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.value().get().texture);
+      }
       DrawModel(handle.mesh, Vector3{(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
-      SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.get().texture);
-      handle.mesh.materialCount = 1;
-      handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));
-      handle.mesh.materials[0] = LoadMaterialDefault();
+      if (difs) {
+        handle.mesh.materialCount = 1;
+        handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));
+        handle.mesh.materials[0] = LoadMaterialDefault();
+      }
     }
     DrawGrid(100, 1.0f);
 
@@ -89,13 +92,13 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<RenderStage>();
   app.add_stage<PreRenderStage>();
   app.add_stage<PostRenderStage>();
+  app.init_component<cevy::engine::Camera>();
+  app.init_component<cevy::engine::Position>();
+  app.init_component<cevy::engine::Rotation>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
   app.add_system<cevy::engine::PreRenderStage>(close_game);
   app.add_system<cevy::engine::RenderStage>(update_window);
-  app.init_component<cevy::engine::Camera>();
-  app.init_component<cevy::engine::Position>();
-  app.init_component<cevy::engine::Rotation>();
   app.spawn(cevy::engine::Camera(), cevy::engine::Position(10.0, 10.0, 10.0),
             cevy::engine::Rotation(0.0, 0.6, 1.0));
   // app.add_system<cevy::RenderStage>(control_object);
