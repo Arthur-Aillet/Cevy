@@ -244,6 +244,7 @@ class cevy::ecs::World {
   template <typename Component, typename... Params>
   typename SparseVector<Component>::reference_type emplace_component(Entity const &to,
                                                                      Params &&...p) {
+
     auto &array = get_components<Component>();
     return array.emplace_at(to, p...);
   }
@@ -265,6 +266,7 @@ class cevy::ecs::World {
     }
     throw(std::runtime_error("Cevy/Ecs: Query unregisted component!"));
   }
+
   template <class Component>
   SparseVector<Component> const &get_components() const {
     auto id = std::type_index(typeid(Component));
@@ -303,5 +305,5 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 
 template <typename... T>
 cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
-  return Query<T...>(w.get_components<T>()...);
+  return Query<T...>(w.get_components<remove_optional<T>>()...);
 }

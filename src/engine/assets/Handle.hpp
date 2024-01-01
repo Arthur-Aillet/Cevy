@@ -16,7 +16,6 @@ class Handle {
 
   ref<Type> _ref;
 
-
   public:
   Handle(Type &ref) : _ref(ref){};
 

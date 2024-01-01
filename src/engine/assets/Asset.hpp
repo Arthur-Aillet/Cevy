@@ -29,7 +29,6 @@ class Asset<Diffuse> {
   }
 };
 
-
 template <>
 class Asset<cevy::engine::Mesh> {
   using Type = Mesh;

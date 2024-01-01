@@ -8,9 +8,13 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
 template <typename T>
 using ref = std::reference_wrapper<T>;
+
+template <class T>
+using option = std::optional<T>;
 
 /// @brief contains all of the engine bits
 namespace cevy {
