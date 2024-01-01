@@ -30,14 +30,16 @@ class AssetManager {
   std::vector<Model3D> models;
 };
 
-template <typename Type> class Asset {};
+template <typename Type>
+class Asset {};
 
 struct Settings3D {
   std::filesystem::path model;
   std::filesystem::path diffuse;
 };
 
-template <typename Type> class Handle {
+template <typename Type>
+class Handle {
   private:
   friend class Asset<Type>;
 
@@ -52,7 +54,8 @@ template <typename Type> class Handle {
   Type &get() { return _ref; }
 };
 
-template <> class Asset<Model3D> {
+template <>
+class Asset<Model3D> {
   using Type = Model3D;
 
   AssetManager &_ref;

@@ -14,40 +14,51 @@
 #include "SparseVector.hpp"
 #include "ecs.hpp"
 
-template <class T> using Option = std::optional<T>;
+template <class T>
+using Option = std::optional<T>;
 
-template <class T> struct is_query : public std::false_type {};
+template <class T>
+struct is_query : public std::false_type {};
 
-template <typename... T> struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
+template <typename... T>
+struct is_query<cevy::ecs::Query<T...>> : public std::true_type {};
 
-template <typename Type> struct is_optional : std::false_type {};
+template <typename Type>
+struct is_optional : std::false_type {};
 
-template <typename Type> struct is_optional<std::optional<Type>> : std::true_type {};
+template <typename Type>
+struct is_optional<std::optional<Type>> : std::true_type {};
 
-template <bool, template <class...> class, class, class Else> struct eval_cond {
+template <bool, template <class...> class, class, class Else>
+struct eval_cond {
   using type = Else;
 };
 
-template <template <class...> class Z, class X, class Else> struct eval_cond<true, Z, X, Else> {
+template <template <class...> class Z, class X, class Else>
+struct eval_cond<true, Z, X, Else> {
   using type = Z<X>;
 };
 
 template <bool test, template <class...> class Z, class X, class Else>
 using eval_cond_t = typename eval_cond<test, Z, X, Else>::type;
 
-template <class X> using inner_optional = typename X::value_type;
+template <class X>
+using inner_optional = typename X::value_type;
 
 template <typename Type>
 using remove_optional = eval_cond_t<is_optional<Type>::value, inner_optional, Type, Type>;
 
-template <class... T> class cevy::ecs::Query {
+template <class... T>
+class cevy::ecs::Query {
   using Containers = std::tuple<SparseVector<remove_optional<T>>...>;
 
   public:
   class iterator {
-    template <class Container> using iterator_t = typename Container::iterator;
+    template <class Container>
+    using iterator_t = typename Container::iterator;
 
-    template <class Container> using it_reference_t = typename iterator_t<Container>::reference;
+    template <class Container>
+    using it_reference_t = typename iterator_t<Container>::reference;
 
     public:
     using value_type = std::tuple<T &...>;
@@ -104,7 +115,8 @@ template <class... T> class cevy::ecs::Query {
       }
     }
 
-    template <typename Current> bool is_set() {
+    template <typename Current>
+    bool is_set() {
       if constexpr (is_optional<Current>::value) {
         return true;
       } else {
@@ -114,7 +126,8 @@ template <class... T> class cevy::ecs::Query {
 
     bool all_set() { return (is_set<T>() && ...); }
 
-    template <typename Current> Current &a_value() {
+    template <typename Current>
+    Current &a_value() {
       if constexpr (is_optional<Current>::value) {
         auto &a = *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
         return a;
@@ -136,8 +149,7 @@ template <class... T> class cevy::ecs::Query {
 
   Query(SparseVector<remove_optional<T>> &...cs)
       : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
-        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){
-        };
+        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){};
 
   iterator begin() { return _begin; };
   iterator end() { return _end; };
@@ -146,8 +158,9 @@ template <class... T> class cevy::ecs::Query {
   const iterator end() const { return _end; };
 
   private:
-  template<typename Current>
-  static void _compute_a_size(SparseVector<Current>& container, size_t &current_size, bool &is_first, size_t &idx, std::vector<bool> &opts) {
+  template <typename Current>
+  static void _compute_a_size(SparseVector<Current> &container, size_t &current_size,
+                              bool &is_first, size_t &idx, std::vector<bool> &opts) {
     if (is_first) {
       is_first = false;
       current_size = container.size();
@@ -157,7 +170,7 @@ template <class... T> class cevy::ecs::Query {
   }
 
   static size_t _compute_size(SparseVector<remove_optional<T>> &...containers) {
-    std::vector<bool> opts {};
+    std::vector<bool> opts{};
     size_t current_size = 0;
     size_t idx = 0;
     bool is_first = true;

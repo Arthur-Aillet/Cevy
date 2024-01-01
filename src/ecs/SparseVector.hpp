@@ -11,7 +11,8 @@
 #include <optional>
 #include <vector>
 
-template <typename Type, typename Alloc = std::allocator<Type>> class SparseVector {
+template <typename Type, typename Alloc = std::allocator<Type>>
+class SparseVector {
   public:
   using value_type = std::optional<Type>;
   using reference_type = value_type &;
@@ -67,7 +68,8 @@ template <typename Type, typename Alloc = std::allocator<Type>> class SparseVect
     return _data[pos];
   }
 
-  template <class... Params> reference_type emplace_at(size_type pos, Params &&...args) {
+  template <class... Params>
+  reference_type emplace_at(size_type pos, Params &&...args) {
     insert_at(pos, std::allocator_traits<Alloc>::construct(args...));
   }
 
