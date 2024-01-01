@@ -151,7 +151,6 @@ class cevy::ecs::World {
   /// register a component to the world
   template <typename T> ComponentId init_component() {
     erase_access f_e = [](World &reg, Entity const &Entity) {
-      std::cout << "ici! A" << std::endl;
       auto &cmpnts = reg.get_components<T>();
       if (Entity < cmpnts.size())
         cmpnts[Entity] = std::nullopt;
@@ -208,8 +207,6 @@ class cevy::ecs::World {
   template <typename Component>
   typename SparseVector<Component>::reference_type add_component(Entity const &to,
                                                                  const Component &c) {
-      std::cout << "ici! B" << std::endl;
-
     auto &array = get_components<Component>();
 
     return array.insert_at(to, c);
@@ -218,13 +215,12 @@ class cevy::ecs::World {
   template <typename Component, typename... Params>
   typename SparseVector<Component>::reference_type emplace_component(Entity const &to,
                                                                      Params &&...p) {
-    std::cout << "ici! C" << std::endl;
+
     auto &array = get_components<Component>();
     return array.emplace_at(to, p...);
   }
 
   template <typename Component> void remove_component(Entity const &from) {
-    std::cout << "ici! D" << std::endl;
     auto &array = get_components<Component>();
     if (from < array.size())
       array.erase(from);
@@ -275,6 +271,5 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 }
 
 template <typename... T> cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
-    std::cout << "ici! E" << std::endl;
   return Query<T...>(w.get_components<remove_optional<T>>()...);
 }
