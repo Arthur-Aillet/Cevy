@@ -61,7 +61,7 @@ class Rotation : public Vector {
     return (Rotation(1.0, 0.0, 0.0));
   }
   Rotation to_rad() {
-    return Rotation(x * (M_PI / 180.0), y * (M_PI / 180.0), z * (M_PI / 180.0));
+    return Rotation(x * (PI / 180.0), y * (PI / 180.0), z * (PI / 180.0));
   };
 };
 } // namespace cevy

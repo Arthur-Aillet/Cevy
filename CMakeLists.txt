@@ -16,7 +16,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_subdirectory(deps)
 
-#add_compile_options(-Wall -Wextra)
+add_compile_options(-Wall -Wextra)
 
 add_subdirectory(src)
 

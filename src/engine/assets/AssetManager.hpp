@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <stdlib.h>
+
 void init_asset_manager(cevy::ecs::World &w);
 
 namespace cevy {
@@ -40,8 +42,8 @@ template <typename Type>
 class Asset {};
 
 struct Settings3D {
-  std::filesystem::path model;
-  std::filesystem::path diffuse;
+  std::string model;
+  std::string diffuse;
 };
 
 template <typename Type>
