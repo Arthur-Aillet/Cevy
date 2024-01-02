@@ -126,8 +126,7 @@ class cevy::ecs::Query {
     template <typename Current>
     Current &a_value() {
       if constexpr (is_optional<Current>::value) {
-        auto &a = *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
-        return a;
+        return *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
       } else {
         return std::get<iterator_t<SparseVector<Current>>>(current)->value();
       }
@@ -144,9 +143,18 @@ class cevy::ecs::Query {
 
   static Query<T...> query(World &);
 
-  Query(SparseVector<remove_optional<T>> &...cs)
-      : _size(_compute_size(cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
-        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){};
+
+  template<typename Current>
+  static void resize_optional(SparseVector<remove_optional<Current>> &c, size_t n) {
+    if constexpr (is_optional<Current>::value) {
+      c.resize(n);
+    }
+  }
+
+  Query(size_t nb_e, SparseVector<remove_optional<T>> &...cs)
+      : _size(_compute_size(nb_e, cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
+        _end(iterator(std::make_tuple(cs.end()...), _size, _size)) {
+        };
 
   iterator begin() { return _begin; };
   iterator end() { return _end; };
@@ -166,14 +174,19 @@ class cevy::ecs::Query {
     idx += 1;
   }
 
-  static size_t _compute_size(SparseVector<remove_optional<T>> &...containers) {
-    std::vector<bool> opts{};
+  static size_t _compute_size(size_t nb_e, SparseVector<remove_optional<T>> &...containers) {
     size_t current_size = 0;
-    size_t idx = 0;
-    bool is_first = true;
+    if ((... && is_optional<T>::value)) {
+      current_size = nb_e;
+    } else {
+      std::vector<bool> opts{};
+      size_t idx = 0;
+      bool is_first = true;
 
-    (opts.push_back(is_optional<T>::value), ...);
-    (_compute_a_size(containers, current_size, is_first, idx, opts), ...);
+      (opts.push_back(is_optional<T>::value), ...);
+      (_compute_a_size(containers, current_size, is_first, idx, opts), ...);
+    }
+    (resize_optional<T>(containers, current_size),...);
     return current_size;
   }
 
