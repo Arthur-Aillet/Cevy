@@ -305,5 +305,5 @@ cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... 
 
 template <typename... T>
 cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
-  return Query<T...>(w.get_components<remove_optional<T>>()...);
+  return Query<T...>(w.entities().size(), w.get_components<remove_optional<T>>()...);
 }
