@@ -143,18 +143,16 @@ class cevy::ecs::Query {
 
   static Query<T...> query(World &);
 
-
-  template<typename Current>
+  template <typename Current>
   static void resize_optional(SparseVector<remove_optional<Current>> &c, size_t n) {
     if constexpr (is_optional<Current>::value) {
-      c.resize(n);
+      c.resize(std::max(c.size, n));
     }
   }
 
   Query(size_t nb_e, SparseVector<remove_optional<T>> &...cs)
       : _size(_compute_size(nb_e, cs...)), _begin(iterator(std::make_tuple(cs.begin()...), _size)),
-        _end(iterator(std::make_tuple(cs.end()...), _size, _size)) {
-        };
+        _end(iterator(std::make_tuple(cs.end()...), _size, _size)){};
 
   iterator begin() { return _begin; };
   iterator end() { return _end; };
@@ -186,7 +184,7 @@ class cevy::ecs::Query {
       (opts.push_back(is_optional<T>::value), ...);
       (_compute_a_size(containers, current_size, is_first, idx, opts), ...);
     }
-    (resize_optional<T>(containers, current_size),...);
+    (resize_optional<T>(containers, current_size), ...);
     return current_size;
   }
 
