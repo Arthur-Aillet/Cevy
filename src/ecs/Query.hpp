@@ -146,7 +146,7 @@ class cevy::ecs::Query {
   template <typename Current>
   static void resize_optional(SparseVector<remove_optional<Current>> &c, size_t n) {
     if constexpr (is_optional<Current>::value) {
-      c.resize(std::max(c.size, n));
+      c.resize(std::max(c.size(), n));
     }
   }
 
