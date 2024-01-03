@@ -7,7 +7,7 @@
 
 #include "Camera.hpp"
 
-cevy::Camera::Camera() {
+cevy::engine::Camera::Camera() {
   this->camera = {0};
   this->camera.position = (Vector3){10.0f, 10.0f, 10.0f};
   this->camera.target = (Vector3){0.0f, 0.0f, 0.0f};
@@ -16,10 +16,10 @@ cevy::Camera::Camera() {
   this->camera.projection = CAMERA_PERSPECTIVE;
 }
 
-cevy::Camera::~Camera() {}
+cevy::engine::Camera::~Camera() {}
 
-cevy::Camera::operator Camera3D &() { return this->camera; }
+cevy::engine::Camera::operator Camera3D &() { return this->camera; }
 
-cevy::Camera::operator Camera3D *() { return &this->camera; }
+cevy::engine::Camera::operator Camera3D *() { return &this->camera; }
 
-cevy::Camera::operator Camera3D() const { return this->camera; }
+cevy::engine::Camera::operator Camera3D() const { return this->camera; }

@@ -8,7 +8,7 @@
 #pragma once
 #include <array>
 
-namespace cevy {
+namespace cevy::engine {
 class Vector {
   public:
   Vector(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z){};
@@ -30,4 +30,4 @@ class Vector {
     return Vector(other.y * z - other.z * y, other.z * x - other.x * z, other.x * y - other.y * x);
   }
 };
-} // namespace cevy
+} // namespace cevy::engine

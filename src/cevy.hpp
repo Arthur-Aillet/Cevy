@@ -35,7 +35,7 @@ namespace cevy {
 namespace ecs {};
 
 /// @brief hold engine mechanics, depends on ecs
-namespace engine {}; // namespace engine
+namespace engine {};
 } // namespace cevy
 
 // note: here name-spaces are being forwa-rd declared;

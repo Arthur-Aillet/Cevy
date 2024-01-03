@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <cstddef>
-
 #include "ecs.hpp"
 
 class cevy::ecs::Entity {
