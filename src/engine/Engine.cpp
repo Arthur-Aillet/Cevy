@@ -20,8 +20,8 @@
 #include "ecs.hpp"
 #include "imgui.h"
 #include "raylib.h"
-#include "rlImGui.h"
 #include "rendering.hpp"
+#include "rlImGui.h"
 
 void init_window() {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -39,7 +39,8 @@ void update_window(
     cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams,
     cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
                      cevy::engine::Handle<cevy::engine::Mesh>,
-                     option<cevy::engine::Handle<cevy::engine::Diffuse>>, option<cevy::engine::Color>>
+                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
+                     option<cevy::engine::Color>>
         models) {
   Vector3 fowards = {0, 0, 0};
   for (auto cam : cams) {

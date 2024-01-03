@@ -11,19 +11,13 @@
 
 namespace cevy::engine {
 class Color {
-    public:
-    unsigned char r;        // Color red value
-    unsigned char g;        // Color green value
-    unsigned char b;        // Color blue value
-    unsigned char a;        // Color alpha value
+  public:
+  unsigned char r; // Color red value
+  unsigned char g; // Color green value
+  unsigned char b; // Color blue value
+  unsigned char a; // Color alpha value
 
-    Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
-    operator ::Color ();
+  Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
+  operator ::Color();
 };
-}
-/*typedef struct Color {
-    unsigned char r;        // Color red value
-    unsigned char g;        // Color green value
-    unsigned char b;        // Color blue value
-    unsigned char a;        // Color alpha value
-} Color;*/
+} // namespace cevy::engine
