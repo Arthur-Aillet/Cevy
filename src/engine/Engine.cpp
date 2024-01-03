@@ -9,20 +9,19 @@
 #include "App.hpp"
 #include "AssetManager.hpp"
 #include "Camera.hpp"
+#include "Color.hpp"
 #include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
 #include "Position.hpp"
 #include "Resource.hpp"
 #include "Rotation.hpp"
-#include "Schedule.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
-#include "input.hpp"
 #include "raylib.h"
 #include "rlImGui.h"
-#include <cstddef>
+#include "rendering.hpp"
 
 void init_window() {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -36,43 +35,24 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
     control.get().abort = true;
 }
 
-// void update_window(Query<Camera, Position, Rotation> cams, Query<Position, Rotation,
-// Handle<Mesh>> models) {
 void update_window(
     cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams,
     cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
                      cevy::engine::Handle<cevy::engine::Mesh>,
-                     option<cevy::engine::Handle<cevy::engine::Diffuse>>>
+                     option<cevy::engine::Handle<cevy::engine::Diffuse>>, option<cevy::engine::Color>>
         models) {
   Vector3 fowards = {0, 0, 0};
   for (auto cam : cams) {
     fowards = std::get<2>(cam).fowards();
     std::get<0>(cam).camera.position = std::get<1>(cam);
-    // std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y +
-    // fowards.y, std::get<1>(cam).z + fowards.z}; UpdateCamera(std::get<0>(cam),
-    // CAMERA_FIRST_PERSON);
   }
   DrawGrid(100, 1.0f);
 
   ClearBackground(WHITE);
   for (auto cam : cams) {
     BeginMode3D(std::get<0>(cam));
-    for (auto model : models) {
-      const cevy::engine::Position &pos = std::get<0>(model).value_or(cevy::engine::Position {0, 0, 0});
-      auto &handle = std::get<2>(model).get();
-      auto difs = std::get<3>(model);
-      if (difs) {
-        SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE, difs.value().get().texture);
-      }
-      DrawModel(handle.mesh, Vector3{(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
-      if (difs) {
-        handle.mesh.materialCount = 1;
-        handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));
-        handle.mesh.materials[0] = LoadMaterialDefault();
-      }
-    }
     DrawGrid(100, 1.0f);
-
+    render_models(models);
     EndMode3D();
   }
   EndDrawing();
@@ -95,18 +75,16 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Position>();
   app.init_component<cevy::engine::Rotation>();
+  app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
   app.add_system<cevy::engine::PreRenderStage>(close_game);
   app.add_system<cevy::engine::RenderStage>(update_window);
   app.spawn(cevy::engine::Camera(), cevy::engine::Position(10.0, 10.0, 10.0),
             cevy::engine::Rotation(0.0, 0.6, 1.0));
-  // app.add_system<cevy::RenderStage>(control_object);
 }
 
 /*
-cevy::Engine::Engine() {
-}
 
 void cevy::Engine::DebugWindow (void) {
     if (IsKeyPressed(KEY_F10)) {
