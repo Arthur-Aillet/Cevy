@@ -8,6 +8,7 @@
 #pragma once
 
 #include <algorithm>
+#include <bitset>
 #include <cstddef>
 #include <optional>
 
@@ -150,7 +151,7 @@ class cevy::ecs::Query {
   private:
   template <typename Current>
   static void _compute_a_size(SparseVector<Current> &container, size_t &current_size,
-                              bool &is_first, size_t &idx, std::vector<bool> &opts) {
+                              bool &is_first, size_t &idx, std::bitset<sizeof...(T)> &opts) {
     if (is_first) {
       is_first = false;
       current_size = container.size();
@@ -164,17 +165,17 @@ class cevy::ecs::Query {
     if ((... && is_optional<T>::value)) {
       current_size = nb_e;
     } else {
-      std::vector<bool> opts{};
+      std::bitset<sizeof...(T)> are_optional;
       size_t idx = 0;
       bool is_first = true;
 
-      (opts.push_back(is_optional<T>::value), ...);
-      (_compute_a_size(containers, current_size, is_first, idx, opts), ...);
+      (are_optional.set(idx++, is_optional<T>::value), ...);
+      idx = 0;
+      (_compute_a_size(containers, current_size, is_first, idx, are_optional), ...);
     }
     (resize_optional<T>(containers, current_size), ...);
     return current_size;
   }
-
   private:
   public:
   size_t _size;
