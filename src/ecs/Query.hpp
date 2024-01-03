@@ -26,19 +26,6 @@ struct is_optional : std::false_type {};
 template <typename Type>
 struct is_optional<std::optional<Type>> : std::true_type {};
 
-template <bool, template <class...> class, class, class Else>
-struct eval_cond {
-  using type = Else;
-};
-
-template <template <class...> class Z, class X, class Else>
-struct eval_cond<true, Z, X, Else> {
-  using type = Z<X>;
-};
-
-template <bool test, template <class...> class Z, class X, class Else>
-using eval_cond_t = typename eval_cond<test, Z, X, Else>::type;
-
 template <class X>
 using inner_optional = typename X::value_type;
 
