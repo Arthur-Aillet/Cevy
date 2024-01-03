@@ -7,15 +7,20 @@
 
 #pragma once
 
-#include "../cevy.hpp"
+#include "cevy.hpp"
 
 namespace cevy::ecs {
-    class App;
-    class Entity;
-    class Plugin;
-    class Schedule;
-    class World;
+class App;
+class Entity;
+class Plugin;
+class Schedule;
+class Commands;
+class Command;
+class EntityCommands;
+class World;
 
-    template <class... Containers>
-    class Query;
-}
+template <typename Content>
+class Resource;
+template <class... Containers>
+class Query;
+} // namespace cevy::ecs
