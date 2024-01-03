@@ -16,6 +16,19 @@ using ref = std::reference_wrapper<T>;
 template <class T>
 using option = std::optional<T>;
 
+template <bool, template <class...> class, class, class Else>
+struct eval_cond {
+  using type = Else;
+};
+
+template <template <class...> class Z, class X, class Else>
+struct eval_cond<true, Z, X, Else> {
+  using type = Z<X>;
+};
+
+template <bool test, template <class...> class Z, class X, class Else>
+using eval_cond_t = typename eval_cond<test, Z, X, Else>::type;
+
 /// @brief contains all of the engine bits
 namespace cevy {
 /// @brief holds the entity components system
