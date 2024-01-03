@@ -8,12 +8,22 @@ SRC_DIR	=	src
 all:	build
 
 build:
-	cmake -S . -B ./build
+	cmake -DDEBUG_MODE=on -S . -B ./build
+	make -j --no-print-directory -C build
+
+release:
+	cmake -DDEBUG_MODE=off -S . -B ./build
 	make -j --no-print-directory -C build
 
 test:
 	cmake -DTESTS=on -S . -B ./build
 	make -j --no-print-directory -C build tests-run-cevy
+
+run:
+	make --no-print-directory -C .. run
+
+run_release:
+	make --no-print-directory -C .. run_release
 
 doc:
 	cd docs/doxygen && doxygen

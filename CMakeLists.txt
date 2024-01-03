@@ -20,6 +20,8 @@ add_subdirectory(deps)
 
 add_compile_options(-Wall -Wextra)
 
+option(DEBUG_MODE "Set DEBUG Mode" ON)
+
 add_subdirectory(src)
 
 option(TESTS "Build tests" OFF)
