@@ -15,6 +15,7 @@ add_library(SparseVector
 add_library(entity
   STATIC
   Entity.cpp
+  #Entity.hpp
   )
 
 target_link_libraries(entity SparseVector)
