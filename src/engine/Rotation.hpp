@@ -11,7 +11,7 @@
 
 #pragma once
 
-namespace cevy {
+namespace cevy::engine {
 class Rotation : public Vector {
   private:
   int direction = 0;
@@ -64,4 +64,4 @@ class Rotation : public Vector {
     return Rotation(x * (PI / 180.0), y * (PI / 180.0), z * (PI / 180.0));
   };
 };
-} // namespace cevy
+} // namespace cevy::engine
