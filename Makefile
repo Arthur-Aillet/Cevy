@@ -8,7 +8,11 @@ SRC_DIR	=	src
 all:	build
 
 build:
-	cmake -S . -B ./build
+	cmake -DDEBUG_MODE=on -S . -B ./build
+	make -j --no-print-directory -C build
+
+release:
+	cmake -DDEBUG_MODE=off -S . -B ./build
 	make -j --no-print-directory -C build
 
 test:
