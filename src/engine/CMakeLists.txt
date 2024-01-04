@@ -8,7 +8,6 @@
 add_library(engine
   SHARED
   Position.hpp
-  velocity.hpp
   Engine.hpp
   Engine.cpp
   Camera.hpp
@@ -19,14 +18,16 @@ set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)
 set(IMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/imgui)
 set(RAYLIB_FOLDER ${CMAKE_BINARY_DIR}/_deps/raylib-build/raylib/include)
 
+add_subdirectory(math)
 add_subdirectory(assets)
 add_subdirectory(rendering)
 
-target_link_libraries(engine PUBLIC raylib imgui rlImGui ecs assets rendering)
+target_link_libraries(engine PUBLIC raylib imgui rlImGui ecs math assets rendering)
 
 target_include_directories(engine PUBLIC
   ../ecs
   .
+  ./math
   assets
   rendering
 )

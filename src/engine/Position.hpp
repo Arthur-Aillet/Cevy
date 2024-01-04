@@ -6,12 +6,11 @@
 */
 
 #pragma once
+
 #include "Vector.hpp"
 
 namespace cevy::engine {
-class Position : public Vector {
-  public:
-  Position(double x = 0, double y = 0, double z = 0) : Vector(x, y, z){};
-  ~Position(){};
+class Position : public cevy::engine::Vector {
+  using cevy::engine::Vector::Vector;
 };
 } // namespace cevy::engine
