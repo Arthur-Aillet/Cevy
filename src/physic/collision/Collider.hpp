@@ -17,10 +17,9 @@ class Collider : public cevy::engine::Position {
 
     private:
         Shape* _shape;
-        cevy::engine::Position _pos;
 
     public:
-    Collider(cevy::engine::Position pos, Shape *shape) : _pos(pos), _shape(shape){};
+    Collider(Shape *shape) : _shape(shape){};
     ~Collider(){};
 
 };
