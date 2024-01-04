@@ -16,6 +16,7 @@ add_library(collision
 target_include_directories(collision PUBLIC
   ../../ecs
   ../../engine
+  ../../engine/math
   .
   ..
   ${RAYLIB_FOLDER}

@@ -5,7 +5,7 @@
 ** Shape.hpp
 */
 
-#include "../../engine/Vector.hpp"
+#include "Vector.hpp"
 
 namespace cevy::physic::collision {
 class Shape {

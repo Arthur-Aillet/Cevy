@@ -21,8 +21,9 @@ target_link_libraries(physic PUBLIC raylib imgui rlImGui ecs engine collision)
 target_include_directories(physic PUBLIC
  ../ecs
  ../engine
+ ../engine/math
  .
- collision
+ ./collision
 )
 
 target_include_directories(rlImGui PUBLIC
