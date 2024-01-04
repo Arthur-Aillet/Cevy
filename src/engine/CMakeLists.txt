@@ -28,6 +28,7 @@ target_link_libraries(engine PUBLIC raylib imgui rlImGui ecs assets rendering)
 
 target_include_directories(engine PUBLIC
   ../ecs
+  ../ecs/commands
   .
   assets
   rendering
