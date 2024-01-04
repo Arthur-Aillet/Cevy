@@ -8,84 +8,27 @@
 #pragma once
 
 #include "App.hpp"
-#include "AssetManager.hpp"
+#include "Diffuse.hpp"
 #include "Engine.hpp"
+#include "Handle.hpp"
+#include "Mesh.hpp"
 #include "Plugin.hpp"
 #include "ecs.hpp"
-#include "raylib.h"
 
-#include <algorithm>
-#include <any>
-#include <filesystem>
-#include <memory>
-#include <typeindex>
-#include <unordered_map>
 #include <vector>
 
 void init_asset_manager(cevy::ecs::World &w);
 
-namespace cevy {
-struct Model3D {
-  Model model;
-  Texture2D diffuse;
-};
-
+namespace cevy::engine {
 class AssetManager {
   public:
   // using map = std::unordered_map<std::type_index, std::any>;
-  std::vector<Model3D> models;
+  std::vector<cevy::engine::Mesh> _meshs;
+  std::vector<Diffuse> _diffuses;
 };
 
-template <typename Type>
-class Asset {};
-
-struct Settings3D {
-  std::filesystem::path model;
-  std::filesystem::path diffuse;
-};
-
-template <typename Type>
-class Handle {
-  private:
-  friend class Asset<Type>;
-
-  using value = Type;
-
-  ref<Type> _ref;
-
-  Handle(Type &ref) : _ref(ref){};
-
-  public:
-  int val = 3;
-  Type &get() { return _ref; }
-};
-
-template <>
-class Asset<Model3D> {
-  using Type = Model3D;
-
-  AssetManager &_ref;
-
-  public:
-  Asset<Model3D>(AssetManager &ref) : _ref(ref){};
-
-  Handle<Model3D> load(const Settings3D &set) {
-    Model3D model{.model = LoadModel(set.model.c_str()),
-                  .diffuse = LoadTexture(set.diffuse.c_str())};
-    model.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = model.diffuse;
-
-    _ref.models.push_back(model);
-    return Handle<Model3D>(_ref.models[_ref.models.size() - 1]);
-  }
-};
-} // namespace cevy
-
-namespace cevy {
 class AssetManagerPlugin : public ecs::Plugin {
   public:
-  void build(ecs::App &app) {
-    app.add_system<cevy::PostStartupRenderStage>(init_asset_manager);
-    app.init_component<cevy::Handle<cevy::Model3D>>();
-  }
+  void build(ecs::App &app);
 };
-} // namespace cevy
+} // namespace cevy::engine

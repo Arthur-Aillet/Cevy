@@ -136,10 +136,11 @@ class cevy::ecs::Schedule {
     static_assert(
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
         "type must be reference to query, world, commands or resource");
-
+#ifdef DEBUG
     if (!schedule_defined<S>()) {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
+#endif
 
     system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
