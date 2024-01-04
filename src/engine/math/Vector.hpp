@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "raylib.h"
+#include "raylib.hpp"
 
 namespace cevy::engine {
 /**
@@ -15,99 +15,103 @@ namespace cevy::engine {
  * implements basic operands, as well as dot product with '*'
  */
 class Vector {
-public:
-    struct __attribute__((aligned(16))) {
-        float x;
-        float y;
-        float z;
-        float w = 0;
-    };
-protected:
-public:
-    Vector();
-    Vector(float x, float y, float z);
-    Vector(const Vector&) = default;
+  public:
+  struct __attribute__((aligned(16))) {
+    float x;
+    float y;
+    float z;
+    float w = 0;
+  };
 
-    operator Vector3() const { return ((Vector3){(float)x, (float)y, (float)z}); }
+  protected:
+  public:
+  Vector();
+  Vector(float x, float y, float z);
+  Vector(const Vector &) = default;
 
-    Vector& operator=(const Vector&);
+  operator Vector3() const { return ((Vector3){(float)x, (float)y, (float)z}); }
 
-    /**
-     * per component multiplication
-     */
-    Vector scale(const Vector& rhs) const;
+  Vector &operator=(const Vector &);
 
-    bool operator<(const Vector& rhs) const;
+  /**
+   * per component multiplication
+   */
+  Vector scale(const Vector &rhs) const;
+
+  bool operator<(const Vector &rhs) const;
 #if __cplusplus >= 202300
-    /**
-     * Compare magnitude
-    */
-    auto operator<=>(const Vector& rhs) const;
-    bool operator<=(const Vector& rhs) const = default;
-    bool operator>(const Vector& rhs) const = default;
-    bool operator>=(const Vector& rhs) const = default;
+  /**
+   * Compare magnitude
+   */
+  auto operator<=>(const Vector &rhs) const;
+  bool operator<=(const Vector &rhs) const = default;
+  bool operator>(const Vector &rhs) const = default;
+  bool operator>=(const Vector &rhs) const = default;
 #endif
-    Vector &operator+=(const Vector& rhs);
-    Vector &operator-=(const Vector& rhs);
+  Vector &operator+=(const Vector &rhs);
+  Vector &operator-=(const Vector &rhs);
 
-    /**
-     * Compare exact
-     */
-    bool operator==(const Vector& rhs) const;
+  /**
+   * Compare exact
+   */
+  bool operator==(const Vector &rhs) const;
 
-    Vector operator+(const Vector& rhs) const;
-    Vector operator-(const Vector& rhs) const;
+  Vector operator+(const Vector &rhs) const;
+  Vector operator-(const Vector &rhs) const;
 
-    /**
-     * Cheaply evaluate magnitude squared
-     */
-    float eval() const;
+  /**
+   * Cheaply evaluate magnitude squared
+   */
+  float eval() const;
 
-    /**
-     * Length of vector
-     */
-    float magnitude() const;
+  /**
+   * Length of vector
+   */
+  float magnitude() const;
 
-    /**
-     * Returns a vector of magnitude 1 or 0
-     */
-    Vector normalize() const;
+  /**
+   * Returns a vector of magnitude 1 or 0
+   */
+  Vector normalize() const;
 
-    /**
-     * ensure each component is between 0 and 1
-     */
-    Vector saturate() const;
+  /**
+   * ensure each component is between 0 and 1
+   */
+  Vector saturate() const;
 
-    /**
-     * ensure each component is between \p min and \p max
-     */
-    Vector clamp(float min, float max) const;
+  /**
+   * ensure each component is between \p min and \p max
+   */
+  Vector clamp(float min, float max) const;
 
-    /**
-     * Scalar product
-     */
-    Vector operator*(float k) const;
-    Vector& operator*=(float k);
-    Vector& operator*=(const Vector& rhs) {*this = scale(rhs); return *this;};
-    Vector operator/(float k) const;
-    Vector& operator/=(float k);
-    Vector operator/(const Vector& k) const;
+  /**
+   * Scalar product
+   */
+  Vector operator*(float k) const;
+  Vector &operator*=(float k);
+  Vector &operator*=(const Vector &rhs) {
+    *this = scale(rhs);
+    return *this;
+  };
+  Vector operator/(float k) const;
+  Vector &operator/=(float k);
+  Vector operator/(const Vector &k) const;
 
-    /**
-     * Dot product
-     */
-    float operator*(const Vector& rhs) const;
+  /**
+   * Dot product
+   */
+  float operator*(const Vector &rhs) const;
 
-    Vector cross(const Vector& rhs) const;
+  Vector cross(const Vector &rhs) const;
 
-    void rotate(const Vector& rot);
-    void rotateR(const Vector& rot);
+  void rotate(const Vector &rot);
+  void rotateR(const Vector &rot);
 
-    Vector reflect(const Vector& normal) const;
+  Vector reflect(const Vector &normal) const;
 
-    Vector refract(const Vector& normal, float ior1, float ior2) const;
+  Vector refract(const Vector &normal, float ior1, float ior2) const;
 #if __cplusplus >= 202300
-    static Vector random(float degree = 1, const Vector& source = Vector(0, 0, 0));
+  static Vector random(float degree = 1, const Vector &source = Vector(0, 0, 0));
 #endif
 };
-}
+} // namespace cevy::engine

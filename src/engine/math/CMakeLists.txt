@@ -12,5 +12,6 @@ add_library(math
 
 target_include_directories(math PUBLIC
   .
+  ..
   ${RAYLIB_FOLDER}
   )

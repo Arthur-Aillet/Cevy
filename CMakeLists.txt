@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.1)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 project(Cevy LANGUAGES CXX VERSION 0.1)
 set(Cevy_VERSION 0.1)
@@ -21,6 +21,12 @@ add_subdirectory(deps)
 add_compile_options(-Wall -Wextra)
 
 option(DEBUG_MODE "Set DEBUG Mode" ON)
+
+add_definitions(-mavx)
+
+if(!DEBUG_MODE)
+    add_definitions(-ffast-math -Ofast)
+endif()
 
 add_subdirectory(src)
 
