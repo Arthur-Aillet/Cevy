@@ -7,6 +7,7 @@
 
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
+#include "Event.hpp"
 #include "Time.hpp"
 #include "ecs.hpp"
 
@@ -28,6 +29,7 @@ void init_timer(cevy::ecs::World &w) { w.insert_resource<cevy::ecs::Time>(cevy::
 
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
+  app.add_plugins(EventPlugin());
   app.insert_resource(cevy::ecs::Control{.abort = false});
   app.add_system<cevy::ecs::Schedule::PostStartup>(init_timer);
 }
