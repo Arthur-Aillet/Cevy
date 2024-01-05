@@ -8,11 +8,15 @@
 #pragma once
 #include "Vector.hpp"
 #include "Position.hpp"
+#include "Rotation.hpp"
+#include "World.hpp"
+#include "Query.hpp"
 
 #include "Shape.hpp"
+#include "ecs.hpp"
+#include <tuple>
 
 namespace cevy::physic::collision {
-
 class Collider : public cevy::engine::Position {
 
     private:
@@ -22,5 +26,22 @@ class Collider : public cevy::engine::Position {
     Collider(Shape *shape) : _shape(shape){};
     ~Collider(){};
 
+    Shape* getShpae() const { return _shape; }
+
 };
+
+enum CELL_SIZE {
+    X = 50,
+    Y = 50,
+    Z = 50,
+};
+struct Cell {
+    std::vector<std::tuple<Collider, std::optional<cevy::engine::Position>, std::optional<cevy::engine::Rotation>>> entities;
+};
+
+std::vector<std::vector<std::vector<Cell>>> grid;
+
+void updateGrid(ecs::World& world);
+void checkCollision(ecs::World& world);
+
 }

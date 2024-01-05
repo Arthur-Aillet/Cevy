@@ -29,15 +29,13 @@ class Cuboid : public Shape {
 
         bool calculateCollision(Shape& other) override {
             Cuboid* cube = dynamic_cast<Cuboid*>(&other);
-            if (cube != nullptr) {
-                bool collisionX = _position.x + _dimension.x >= cube->getPosition().x &&
-                    cube->getPosition().x + cube->getDimension().x >= _position.x;
-                bool collisionY = _position.y + _dimension.y >= cube->getPosition().y &&
-                    cube->getPosition().y + cube->getDimension().y >= _position.y;
-                bool collisionZ = _position.z + _dimension.z >= cube->getPosition().z &&
-                    cube->getPosition().z + cube->getDimension().z >= _position.z;
-                return collisionX && collisionY && collisionZ;
-            }
+            bool collisionX = _position.x + _dimension.x >= cube->getPosition().x &&
+                cube->getPosition().x + cube->getDimension().x >= _position.x;
+            bool collisionY = _position.y + _dimension.y >= cube->getPosition().y &&
+                cube->getPosition().y + cube->getDimension().y >= _position.y;
+            bool collisionZ = _position.z + _dimension.z >= cube->getPosition().z &&
+                cube->getPosition().z + cube->getDimension().z >= _position.z;
+            return collisionX && collisionY && collisionZ;
         }
 };
 
