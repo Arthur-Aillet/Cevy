@@ -176,6 +176,7 @@ class cevy::ecs::Query {
     (resize_optional<T>(containers, current_size), ...);
     return current_size;
   }
+
   private:
   public:
   size_t _size;
