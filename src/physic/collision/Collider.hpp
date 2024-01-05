@@ -35,8 +35,10 @@ enum CELL_SIZE {
     Y = 50,
     Z = 50,
 };
+
+using entity = std::tuple<const Collider, const option<cevy::engine::Position>, const option<cevy::engine::Rotation>>;
 struct Cell {
-    std::vector<std::tuple<Collider, std::optional<cevy::engine::Position>, std::optional<cevy::engine::Rotation>>> entities;
+    std::vector<std::tuple<const Collider, const option<cevy::engine::Position>, const option<cevy::engine::Rotation>>> entities;
 };
 
 std::vector<std::vector<std::vector<Cell>>> grid;

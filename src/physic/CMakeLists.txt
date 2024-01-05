@@ -7,7 +7,8 @@
 
 add_library(physic
     SHARED
-    physic.hpp
+    Physic.hpp
+    Physic.cpp
   )
 
 set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)

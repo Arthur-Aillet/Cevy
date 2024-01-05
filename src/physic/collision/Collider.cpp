@@ -9,6 +9,7 @@
 #include "Position.hpp"
 #include "Rotation.hpp"
 #include "ecs.hpp"
+#include <cstdio>
 #include <optional>
 #include <tuple>
 
@@ -23,11 +24,11 @@ void updateGrid(cevy::ecs::World& world) {
         }
     }
 
-    cevy::ecs::Query<Collider, std::optional<cevy::engine::Position>, std::optional<cevy::engine::Rotation>> query = cevy::ecs::Query<Collider, std::optional<cevy::engine::Position>, std::optional<cevy::engine::Rotation>>::query(world);
+    cevy::ecs::Query<Collider, option<cevy::engine::Position>, option<cevy::engine::Rotation>> query = cevy::ecs::Query<Collider, option<cevy::engine::Position>, option<cevy::engine::Rotation>>::query(world);
     for (auto it = query.begin(); it != query.end(); ++it) {
-        auto& collider = std::get<0>(*it);
-        auto& position = std::get<1>(*it);
-        auto& rotation = std::get<2>(*it);
+        const auto& collider = std::get<0>(*it);
+        const auto& position = std::get<1>(*it).value_or(cevy::engine::Position(0, 0,  0));
+        const auto& rotation = std::get<2>(*it).value_or(cevy::engine::Rotation(0, 0, 0));
         int x = dynamic_cast<Cuboid*>(collider.getShpae())->getPosition().x / CELL_SIZE::X;
         int y = dynamic_cast<Cuboid*>(collider.getShpae())->getPosition().y / CELL_SIZE::Y;
         int z = dynamic_cast<Cuboid*>(collider.getShpae())->getPosition().z / CELL_SIZE::Z;
@@ -36,16 +37,36 @@ void updateGrid(cevy::ecs::World& world) {
     }
 }
 
-// void checkCollision(cevy::ecs::World& world) {
-//     cevy::physic::collision::updateGrid(world);
+void collisionWithNeighboringEntities(entity& entity) {
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                int x = std::get<1>(entity)->x / CELL_SIZE::X + dx;
+                int y = std::get<1>(entity)->y / CELL_SIZE::Y + dy;
+                int z = std::get<1>(entity)->z / CELL_SIZE::Z + dz;
+                if (x >= 0 && y >= 0 && z >= 0 && x <  static_cast<int>(grid.size()) && y < static_cast<int>(grid[0].size()) && z < static_cast<int>(grid[0][0].size())) {
+                    for (auto& entity2 : grid[x][y][z].entities) {
+                        if (entity != entity2 && std::get<0>(entity).getShpae()->calculateCollision(*std::get<0>(entity2).getShpae())) {
+                            std::cout << "entity 1 in position " << x << ", " << y << ", " << z;
+                            std::cout << " have a collision with the entity in position " << std::get<1>(entity2)->x << ", " << std::get<1>(entity2)->y << ", " << std::get<1>(entity2)->z << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
-//     for (auto& row : grid) {
-//         for (auto& col : row) {
-//             for (auto& cell : col) {
-//                 for (auto& entity : cell.entities) {
+void checkCollision(cevy::ecs::World& world) {
+    cevy::physic::collision::updateGrid(world);
 
-//                 }
-//             }
-//         }
-//     }
-// }
+    for (auto& row : grid) {
+        for (auto& col : row) {
+            for (auto& cell : col) {
+                for (auto& entity : cell.entities) {
+                    collisionWithNeighboringEntities(entity);
+                }
+            }
+        }
+    }
+}
