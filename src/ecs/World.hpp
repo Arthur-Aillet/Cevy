@@ -15,6 +15,7 @@
  * World. Holds the actual components and entities
  */
 
+#include "cevy.hpp"
 #include "Entity.hpp"
 #include "Resource.hpp"
 #include "SparseVector.hpp"
@@ -38,16 +39,6 @@ struct is_world<cevy::ecs::World &> : public std::true_type {};
 
 template <>
 struct is_world<const cevy::ecs::World &> : public std::true_type {};
-
-template <typename... Args>
-constexpr bool all(Args... args) {
-  return (... && args);
-}
-
-template <typename... Args>
-constexpr bool any() {
-  return (... || Args::value);
-};
 
 template <typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
