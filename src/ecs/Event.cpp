@@ -8,5 +8,6 @@
 #include "Event.hpp"
 
 void cevy::ecs::EventPlugin::build(cevy::ecs::App &app) {
-    std::cout << "Event Plugin Instanciated" << std::endl;
+
+/*app.add_system<>();*/
 }
