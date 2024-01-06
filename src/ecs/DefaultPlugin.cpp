@@ -7,6 +7,8 @@
 
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
+#include "Input/Keyboard.hpp"
+#include "Input/Mouse.hpp"
 #include "Time.hpp"
 #include "ecs.hpp"
 
@@ -30,4 +32,7 @@ void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
   app.insert_resource(cevy::ecs::Control{.abort = false});
   app.add_system<cevy::ecs::Schedule::PostStartup>(init_timer);
+  app.insert_resource(Input<KeyBoard>());
+  app.insert_resource(Input<Mouse>());
+  app.add_system<cevy::ecs::Schedule::PreUpdate>(update_all_inputs);
 }
