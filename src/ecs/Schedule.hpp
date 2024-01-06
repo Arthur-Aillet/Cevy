@@ -6,136 +6,157 @@
 */
 
 #pragma once
+#include <algorithm>
 #include <functional>
 #include <list>
-#include <tuple>
 #include <optional>
-#include <algorithm>
+#include <tuple>
+#include <type_traits>
 #include <typeindex>
-#include <any>
 
+#include "World.hpp"
 #include "ecs.hpp"
 
-
 class cevy::ecs::Schedule {
+  public:
+  struct IsStage {};
+
+  template <typename Before = std::nullopt_t, typename After = std::nullopt_t,
+            typename Repeat = std::true_type>
+  class Stage : public IsStage {
     public:
-        template<typename Before = std::nullopt_t, typename After = std::nullopt_t>
-        class Stage {
-            public:
-                template<typename T>
-                using before = Stage<T, std::nullopt_t>;
+    using is_repeat = Repeat;
+    using previous = Before;
+    using next = After;
 
-                template<typename T>
-                using after = Stage<std::nullopt_t, T>;
-        };
-        template<typename T>
-        using before = Stage<>::before<T>;
-        template<typename T>
-        using after = Stage<>::after<T>;
+    template <typename T>
+    using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
 
-        class First : public Stage<> {};
+    template <typename T>
+    using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
+  };
+  template <typename T>
+  using before = Stage<>::before<T>;
+  template <typename T>
+  using after = Stage<>::after<T>;
 
-        class Update : public after<First> {};
-        class PreUpdate : public before<Update> {};
-        class PostUpdate : public after<Update> {};
+  using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
 
-        class StateTransition : public before<Update> {};
-        class RunFixedUpdateLoop : public before<Update> {};
+  class Startup : public at_start {};
+  class PreStartup : public before<Startup> {};
+  class PostStartup : public after<Startup> {};
 
-        class Last : public after<PostUpdate> {};
+  class First : public Stage<> {};
 
-    private:
-        using type_tuple = std::tuple<std::type_index, std::any>;
-        std::list<std::type_index> _schedule;
+  class Update : public after<First> {};
+  class PreUpdate : public before<Update> {};
+  class PostUpdate : public after<Update> {};
 
-    public:
-        void init_default_schedule() {
-            insert_schedule<First>();
-            insert_schedule<Update>();
-            insert_schedule<PreUpdate>();
-            insert_schedule<PostUpdate>();
-            // insert_schedule<StateTransition>();
-            // insert_schedule<RunFixedUpdateLoop>();
-            insert_schedule<Last>();
+  class StateTransition : public before<Update> {};
+  class RunFixedUpdateLoop : public before<Update> {};
 
-            // add systems relating to the automatic parts of
-            //StateTransitions and RunFixedUpdateLoop ?
-        }
+  class Last : public after<PostUpdate> {};
 
+  private:
+  std::list<std::type_index> _schedule;
+  std::list<std::type_index> _at_start_schedule;
 
-        template<typename T, typename T::before>
-        void insert_schedule() {
-            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::before)));
-            _schedule.insert(it, std::type_index(typeid(T)));
-        }
+  public:
+  template <typename S, typename std::enable_if_t<
+                            std::is_same_v<typename S::is_repeat, std::true_type>, bool> = true>
+  bool schedule_defined() {
+    auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(S)));
 
-        template<typename T, typename T::after>
-        void insert_schedule() {
-            auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(T::after)));
-            ++it;
-            _schedule.insert(it, std::type_index(typeid(T)));
-        }
+    return (it != _schedule.end());
+  }
 
-        template<typename T>
-        void insert_schedule() {
-            _schedule.push_back(std::type_index(typeid(T)));
-        }
+  template <typename S, typename std::enable_if_t<
+                            std::is_same_v<typename S::is_repeat, std::false_type>, bool> = true>
+  bool schedule_defined() {
+    auto it =
+        std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(S)));
 
-        using system_function = std::function<void (World &)>;
-        using system = std::tuple<system_function, std::type_index>;
-        std::vector<system> _systems;
-        Schedule() {
-            init_default_schedule();
-        }
-        ~Schedule() = default;
+    return (it != _at_start_schedule.end());
+  }
 
-        void quit() const;
-        void abort();
+  template <typename T, typename std::enable_if_t<
+                            std::is_same_v<typename T::is_repeat, std::true_type>, bool> = true>
+  void insert_schedule() {
+    if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
+      auto it = std::find(_schedule.begin(), _schedule.end(),
+                          std::type_index(typeid(typename T::previous)));
 
-        template <typename S, class... Components, typename Function>
-        void add_system(Function const &f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+      _schedule.insert(it, std::type_index(typeid(T)));
+    } else if constexpr (!std::is_same_v<typename T::next, std::nullopt_t>) {
+      auto it =
+          std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(typename T::next)));
 
-        }
+      ++it;
+      _schedule.insert(it, std::type_index(typeid(T)));
+    } else {
+      _schedule.push_back(std::type_index(typeid(T)));
+    }
+  }
 
-        template <typename S, class... Components, typename Function>
-        void add_system(Function &&f) {
-            system_function sys = [&f] (World & reg) {
-                f(reg, reg.get_components<Components>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-        }
+  template <typename T, typename std::enable_if_t<
+                            std::is_same_v<typename T::is_repeat, std::false_type>, bool> = true>
+  void insert_schedule() {
+    if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
+      auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(),
+                          std::type_index(typeid(typename T::previous)));
 
-        template<class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            add_super_system<Update>(func);
-        }
+      _at_start_schedule.insert(it, std::type_index(typeid(T)));
+    } else if constexpr (!std::is_same_v<typename T::next, std::nullopt_t>) {
+      auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(),
+                          std::type_index(typeid(typename T::next)));
 
-        template<class S, class R, class ...Args>
-        void add_super_system(R(&&func)(Args...)) {
-            static_assert(all(is_super<Args>()...), "type must be reference to super");
-            system_function sys = [&func] (World & reg) {
-                func(reg.get_super<Args>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-        }
+      ++it;
+      _at_start_schedule.insert(it, std::type_index(typeid(T)));
+    } else {
+      _at_start_schedule.push_back(std::type_index(typeid(T)));
+    }
+  }
 
-    protected:
-        mutable bool _stop = false;
-        mutable bool _abort = false;
-        std::list<std::type_index>::iterator _stage;
+  using system_function = std::function<void(World &)>;
+  using system = std::tuple<system_function, std::type_index>;
+  std::vector<system> _systems;
+  Schedule() : _stage(_at_start_schedule.begin()){};
+  ~Schedule() = default;
 
+  void quit() const;
+  void abort();
 
-        void runStages(World& world);
-        void runStage(World& world);
-    private:
+  template <class R, class... Args>
+  void add_system(R (&&func)(Args...)) {
+    add_system<Update>(func);
+  }
 
-        /* Bevy-compliant */
-    public:
-        void run(World& world);
+  template <class S, class R, class... Args>
+  void add_system(R (&&func)(Args...)) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
+        "type must be reference to query, world, commands or resource");
+#ifdef DEBUG
+    if (!schedule_defined<S>()) {
+      std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+    }
+#endif
 
-        // Schedule& add_systems();
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
+    _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+  }
+
+  protected:
+  mutable bool _stop = false;
+  mutable bool _abort = false;
+  std::list<std::type_index>::iterator _stage;
+
+  void runStartStages(World &world);
+  void runStages(World &world);
+  void runStage(World &world);
+
+  private:
+  /* Bevy-compliant */
+  public:
+  void run(World &world);
 };

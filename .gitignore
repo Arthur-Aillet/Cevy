@@ -39,5 +39,6 @@ lib/*
 build
 lib
 bin
+.cache
 
 docs/doxygen/xml

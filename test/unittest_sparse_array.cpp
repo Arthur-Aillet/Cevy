@@ -1,26 +1,26 @@
 #include <criterion/criterion.h>
 
-#include "../src/sparse_array.hpp"
+#include "../src/SparseVector.hpp"
 
-Test(sparse_array, constructors) {
-    sparse_array<int> test = sparse_array<int>();
-    sparse_array<int> copy(test);
-    sparse_array<int> snd = std::move(test);
-    sparse_array<int> third;
-    sparse_array<int> fourth;
+Test(SparseVector, constructors) {
+    SparseVector<int> test = SparseVector<int>();
+    SparseVector<int> copy(test);
+    SparseVector<int> snd = std::move(test);
+    SparseVector<int> third;
+    SparseVector<int> fourth;
     third = test;
     fourth = std::move(test);
 }
 
-Test(sparse_array, size) {
-    sparse_array<int> test;
+Test(SparseVector, size) {
+    SparseVector<int> test;
     cr_assert(test.size() == 0);
     test.resize(4);
     cr_assert(test.size() == 4);
 }
 
-Test(sparse_array, insert_at) {
-    sparse_array<int> test;
+Test(SparseVector, insert_at) {
+    SparseVector<int> test;
     test.insert_at(3, 4);
     cr_assert(test[3] == 4);
     cr_assert(test[2] == std::nullopt);
@@ -35,16 +35,16 @@ Test(sparse_array, insert_at) {
     cr_assert(initial == 8);
 }
 
-Test(sparse_array, erase) {
-    sparse_array<int> test;
+Test(SparseVector, erase) {
+    SparseVector<int> test;
     test.insert_at(3, 4);
     cr_assert(test[3] == 4);
     test.erase(3);
     cr_assert(test[3] == std::nullopt);
 }
 
-Test(sparse_array, get_index) {
-    sparse_array<int> test;
+Test(SparseVector, get_index) {
+    SparseVector<int> test;
     int var = 3;
     test.insert_at(2, var);
     cr_assert(test[2] == 3);
@@ -52,15 +52,15 @@ Test(sparse_array, get_index) {
     cr_assert(test.get_index(*(test.begin() + 1)).value() == 1);
 }
 
-void print_sparse(sparse_array<int> arr) {
+void print_sparse(SparseVector<int> arr) {
     for (auto& elm : arr) {
         std::cout << elm.value_or(-1) << ", ";
     }
     std::cout << std::endl;
 }
 
-Test(sparse_array, insert) {
-    sparse_array<int> test;
+Test(SparseVector, insert) {
+    SparseVector<int> test;
     test.insert_at(2, 3);
     test.insert_at(4, 2);
     test.insert_at(3, 5);
@@ -72,13 +72,13 @@ Test(sparse_array, insert) {
     cr_assert(6 == test.get_index(fst).value());
 }
 
-Test(sparse_array, assignation_op) {
-    sparse_array<int> test;
+Test(SparseVector, assignation_op) {
+    SparseVector<int> test;
     test.insert(1);
     test.insert(2);
     test.insert(3);
     test.insert(4);
-    sparse_array<int> test2 = test;
+    SparseVector<int> test2 = test;
     cr_assert(test[2] == 3);
     test[2] = 8;
     cr_assert(test[2] == 8);
@@ -86,20 +86,20 @@ Test(sparse_array, assignation_op) {
 }
 
 /*
-Test(sparse_array, get) {
-    sparse_array<int> test;
+Test(SparseVector, get) {
+    SparseVector<int> test;
     test[1] = 3;
     cr_assert(test[1] == 3);
 }
 
-Test(sparse_array, begin) {
-    sparse_array<int> test;
+Test(SparseVector, begin) {
+    SparseVector<int> test;
     test.begin();
     test.cbegin();
 }
 
-Test(sparse_array, end) {
-    sparse_array<int> test;
+Test(SparseVector, end) {
+    SparseVector<int> test;
     test.end();
     test.cend();
 }
