@@ -16,12 +16,13 @@
 #include "DefaultPlugin.hpp"
 #include "Resource.hpp"
 #include "Camera.hpp"
-#include "input.hpp"
 #include "Position.hpp"
 #include "Rotation.hpp"
 #include "Commands.hpp"
 #include "EntityCommands.hpp"
 #include "imgui.h"
+#include "Keyboard.hpp"
+#include "Mouse.hpp"
 
 void init_window() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -78,10 +79,13 @@ void cevy::Engine::build(cevy::ecs::App& app) {
     app.add_plugins(cevy::AssetManagerPlugin());
     app.add_system<cevy::PreStartupRenderStage>(init_window);
     app.add_system<cevy::PreRenderStage>(close_game);
+    app.add_system<cevy::PreRenderStage>(update_all_inputs);
     app.add_system<cevy::RenderStage>(update_window);
     app.init_component<cevy::Camera>();
     app.init_component<cevy::Position>();
     app.init_component<cevy::Rotation>();
+    app.init_component<cevy::Input<KeyBoard>>();
+    app.init_component<cevy::Input<Mouse>>();
     app.spawn(cevy::Camera(), cevy::Position(10.0, 10.0, 10.0), cevy::Rotation(0.0, 0.6, 1.0));
     // app.add_system<cevy::RenderStage>(control_object);
 }
