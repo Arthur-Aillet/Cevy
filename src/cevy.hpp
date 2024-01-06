@@ -31,12 +31,18 @@ using eval_cond_t = typename eval_cond<test, Z, X, Else>::type;
 
 /// @brief contains all of the engine bits
 namespace cevy {
+
 /// @brief holds the entity components system
 namespace ecs {};
 
 /// @brief hold engine mechanics, depends on ecs
 namespace engine {};
+
+/// @brief hold physics mechanism, depends on ecs
+namespace physic {};
+
 } // namespace cevy
+
 
 // note: here name-spaces are being forwa-rd declared;
 // they will be expanded by their relevant files;
