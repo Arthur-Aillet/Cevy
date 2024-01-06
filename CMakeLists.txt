@@ -22,6 +22,12 @@ add_subdirectory(deps)
 
 option(DEBUG_MODE "Set DEBUG Mode" ON)
 
+add_definitions(-mavx)
+
+if(!DEBUG_MODE)
+    add_definitions(-ffast-math -Ofast)
+endif()
+
 add_subdirectory(src)
 
 option(TESTS "Build tests" OFF)

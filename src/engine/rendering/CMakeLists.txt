@@ -14,6 +14,7 @@ add_library(rendering
 target_include_directories(rendering PUBLIC
   ../../ecs
   ../assets
+  ../math
   .
   ..
   ${RAYLIB_FOLDER}
