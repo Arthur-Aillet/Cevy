@@ -10,6 +10,8 @@
 #include "ecs.hpp"
 
 class cevy::ecs::Plugin {
-    public:
-        virtual void build(App&) = 0;
+  public:
+  virtual void build(cevy::ecs::App &) = 0;
+  Plugin() = default;
+  ~Plugin() = default;
 };
