@@ -17,8 +17,6 @@
 
 #include <vector>
 
-#include <stdlib.h>
-
 void init_asset_manager(cevy::ecs::World &w);
 
 namespace cevy::engine {
