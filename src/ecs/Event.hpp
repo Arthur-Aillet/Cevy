@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Plugin.hpp"
 #include <iterator>
 #include <tuple>
 #include <vector>
@@ -61,8 +60,8 @@ class EventReader {
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
-    using pointer = T*;
-    using reference = T&;
+    using pointer = T *;
+    using reference = T &;
 
     using parent_iterator_type = typename std::vector<std::tuple<T, size_t>>::const_iterator;
 
@@ -100,11 +99,6 @@ class EventReader {
   const iterator begin() const { return iterator(raw_data.event_queue.cbegin()); };
   const iterator end() const { return iterator(raw_data.event_queue.cend()); };
   const iterator read() const { return iterator(raw_data.event_queue.begin()); };
-};
-
-class EventPlugin : public cevy::ecs::Plugin {
-  public:
-  void build(cevy::ecs::App &);
 };
 } // namespace cevy::ecs
 
