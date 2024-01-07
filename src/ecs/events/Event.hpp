@@ -41,7 +41,9 @@ class EventWriter {
   public:
   using value_type = T;
 
-  void send(T &&event) { _event_access.event_queue.push_back(std::make_tuple(std::move(event), _idx)); }
+  void send(T &&event) {
+    _event_access.event_queue.push_back(std::make_tuple(std::move(event), _idx));
+  }
 };
 
 template <typename T>
@@ -50,11 +52,11 @@ class EventReader {
   friend class World;
 
   EventReader(const Event<T> &event_access) : event_access(event_access) {}
+
   public:
   using value_type = T;
 
   const Event<T> &event_access; // TODO: replace by a query like iterator
-
 };
 
 class EventPlugin : public cevy::ecs::Plugin {

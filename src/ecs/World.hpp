@@ -15,11 +15,11 @@
  * World. Holds the actual components and entities
  */
 
-#include "cevy.hpp"
 #include "Entity.hpp"
 #include "Event.hpp"
 #include "Resource.hpp"
 #include "SparseVector.hpp"
+#include "cevy.hpp"
 
 #include <any>
 #include <functional>
@@ -271,32 +271,37 @@ class cevy::ecs::World {
   }
 
   template <typename W, typename std::enable_if_t<is_world<W>::value, bool> = true>
-  cevy::ecs::World &get_super() {
+  cevy::ecs::World &get_super(size_t) {
     return *this;
   }
 
   template <typename Q, typename std::enable_if_t<is_query<Q>::value, bool> = true>
-  Q get_super() {
+  Q get_super(size_t) {
     return Q::query(*this);
   }
 
   template <typename R, typename std::enable_if_t<is_event_reader<R>::value, bool> = true>
-  R get_super() {
+  R get_super(size_t) {
     return EventReader(resource<Event<typename R::value_type>>());
   }
 
   template <typename W, typename std::enable_if_t<is_event_writer<W>::value, bool> = true>
-  W get_super() {
-    return EventWriter(resource<Event<typename W::value_type>>(), 0);
+  W get_super(size_t system_id) {
+    auto &res = resource<Event<typename W::value_type>>();
+    for (auto it = res.event_queue.begin(); it != res.event_queue.end(); it++) {
+      if (std::get<1>(*it) == system_id)
+        res.event_queue.erase(it);
+    }
+    return EventWriter(res, system_id);
   }
 
   template <typename R, typename std::enable_if_t<is_resource<R>::value, bool> = true>
-  R get_super() {
+  R get_super(size_t) {
     return _resource_manager.get<typename R::value>();
   }
 
   template <typename C, typename std::enable_if_t<is_commands<C>::value, bool> = true>
-  C get_super();
+  C get_super(size_t);
 };
 
 template <typename... Ts>

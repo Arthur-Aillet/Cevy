@@ -18,8 +18,8 @@ class cevy::ecs::App : public cevy::ecs::World {
   public:
   using World::ComponentId;
   using system = Schedule::system;
-  //TODO: refactor to has-a ?
-  // World world;
+  // TODO: refactor to has-a ?
+  //  World world;
   private:
   Schedule _scheduler;
   std::vector<std::shared_ptr<Plugin>> _plugins;
