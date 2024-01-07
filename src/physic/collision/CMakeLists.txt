@@ -10,7 +10,8 @@ add_library(collision
     Collider.hpp
     Collider.cpp
     Shape.hpp
-    CollidingEntities.hpp
+    Shape.cpp
+    EntitiesCollision.cpp
 )
 
 target_include_directories(collision PUBLIC

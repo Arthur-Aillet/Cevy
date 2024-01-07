@@ -7,7 +7,7 @@
 
 #include "Vector.hpp"
 
-namespace cevy::physic::collision {
+namespace cevy::physic {
 class Shape {
     public:
         virtual ~Shape(){};
@@ -27,16 +27,7 @@ class Cuboid : public Shape {
 
         const cevy::engine::Vector& getDimension() const { return _dimension; }
 
-        bool calculateCollision(Shape& other) override {
-            Cuboid* cube = dynamic_cast<Cuboid*>(&other);
-            bool collisionX = _position.x + _dimension.x >= cube->getPosition().x &&
-                cube->getPosition().x + cube->getDimension().x >= _position.x;
-            bool collisionY = _position.y + _dimension.y >= cube->getPosition().y &&
-                cube->getPosition().y + cube->getDimension().y >= _position.y;
-            bool collisionZ = _position.z + _dimension.z >= cube->getPosition().z &&
-                cube->getPosition().z + cube->getDimension().z >= _position.z;
-            return collisionX && collisionY && collisionZ;
-        }
+        bool calculateCollision(Shape& other) override;
 };
 
 }

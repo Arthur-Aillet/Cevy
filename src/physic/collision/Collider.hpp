@@ -7,43 +7,48 @@
 
 #pragma once
 #include "Vector.hpp"
+#include "SparseVector.hpp"
 #include "Position.hpp"
 #include "Rotation.hpp"
 #include "World.hpp"
-#include "Query.hpp"
 
 #include "Shape.hpp"
 #include "ecs.hpp"
 #include <tuple>
+#include <vector>
 
-namespace cevy::physic::collision {
-class Collider : public cevy::engine::Position {
-
-    private:
-        Shape* _shape;
-
-    public:
-    Collider(Shape *shape) : _shape(shape){};
-    ~Collider(){};
-
-    Shape* getShpae() const { return _shape; }
-
-};
+namespace cevy::physic {
 
 enum CELL_SIZE {
     X = 50,
     Y = 50,
     Z = 50,
 };
+class Collider {
+    private:
+        Shape* _shape;
 
-using entity = std::tuple<const Collider, const option<cevy::engine::Position>, const option<cevy::engine::Rotation>>;
-struct Cell {
-    std::vector<std::tuple<const Collider, const option<cevy::engine::Position>, const option<cevy::engine::Rotation>>> entities;
+    public:
+
+
+    Collider(Shape *shape) : _shape(shape){};
+    ~Collider(){};
+
+    Shape* getShape() const { return _shape; }
 };
 
-std::vector<std::vector<std::vector<Cell>>> grid;
+using entity = std::tuple<const Collider*, const cevy::engine::Position*, const cevy::engine::Rotation*>;
+class Grid {
+    private:
+    SparseVector<SparseVector<SparseVector<std::vector<entity>>>> _cells;
 
-void updateGrid(ecs::World& world);
-void checkCollision(ecs::World& world);
+    public:
+    Grid() {};
+    ~Grid() {};
 
+    SparseVector<SparseVector<SparseVector<std::vector<entity>>>> getCells() const { return _cells; };
+    void addEntity(const size_t x, const size_t y, const size_t z, const entity& value);
+    void setGrid(cevy::ecs::World& world);
+    void collisionWithNeighboringEntities(const entity& entity1);
+};
 }
