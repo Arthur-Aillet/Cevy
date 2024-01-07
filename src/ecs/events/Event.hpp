@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Plugin.hpp"
+#include <iterator>
 #include <tuple>
 #include <vector>
 
@@ -19,13 +20,10 @@ class EventWriter;
 
 template <typename T>
 class Event {
-  private:
-  friend EventWriter<T>;
-  friend class World;
-
-  using EventWriterId = size_t;
-
   public:
+  using EventWriterId = size_t;
+  using data_iterator_type = typename std::vector<std::tuple<T, EventWriterId>>::iterator;
+
   std::vector<std::tuple<T, EventWriterId>> event_queue{};
 };
 
@@ -51,15 +49,61 @@ class EventReader {
   private:
   friend class World;
 
-  EventReader(const Event<T> &event_access) : event_access(event_access) {}
+  EventReader(const Event<T> &event_access) : raw_data(event_access) {}
 
   public:
   using value_type = T;
 
-  const Event<T> &event_access; // TODO: replace by a query like iterator
+  const Event<T> &raw_data; // TODO: replace by a query like iterator
+
+  class iterator {
+    public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
+
+    using parent_iterator_type = typename std::vector<std::tuple<T, size_t>>::const_iterator;
+
+    parent_iterator_type inner_iter;
+
+    iterator(parent_iterator_type &&inner_iter) : inner_iter(inner_iter) {}
+
+    iterator operator++() {
+      inner_iter++;
+      return *this;
+    };
+
+    iterator &operator++(int) {
+      auto old = *this;
+      inner_iter++;
+      return old;
+    };
+
+    value_type operator*() { return std::get<0>(*inner_iter); };
+    value_type operator->() { return std::get<0>(*inner_iter); };
+
+    operator reference() const { return std::get<0>(*inner_iter); };
+
+    friend bool operator==(iterator const &lhs, iterator const &rhs) {
+      return lhs.inner_iter == rhs.inner_iter;
+    };
+    friend bool operator!=(iterator const &lhs, iterator const &rhs) {
+      return lhs.inner_iter != rhs.inner_iter;
+    };
+  };
+
+  public:
+  const iterator cbegin() const { return iterator(raw_data.event_queue.cbegin()); };
+  const iterator cend() const { return iterator(raw_data.event_queue.cend()); };
+  const iterator begin() const { return iterator(raw_data.event_queue.cbegin()); };
+  const iterator end() const { return iterator(raw_data.event_queue.cend()); };
+  const iterator read() const { return iterator(raw_data.event_queue.begin()); };
 };
 
 class EventPlugin : public cevy::ecs::Plugin {
+  public:
   void build(cevy::ecs::App &);
 };
 } // namespace cevy::ecs
