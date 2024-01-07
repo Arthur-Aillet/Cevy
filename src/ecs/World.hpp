@@ -290,12 +290,12 @@ class cevy::ecs::World {
   W get_super(size_t system_id) {
     auto &res = resource<Event<typename W::value_type>>();
 
-    if(res.event_queue.empty())
+    if (res.event_queue.empty())
       return EventWriter(res, system_id);
 
-    for(int i = res.event_queue.size() - 1; i >= 0; i--)
-      if(std::get<1>(res.event_queue.at(i)) == system_id)
-        res.event_queue.erase( res.event_queue.begin() + i );
+    for (int i = res.event_queue.size() - 1; i >= 0; i--)
+      if (std::get<1>(res.event_queue.at(i)) == system_id)
+        res.event_queue.erase(res.event_queue.begin() + i);
     return EventWriter(res, system_id);
   }
 

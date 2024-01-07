@@ -15,7 +15,7 @@ void exemple_event_system1(cevy::ecs::Resource<cevy::ecs::Event<int>> res) {
 
 void exemple_event_system(cevy::ecs::EventReader<int> res) {
   for (auto &val : res.event_access.event_queue) {
-    std::cout << "first sys: "<< std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
+    std::cout << "first sys: " << std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
   }
 }
 
@@ -26,7 +26,7 @@ void exemple_event_system2(cevy::ecs::EventWriter<int> res) {
 
 void exemple_event_system3(cevy::ecs::EventReader<int> res) {
   for (auto &val : res.event_access.event_queue) {
-    std::cout << "second sys: "<< std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
+    std::cout << "second sys: " << std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
   }
 }
 

@@ -9,7 +9,6 @@
 
 #include "Plugin.hpp"
 #include <tuple>
-#include <iostream>
 #include <vector>
 
 namespace cevy::ecs {
@@ -27,7 +26,7 @@ class Event {
   using EventWriterId = size_t;
 
   public:
-  std::vector<std::tuple<T, EventWriterId>> event_queue {};
+  std::vector<std::tuple<T, EventWriterId>> event_queue{};
 };
 
 template <typename T>
