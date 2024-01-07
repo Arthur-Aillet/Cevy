@@ -17,6 +17,7 @@
 
 #include "cevy.hpp"
 #include "Entity.hpp"
+#include "Event.hpp"
 #include "Resource.hpp"
 #include "SparseVector.hpp"
 
@@ -277,6 +278,16 @@ class cevy::ecs::World {
   template <typename Q, typename std::enable_if_t<is_query<Q>::value, bool> = true>
   Q get_super() {
     return Q::query(*this);
+  }
+
+  template <typename R, typename std::enable_if_t<is_event_reader<R>::value, bool> = true>
+  R get_super() {
+    return EventReader(resource<Event<typename R::value_type>>());
+  }
+
+  template <typename W, typename std::enable_if_t<is_event_writer<W>::value, bool> = true>
+  W get_super() {
+    return EventWriter(resource<Event<typename W::value_type>>(), 0);
   }
 
   template <typename R, typename std::enable_if_t<is_resource<R>::value, bool> = true>

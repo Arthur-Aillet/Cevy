@@ -12,7 +12,6 @@
 #include "Plugin.hpp"
 #include "Schedule.hpp"
 #include "World.hpp"
-#include "Event.hpp"
 #include "ecs.hpp"
 
 class cevy::ecs::App : public cevy::ecs::World {
@@ -23,11 +22,7 @@ class cevy::ecs::App : public cevy::ecs::World {
   // World world;
   private:
   Schedule _scheduler;
-  EventManager _event_manager;
   std::vector<std::shared_ptr<Plugin>> _plugins;
-
-  public:
-  App() : _event_manager(EventManager(*this)) {};
 
   private:
   template <typename GivenPlugin>
@@ -64,8 +59,8 @@ class cevy::ecs::App : public cevy::ecs::World {
     _scheduler.add_system(func);
   }
 
-  template <typename Event>
+  template <typename T>
   void add_event() {
-    _event_manager.add_event<Event>();
+    insert_resource(Event<T>());
   }
 };

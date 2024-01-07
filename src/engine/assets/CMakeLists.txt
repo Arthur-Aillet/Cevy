@@ -14,6 +14,7 @@ add_library(assets
   )
 
 target_include_directories(assets PUBLIC
+  ../../ecs/events
   ../../ecs
   .
   ..

@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <typeindex>
 
+#include "Event.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
@@ -134,8 +135,8 @@ class cevy::ecs::Schedule {
   template <class S, class R, class... Args>
   void add_system(R (&&func)(Args...)) {
     static_assert(
-        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
-        "type must be reference to query, world, commands or resource");
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>, is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
 #ifdef DEBUG
     if (!schedule_defined<S>()) {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
