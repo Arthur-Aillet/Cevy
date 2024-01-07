@@ -22,6 +22,7 @@
 #include "cevy.hpp"
 
 #include <any>
+#include <cstddef>
 #include <functional>
 #include <queue>
 #include <tuple>
@@ -288,10 +289,13 @@ class cevy::ecs::World {
   template <typename W, typename std::enable_if_t<is_event_writer<W>::value, bool> = true>
   W get_super(size_t system_id) {
     auto &res = resource<Event<typename W::value_type>>();
-    for (auto it = res.event_queue.begin(); it != res.event_queue.end(); it++) {
-      if (std::get<1>(*it) == system_id)
-        res.event_queue.erase(it);
-    }
+
+    if(res.event_queue.empty())
+      return EventWriter(res, system_id);
+
+    for(int i = res.event_queue.size() - 1; i >= 0; i--)
+      if(std::get<1>(res.event_queue.at(i)) == system_id)
+        res.event_queue.erase( res.event_queue.begin() + i );
     return EventWriter(res, system_id);
   }
 

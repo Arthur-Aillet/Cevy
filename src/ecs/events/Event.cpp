@@ -9,8 +9,14 @@
 #include "App.hpp"
 #include "ecs.hpp"
 
-void exemple_event_system(cevy::ecs::Resource<cevy::ecs::Event<int>> res) {
+void exemple_event_system1(cevy::ecs::Resource<cevy::ecs::Event<int>> res) {
   // std::cout << res.get().event_queue.size() << std::endl;
+}
+
+void exemple_event_system(cevy::ecs::EventReader<int> res) {
+  for (auto &val : res.event_access.event_queue) {
+    std::cout << "first sys: "<< std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
+  }
 }
 
 void exemple_event_system2(cevy::ecs::EventWriter<int> res) {
@@ -18,14 +24,9 @@ void exemple_event_system2(cevy::ecs::EventWriter<int> res) {
   res.send(i++);
 }
 
-void exemple_event_system4(cevy::ecs::EventWriter<int> res) {
-  int i = 300;
-  res.send(std::move(i));
-}
-
 void exemple_event_system3(cevy::ecs::EventReader<int> res) {
   for (auto &val : res.event_access.event_queue) {
-    std::cout << std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
+    std::cout << "second sys: "<< std::get<0>(val) << " : " << std::get<1>(val) << std::endl;
   }
 }
 
@@ -33,7 +34,6 @@ void cevy::ecs::EventPlugin::build(cevy::ecs::App &app) {
   app.add_event<int>();
   app.add_system(exemple_event_system);
   app.add_system(exemple_event_system2);
-  app.add_system(exemple_event_system4);
   app.add_system(exemple_event_system3);
   /*app.add_system<>();*/
 }
