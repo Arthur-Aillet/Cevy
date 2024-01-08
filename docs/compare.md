@@ -315,6 +315,9 @@ void event_listener(EvenReader<MyEvent>& events)
     for (auto my_event: events) {
         std::cerr << my_event.message << std::endl;
     }
+    for (const auto &my_event: events) {
+        std::cerr << my_event.message << std::endl;
+    }
 }
 
 ```

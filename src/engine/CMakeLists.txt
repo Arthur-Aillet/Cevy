@@ -5,8 +5,10 @@
 ## engine-cmake
 ##
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_library(engine
-  SHARED
+  # SHARED
   Position.hpp
   Engine.hpp
   Engine.cpp
@@ -26,6 +28,7 @@ target_link_libraries(engine PUBLIC raylib imgui rlImGui ecs math assets renderi
 
 target_include_directories(engine PUBLIC
   ../ecs
+  ../ecs/commands
   .
   ./math
   assets

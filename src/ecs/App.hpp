@@ -18,13 +18,13 @@ class cevy::ecs::App : public cevy::ecs::World {
   public:
   using World::ComponentId;
   using system = Schedule::system;
-
-  /// TODO: refactor to has-a ?
-  // World world;
+  // TODO: refactor to has-a ?
+  //  World world;
   private:
-  Schedule _schedule;
+  Schedule _scheduler;
   std::vector<std::shared_ptr<Plugin>> _plugins;
 
+  private:
   template <typename GivenPlugin>
   void add_plugin(const GivenPlugin &plugin) {
     static_assert(std::is_base_of_v<Plugin, GivenPlugin>,
@@ -46,16 +46,21 @@ class cevy::ecs::App : public cevy::ecs::World {
 
   template <typename T>
   void add_stage() {
-    _schedule.insert_schedule<T>();
+    _scheduler.insert_schedule<T>();
   }
 
   template <class S, class R, class... Args>
   void add_system(R (&&func)(Args...)) {
-    _schedule.add_system<S>(func);
+    _scheduler.add_system<S>(func);
   }
 
   template <class R, class... Args>
   void add_system(R (&&func)(Args...)) {
-    _schedule.add_system(func);
+    _scheduler.add_system(func);
+  }
+
+  template <typename T>
+  void add_event() {
+    insert_resource(Event<T>());
   }
 };

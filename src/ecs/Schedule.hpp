@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <typeindex>
 
+#include "Event.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
@@ -35,6 +36,7 @@ class cevy::ecs::Schedule {
     template <typename T>
     using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
   };
+
   template <typename T>
   using before = Stage<>::before<T>;
   template <typename T>
@@ -57,9 +59,12 @@ class cevy::ecs::Schedule {
 
   class Last : public after<PostUpdate> {};
 
+  using SystemId = size_t;
+
   private:
   std::list<std::type_index> _schedule;
   std::list<std::type_index> _at_start_schedule;
+  SystemId last_id = 0;
 
   public:
   template <typename S, typename std::enable_if_t<
@@ -134,15 +139,19 @@ class cevy::ecs::Schedule {
   template <class S, class R, class... Args>
   void add_system(R (&&func)(Args...)) {
     static_assert(
-        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
-        "type must be reference to query, world, commands or resource");
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
 #ifdef DEBUG
     if (!schedule_defined<S>()) {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
 #endif
 
-    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
+    system_function sys = [id = last_id, &func](World &reg) mutable {
+      func(reg.get_super<Args>(id)...);
+    };
+    last_id += 1;
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 

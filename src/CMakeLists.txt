@@ -13,7 +13,7 @@ add_subdirectory(physic)
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../public/*")
 add_library(cevy SHARED ${CEVY_HEADERS})
-target_link_libraries(cevy PUBLIC ecs engine physic)
+target_link_libraries(cevy ecs engine physic)
 set_target_properties(cevy PROPERTIES LINKER_LANGUAGE CXX)
 
 if(DEBUG_MODE)

@@ -60,6 +60,7 @@ class ResourceManager {
 
     if (it != _resources_map.end()) {
       Content val = std::any_cast<Content>(_resources_map[std::type_index(typeid(Content))]);
+
       _resources_map.erase(it);
       return std::optional<Content>(val);
     }
@@ -72,17 +73,16 @@ class ResourceManager {
   }
 
   template <typename Content>
-  const Content &resource() {
-    return std::any_cast<const Content &>(_resources_map[std::type_index(typeid(Content))]);
+  const Content &resource() const {
+    return std::any_cast<const Content &>(_resources_map.at(std::type_index(typeid(Content))));
   }
 
   template <typename Content>
   std::optional<std::reference_wrapper<Content>> get_resource() {
     auto it = _resources_map.find(std::type_index(typeid(Content)));
 
-    if (it != _resources_map.end()) {
+    if (it != _resources_map.end())
       return std::any_cast<Content &>(_resources_map[std::type_index(typeid(Content))]);
-    }
     return std::nullopt;
   }
   /* TODO:
