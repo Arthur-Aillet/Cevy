@@ -25,6 +25,14 @@ class cevy::ecs::EntityCommands {
         [c..., e = _entity](cevy::ecs::World &w) mutable { (w.add_component(e, c), ...); });
     return *this;
   }
+
+        template<typename... Components>
+        cevy::ecs::EntityCommands &remove() {
+            _commands.add([e = _entity] (cevy::ecs::World &w) mutable {
+                (w.remove_component<Components>(e), ...);
+            });
+            return *this;
+        }
 };
 
 template <typename... Ts>

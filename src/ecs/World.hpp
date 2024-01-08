@@ -94,6 +94,7 @@ class cevy::ecs::World {
   public:
   /// @brief Id refering to a specific component
   using ComponentId = std::type_index;
+  using Id = std::type_index;
 
   private:
   std::unordered_map<std::type_index, component_data> _components_arrays;
@@ -160,6 +161,7 @@ class cevy::ecs::World {
   /// register a component to the world
   template <typename T>
   ComponentId init_component() {
+    static_assert(std::is_copy_constructible<T>::value, "Components must be copy-constructible");
     erase_access f_e = [](World &reg, Entity const &Entity) {
       auto &cmpnts = reg.get_components<T>();
       if (Entity < cmpnts.size())
