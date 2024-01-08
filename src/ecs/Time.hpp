@@ -21,22 +21,16 @@ class Time {
   duration<double, std::ratio<1>> _last_update_delta;
 
   public:
-  duration<double, std::ratio<1>> startup() {
-    return high_resolution_clock::now() - _first_update;
-  }
+  duration<double, std::ratio<1>> startup() { return high_resolution_clock::now() - _first_update; }
 
   void update_with_instant(time_point<high_resolution_clock> &&instant) {
     _last_update_delta = instant - _last_update;
     _last_update = instant;
   }
 
-  duration<double, std::ratio<1>> delta() {
-    return _last_update_delta;
-  }
+  duration<double, std::ratio<1>> delta() { return _last_update_delta; }
 
-  double delta_seconds() {
-    return _last_update_delta.count();
-  }
+  double delta_seconds() { return _last_update_delta.count(); }
 
   Time();
 };
