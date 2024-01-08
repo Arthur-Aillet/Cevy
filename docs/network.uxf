@@ -1,0 +1,59 @@
+<diagram program="umletino" version="15.1"><zoom_level>14</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>168</x><y>406</y><w>252</w><h>98</h></coordinates><panel_attributes>Server ECS
+--
+Shared systems
+--
+Server systems
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>952</x><y>406</y><w>252</w><h>112</h></coordinates><panel_attributes>Client ECS
+--
+Shared systems
+--
+Client systems
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>168</x><y>140</y><w>252</w><h>98</h></coordinates><panel_attributes>Synchroniser
+--
+[SyncBlocks]
+--
+[SpawnCommands]
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>952</x><y>140</y><w>252</w><h>98</h></coordinates><panel_attributes>Synchroniser
+--
+[SyncBlocks]
+--
+[SpawnCommands]
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>280</x><y>280</y><w>140</w><h>70</h></coordinates><panel_attributes>"Actions"
+--
+??
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>952</x><y>280</y><w>140</w><h>70</h></coordinates><panel_attributes>"Actions"
+--
+??
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>994</x><y>336</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>1036</x><y>336</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1148</x><y>224</y><w>42</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1106</x><y>224</y><w>42</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>308</x><y>336</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>336</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>238</x><y>224</y><w>42</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;..</panel_attributes><additional_attributes>10;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>196</x><y>224</y><w>42</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>588</x><y>294</y><w>210</w><h>56</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;
+TCP
+fg=green</panel_attributes><additional_attributes>130;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>588</x><y>168</y><w>210</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;
+UDP
+fg=green
+</panel_attributes><additional_attributes>130;20;10;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>952</x><y>574</y><w>252</w><h>140</h></coordinates><panel_attributes>Game UI
+--
+keyboard
+mouse
+--
+screen
+--
+sound
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1120</x><y>504</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>994</x><y>504</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>952</x><y>756</y><w>252</w><h>42</h></coordinates><panel_attributes>Player
+bg=#aa44ee</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1120</x><y>700</y><w>42</w><h>84</h></coordinates><panel_attributes>lt=&lt;&lt;-
+bg=#aa44ee</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1008</x><y>700</y><w>42</w><h>84</h></coordinates><panel_attributes>lt=&lt;&lt;-
+bg=#aa44ee</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element><element><id>Relation</id><coordinates><x>994</x><y>224</y><w>42</w><h>84</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>112</y><w>140</w><h>238</h></coordinates><panel_attributes>ClientHandler
+: CevyNetwork
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>756</x><y>182</y><w>224</w><h>42</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;</panel_attributes><additional_attributes>10;10;140;10</additional_attributes></element><element><id>Relation</id><coordinates><x>756</x><y>308</y><w>224</w><h>42</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;</panel_attributes><additional_attributes>10;10;140;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>462</x><y>112</y><w>140</w><h>238</h></coordinates><panel_attributes>ServHandler
+: CevyNetwork
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>406</x><y>182</y><w>224</w><h>42</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;</panel_attributes><additional_attributes>140;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>406</x><y>308</y><w>224</w><h>42</h></coordinates><panel_attributes>lt=&lt;&lt;-&gt;&gt;</panel_attributes><additional_attributes>140;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>406</x><y>336</y><w>126</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>70;10;70;80;10;80</additional_attributes></element><element><id>Relation</id><coordinates><x>406</x><y>336</y><w>182</w><h>182</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;110;110;110;110;10</additional_attributes></element><element><id>Relation</id><coordinates><x>798</x><y>336</y><w>182</w><h>182</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;110;110;110</additional_attributes></element><element><id>Relation</id><coordinates><x>854</x><y>336</y><w>126</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>70;80;10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>672</x><y>56</y><w>42</w><h>658</h></coordinates><panel_attributes>fg=#55555555</panel_attributes><additional_attributes>10;10;10;450</additional_attributes></element><element><id>UMLClass</id><coordinates><x>168</x><y>560</y><w>252</w><h>168</h></coordinates><panel_attributes>Game Logic
+--
+Physics
+Movement
+--
+authorisations
+--
+events, kills, actions
+--
+bots
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>210</x><y>490</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>336</x><y>490</y><w>42</w><h>98</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>364</x><y>42</y><w>84</w><h>42</h></coordinates><panel_attributes>Server
+style=wordwrap</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>938</x><y>42</y><w>70</w><h>42</h></coordinates><panel_attributes>Client
+style=wordwrap</panel_attributes><additional_attributes></additional_attributes></element></diagram>
