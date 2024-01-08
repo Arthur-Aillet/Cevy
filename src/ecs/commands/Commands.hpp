@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Entity.hpp"
 #include "Command.hpp"
+#include "Entity.hpp"
 #include "World.hpp"
 
 namespace cevy {
@@ -44,7 +44,7 @@ class cevy::ecs::Commands {
   template <typename... Ts>
   cevy::ecs::EntityCommands spawn(Ts... a);
 
-  EntityCommands entity(const Entity& e);
+  EntityCommands entity(const Entity &e);
 };
 
 template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>

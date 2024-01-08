@@ -8,12 +8,12 @@
 #pragma once
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <optional>
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
-#include <iostream>
 
 #include "Event.hpp"
 #include "World.hpp"
@@ -132,34 +132,34 @@ class cevy::ecs::Schedule {
   void quit() const;
   void abort();
 
-        template<class F, class S, class ...Args>
-        void add_class_system(const F& func) {
-            static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...), "type must be reference to query, world, commands or resource");
+  template <class F, class S, class... Args>
+  void add_class_system(const F &func) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
+        "type must be reference to query, world, commands or resource");
 
-            if (!schedule_defined<S>()) {
-                std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
-            }
+    if (!schedule_defined<S>()) {
+      std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+    }
 
-            system_function sys = [&func] (World & reg) mutable {
-                func(reg.get_super<Args>()...);
-            };
-            _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
-        }
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
+    _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+  }
 
   template <class R, class... Args>
   void add_system(R (&&func)(Args...)) {
     add_system<Update>(func);
   }
 
-  template<class S, class R, class ...Args>
-  void add_system(const std::function<R(Args...)>& func) {
-    static_assert(all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...), "type must be reference to query, world, commands or resource");
+  template <class S, class R, class... Args>
+  void add_system(const std::function<R(Args...)> &func) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
+        "type must be reference to query, world, commands or resource");
     if (!schedule_defined<S>()) {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
-    system_function sys = [&func] (World & reg) mutable {
-      func(reg.get_super<Args>()...);
-    };
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 

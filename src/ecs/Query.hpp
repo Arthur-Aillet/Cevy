@@ -12,8 +12,8 @@
 #include <cstddef>
 #include <optional>
 
-#include "SparseVector.hpp"
 #include "Entity.hpp"
+#include "SparseVector.hpp"
 
 template <class T>
 struct is_query : public std::false_type {};
@@ -45,7 +45,7 @@ class cevy::ecs::Query {
     template <class Container>
     using it_reference_t = typename iterator_t<Container>::reference;
 
-                friend class Entity;
+    friend class Entity;
 
     public:
     using value_type = std::tuple<T &...>;
@@ -124,10 +124,8 @@ class cevy::ecs::Query {
 
     const value_type to_value() { return std::tuple<T &...>{a_value<T>()...}; }
 
+    operator Entity() { return Entity(_idx); }
 
-                operator Entity () {
-                    return Entity(_idx);
-                }
     private:
     iterator_tuple current;
     size_t _max;

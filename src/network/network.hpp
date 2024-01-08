@@ -10,8 +10,8 @@
 #include "../cevy.hpp"
 
 namespace cevy {
-    class Synchroniser;
-    class CevyNetwork;
-    class NetworkBase;
-    using Network = CevyNetwork;
-}
+class Synchroniser;
+class CevyNetwork;
+class NetworkBase;
+using Network = CevyNetwork;
+} // namespace cevy

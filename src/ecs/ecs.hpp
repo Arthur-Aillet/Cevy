@@ -10,17 +10,17 @@
 #include "cevy.hpp"
 
 namespace cevy::ecs {
-    class App;
-    class Entity;
-    class Plugin;
-    class Schedule;
-    class Commands;
-    class Command;
-    class EntityCommands;
-    class World;
+class App;
+class Entity;
+class Plugin;
+class Schedule;
+class Commands;
+class Command;
+class EntityCommands;
+class World;
 
-    template <typename T>
-    class Factory;
+template <typename T>
+class Factory;
 
 template <typename Content>
 class Resource;
