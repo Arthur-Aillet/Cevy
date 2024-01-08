@@ -24,17 +24,17 @@ class cevy::ecs::EntityCommands {
             });
             return *this;
         }
+
+        template<typename... Components>
+        cevy::ecs::EntityCommands &remove() {
+            _commands.add([e = _entity] (cevy::ecs::World &w) mutable {
+                (w.remove_component<Components>(e), ...);
+            });
+            return *this;
+        }
 };
 
 template<typename... Ts>
 cevy::ecs::EntityCommands cevy::ecs::Commands::spawn(Ts... a) {
     return spawn_empty().insert(a...);
 }
-
-
-template<typename T>
-cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype() {
-    add([] (cevy::ecs::World &w) {
-        w.spawn_archetype<T>();
-    });
-};

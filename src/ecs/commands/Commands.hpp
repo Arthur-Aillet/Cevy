@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "Entity.hpp"
 #include "World.hpp"
 #include "Command.hpp"
 #include <typeindex>
@@ -46,10 +47,7 @@ class cevy::ecs::Commands {
         template<typename... Ts>
         cevy::ecs::EntityCommands spawn(Ts... a);
 
-        template<typename T>
-        cevy::ecs::EntityCommands spawn_archetype();
-
-        cevy::ecs::EntityCommands spawn_archetype(std::type_index type);
+        EntityCommands entity(const Entity& e);
 };
 
 template<typename C,

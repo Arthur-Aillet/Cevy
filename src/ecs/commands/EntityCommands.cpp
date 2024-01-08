@@ -14,9 +14,3 @@ cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_empty() {
     _world_access._entities.insert_at(pos, new_e);
     return (cevy::ecs::EntityCommands(*this, new_e));
 }
-
-cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_archetype(std::type_index type) {
-    add([type] (cevy::ecs::World &w) {
-        w.spawn_archetype(type);
-    });
-};

@@ -35,7 +35,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 
         CevyNetwork(const std::string& endpoint, size_t port) : NetworkBase(endpoint, port) {};
         CevyNetwork(size_t port) : NetworkBase(port) {};
-        ~CevyNetwork();
+        CevyNetwork(CevyNetwork&& rhs) : NetworkBase(std::move(rhs)) {};
+        ~CevyNetwork() {};
 
         template<typename T>
         static uint8_t byte(const T& t, size_t n) {

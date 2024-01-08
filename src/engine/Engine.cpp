@@ -40,7 +40,7 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
     Vector3 fowards = {0, 0, 0};
     for (auto cam : cams) {
         // fowards = std::get<2>(cam).fowards();
-        std::get<0>(cam).camera.position = std::get<1>(cam);
+        std::get<cevy::Camera&>(cam).camera.position = std::get<cevy::Position&>(cam);
         // std::get<0>(cam).camera.target = {std::get<1>(cam).x + fowards.x, std::get<1>(cam).y + fowards.y, std::get<1>(cam).z + fowards.z};
         // UpdateCamera(std::get<0>(cam), CAMERA_FIRST_PERSON);
     }
@@ -50,8 +50,8 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
     for (auto cam : cams) {
         BeginMode3D(std::get<0>(cam));
         for (auto model : models) {
-            cevy::Position &pos = std::get<0>(model);
-            cevy::Handle<cevy::Model3D> handle = std::get<2>(model);
+            auto& pos = std::get<cevy::Position&>(model);
+            auto& handle = std::get<cevy::Handle<cevy::Model3D>&>(model);
 
             DrawModel(handle.get().model, Vector3 {(float)pos.x, (float)pos.y, (float)pos.z}, 2, WHITE);
         }
@@ -64,7 +64,7 @@ void update_window(cevy::ecs::Query<cevy::Camera, cevy::Position, cevy::Rotation
 
 void list_pos(cevy::ecs::Query<cevy::Position> pos) {
     for (auto po : pos) {
-        std::cout << std::get<0>(po).x << std::endl;
+        std::cout << std::get<cevy::Position&>(po).x << std::endl;
     }
 }
 

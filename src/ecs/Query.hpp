@@ -13,6 +13,7 @@
 
 #include "ecs.hpp"
 #include "SparseVector.hpp"
+#include "Entity.hpp"
 
 template<class T>
 struct is_query : public std::false_type {};
@@ -41,9 +42,7 @@ class cevy::ecs::Query {
                 using iterator_category = std::bidirectional_iterator_tag;
                 using iterator_tuple = std::tuple<iterator_t<SparseVector<T>>...>;
 
-                template<typename... >
-                class zipper;
-                friend class zipper<T...>; // FIXME - reactivate
+                friend class Entity;
                 iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0) : current(it_tuple), _max(max), _idx(idx) { sync(); };
             public:
                 iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx) {};
@@ -103,6 +102,10 @@ class cevy::ecs::Query {
                 // template <size_t... Is>
                 const value_type to_value( /* std::index_sequence<Is...> */ ) {
                     return std::tuple<T&...>{std::get<iterator_t<SparseVector<T>>>(current)->value() ...};
+                }
+
+                operator Entity () {
+                    return Entity(_idx);
                 }
             private:
             public:

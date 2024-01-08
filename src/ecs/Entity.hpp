@@ -18,6 +18,8 @@ class cevy::ecs::Entity {
     public:
         friend class ecs::World;
         friend class ecs::Commands;
+        template<typename... T>
+        friend class ecs::Query;
         operator std::size_t&();
         operator std::size_t() const;
 };

@@ -126,6 +126,16 @@ class cevy::NetworkBase
         std::array<uint8_t, 512> _udp_recv;
         std::vector<uint8_t> _tcp_recv;
 
+        NetworkBase(NetworkBase&& rhs)
+          : _nw_thread(std::move(rhs._nw_thread)),
+            _udp_endpoint(std::move(rhs._udp_endpoint)),
+            _tcp_endpoint(std::move(rhs._tcp_endpoint)),
+            _udp_socket(std::move(rhs._udp_socket)),
+            _tcp_socket(std::move(rhs._tcp_socket)),
+            _udp_recv(std::move(rhs._udp_recv)),
+            _tcp_recv(std::move(rhs._tcp_recv))
+          {};
+
         NetworkBase(asio::ip::udp::socket&& udp_socket, asio::ip::tcp::socket&& tcp_socket)
          : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
 

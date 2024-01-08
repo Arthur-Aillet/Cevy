@@ -162,6 +162,7 @@ class cevy::ecs::World {
         /// register a component to the world
         template<typename T>
         ComponentId init_component() {
+            static_assert(std::is_copy_constructible<T>::value, "Components must be copy-constructible");
             erase_access f_e = [] (World & reg, Entity const & Entity) {
                 auto &cmpnts = reg.get_components<T>();
                 if (Entity < cmpnts.size())
