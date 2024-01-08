@@ -24,10 +24,9 @@ void init_default_schedules(cevy::ecs::App &app) {
   app.add_stage<Schedule::Last>();
 }
 
-void init_timer(cevy::ecs::World &w) { w.insert_resource<cevy::ecs::Time>(cevy::ecs::Time()); }
-
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
   app.insert_resource(cevy::ecs::Control{.abort = false});
   app.add_system<cevy::ecs::Schedule::PostStartup>(init_timer);
+  app.add_system<cevy::ecs::Schedule::First>(update_timer);
 }
