@@ -7,6 +7,7 @@
 
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
+#include "Event.hpp"
 #include "Time.hpp"
 #include "ecs.hpp"
 

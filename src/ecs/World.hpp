@@ -16,10 +16,13 @@
  */
 
 #include "Entity.hpp"
+#include "Event.hpp"
 #include "Resource.hpp"
 #include "SparseVector.hpp"
+#include "cevy.hpp"
 
 #include <any>
+#include <cstddef>
 #include <functional>
 #include <queue>
 #include <tuple>
@@ -38,16 +41,6 @@ struct is_world<cevy::ecs::World &> : public std::true_type {};
 
 template <>
 struct is_world<const cevy::ecs::World &> : public std::true_type {};
-
-template <typename... Args>
-constexpr bool all(Args... args) {
-  return (... && args);
-}
-
-template <typename... Args>
-constexpr bool any() {
-  return (... || Args::value);
-};
 
 template <typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
@@ -279,22 +272,46 @@ class cevy::ecs::World {
   }
 
   template <typename W, typename std::enable_if_t<is_world<W>::value, bool> = true>
-  cevy::ecs::World &get_super() {
+  cevy::ecs::World &get_super(size_t) {
     return *this;
   }
 
   template <typename Q, typename std::enable_if_t<is_query<Q>::value, bool> = true>
-  Q get_super() {
+  Q get_super(size_t) {
     return Q::query(*this);
   }
 
+  template <typename R, typename std::enable_if_t<is_event_reader<R>::value, bool> = true>
+  R get_super(size_t) {
+    if (!contains_resource<Event<typename R::value_type>>())
+      throw(std::runtime_error("Cevy/Ecs: Try to use EventReader on an unregisted event!"));
+
+    return EventReader(resource<Event<typename R::value_type>>());
+  }
+
+  template <typename W, typename std::enable_if_t<is_event_writer<W>::value, bool> = true>
+  W get_super(size_t system_id) {
+    if (!contains_resource<Event<typename W::value_type>>())
+      throw(std::runtime_error("Cevy/Ecs: Try to use EventWriter on an unregisted event!"));
+
+    auto &res = resource<Event<typename W::value_type>>();
+
+    if (res.event_queue.empty())
+      return EventWriter(res, system_id);
+
+    for (int i = res.event_queue.size() - 1; i >= 0; i--)
+      if (std::get<1>(res.event_queue.at(i)) == system_id)
+        res.event_queue.erase(res.event_queue.begin() + i);
+    return EventWriter(res, system_id);
+  }
+
   template <typename R, typename std::enable_if_t<is_resource<R>::value, bool> = true>
-  R get_super() {
+  R get_super(size_t) {
     return _resource_manager.get<typename R::value>();
   }
 
   template <typename C, typename std::enable_if_t<is_commands<C>::value, bool> = true>
-  C get_super();
+  C get_super(size_t);
 };
 
 template <typename... Ts>

@@ -7,7 +7,7 @@
 
 #include "App.hpp"
 
-void cevy::ecs::App::run() { _schedule.run(*this); }
+void cevy::ecs::App::run() { _scheduler.run(*this); }
 
-void cevy::ecs::App::quit() { _schedule.quit(); }
-void cevy::ecs::App::abort() { _schedule.abort(); }
+void cevy::ecs::App::quit() { _scheduler.quit(); }
+void cevy::ecs::App::abort() { _scheduler.abort(); }
