@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <asio/error_code.hpp>
 #include <cstdint>
 #include <cstring>
 #include <list>
@@ -28,6 +27,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
             Action         = 4,
             ActionSuccess  = 5,
             ActionFailure  = 6,
+            HandShake      = 7,
         };
         enum class Event : unsigned short {
             Summon         = 1,
@@ -95,7 +95,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 
     protected:
 
-        void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) override
+        void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer, asio::ip::udp::endpoint udp_endpoint) override
         {
             if (bytes < 0)
                 return;
@@ -105,6 +105,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
             if (buffer[0] == (uint8_t)Communication::Event) {
                 return handle_events(bytes, buffer);
             }
+
         }
 
     private:
@@ -114,3 +115,30 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
         std::unordered_map<uint16_t, uint8_t> _summon_recv;
         std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
 };
+
+class cevy::ClientHandler : cevy::CevyNetwork {
+
+    std::string server_ip;
+    float server_ping;
+    //uint16_t session_id;
+
+    public:
+        void handleHandShake(size_t bytes, std::array<uint8_t, 512>& buffer) {
+            //std::cout << "handshake received" << std::endl;
+        }
+
+        // void sendHandShake(uint16_t id, uint8_t archetype) {
+        //     half h = {.h = id};
+        //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
+        //     writeUDP(_summon_send[id], [](){});
+        // }
+
+        void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer, asio::ip::udp::endpoint udp_endpoint) override
+        {
+            if (buffer[0] == (uint8_t)Communication::HandShake) {
+                handleHandShake(bytes, buffer);
+            } else {
+                cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint);
+            }
+        }
+}

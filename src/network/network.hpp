@@ -12,6 +12,7 @@
 namespace cevy {
     class Synchroniser;
     class CevyNetwork;
+    class ClientHandler;
     class NetworkBase;
     using Network = CevyNetwork;
 }

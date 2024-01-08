@@ -158,7 +158,7 @@ class cevy::NetworkBase
         void readUDP() {
             _udp_socket.async_receive_from(
                 asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes){
-                    this->udp_receive(error, bytes, this->_udp_recv);
+                    this->udp_receive(error, bytes, this->_udp_recv, _udp_endpoint);
                     readUDP();
                 }
             );
@@ -171,7 +171,7 @@ class cevy::NetworkBase
             });
         }
 
-        virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer) {
+        virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer, asio::ip::udp::endpoint udp_endpoint) {
             if (!error) {
                 std::cout << "revieved " << bytes << " bytes:" << std::endl;
                 for (size_t i = 0; i < bytes; ++i) {
