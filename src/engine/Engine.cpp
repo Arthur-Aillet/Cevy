@@ -44,8 +44,8 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 }
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
-                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
-                                    cevy::engine::Line, option<cevy::engine::Color>>
+                   cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
+                                    option<cevy::engine::Color>>
                        lines,
                    cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
                                     cevy::engine::Handle<cevy::engine::Mesh>,

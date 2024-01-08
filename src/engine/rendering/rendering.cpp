@@ -15,8 +15,7 @@
 using namespace cevy::engine;
 using namespace cevy;
 
-void render_lines(
-    ecs::Query<option<Position>, Line, option<cevy::engine::Color>> lines) {
+void render_lines(ecs::Query<option<Position>, Line, option<cevy::engine::Color>> lines) {
   for (auto [opt_pos, lines, opt_color] : lines) {
     const Position &pos = opt_pos.value_or(Position(0., 0., 0.));
     const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));

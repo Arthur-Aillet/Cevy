@@ -23,6 +23,6 @@ void render_models(cevy::ecs::Query<option<cevy::engine::Position>, option<cevy:
                                     option<cevy::engine::Color>>
                        models);
 
-void render_lines(cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
-                                   cevy::engine::Line, option<cevy::engine::Color>>
+void render_lines(cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
+                                   option<cevy::engine::Color>>
                       lines);
