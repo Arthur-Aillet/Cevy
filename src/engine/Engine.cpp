@@ -13,9 +13,11 @@
 #include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
+#include "Line.hpp"
 #include "Position.hpp"
 #include "Resource.hpp"
 #include "Rotation.hpp"
+#include "Target.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
@@ -43,17 +45,19 @@ void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
                    cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
+                                    cevy::engine::Line, option<cevy::engine::Color>>
+                       lines,
+                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
                                     cevy::engine::Handle<cevy::engine::Mesh>,
                                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
                                     option<cevy::engine::Color>>
                        models) {
-  DrawGrid(100, 1.0f);
-
   ClearBackground(WHITE);
   for (auto [cam] : cams) {
     BeginMode3D(cam);
     DrawGrid(100, 1.0f);
     render_models(models);
+    render_lines(lines);
     EndMode3D();
   }
   EndDrawing();
@@ -69,6 +73,8 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PostRenderStage>();
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Position>();
+  app.init_component<cevy::engine::Target>();
+  app.init_component<cevy::engine::Line>();
   app.init_component<cevy::engine::Rotation>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());

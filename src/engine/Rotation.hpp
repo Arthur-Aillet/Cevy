@@ -20,5 +20,11 @@ class Rotation : public cevy::engine::Vector {
   float &yaw() { return x; };
   float &pitch() { return y; };
   float &roll() { return z; };
+
+  void operator=(Vector &v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+  }
 };
 } // namespace cevy::engine

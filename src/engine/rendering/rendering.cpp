@@ -7,10 +7,23 @@
 
 #include "rendering.hpp"
 #include "Color.hpp"
+#include "Line.hpp"
+#include "Rotation.hpp"
+#include "cevy.hpp"
 #include "raylib.hpp"
 
 using namespace cevy::engine;
 using namespace cevy;
+
+void render_lines(
+    ecs::Query<option<Position>, Line, option<cevy::engine::Color>> lines) {
+  for (auto [opt_pos, lines, opt_color] : lines) {
+    const Position &pos = opt_pos.value_or(Position(0., 0., 0.));
+    const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));
+
+    DrawCylinderEx(lines.start + pos, lines.end + pos, 0.1, 0.1, 4, (::Color)col);
+  }
+}
 
 void render_models(ecs::Query<option<Position>, option<Rotation>, Handle<engine::Mesh>,
                               option<Handle<Diffuse>>, option<engine::Color>>
