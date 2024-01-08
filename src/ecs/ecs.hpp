@@ -8,7 +8,6 @@
 #pragma once
 
 #include "cevy.hpp"
-
 namespace cevy::ecs {
 class App;
 class Entity;
