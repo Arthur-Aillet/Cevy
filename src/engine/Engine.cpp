@@ -50,19 +50,13 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
   DrawGrid(100, 1.0f);
 
   ClearBackground(WHITE);
-  for (auto cam : cams) {
-    BeginMode3D(std::get<0>(cam));
+  for (auto [cam] : cams) {
+    BeginMode3D(cam);
     DrawGrid(100, 1.0f);
     render_models(models);
     EndMode3D();
   }
   EndDrawing();
-}
-
-void list_pos(cevy::ecs::Query<cevy::engine::Position> pos) {
-  for (auto po : pos) {
-    std::cout << std::get<0>(po).x << std::endl;
-  }
 }
 
 void cevy::engine::Engine::build(cevy::ecs::App &app) {
