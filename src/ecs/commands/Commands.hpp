@@ -45,6 +45,11 @@ class cevy::ecs::Commands {
   cevy::ecs::EntityCommands spawn(Ts... a);
 
   EntityCommands entity(const Entity &e);
+
+  template <class R, class... Args>
+  R system(R (&&func)(Args...)) {
+    return std::forward<R>(_world_access.run_system(func));
+  }
 };
 
 template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>
