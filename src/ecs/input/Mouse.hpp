@@ -9,18 +9,18 @@
 
 #include "Input.hpp"
 
-enum MouseButton {
-  MOUSE_BUTTON_LEFT = 0,
-  MOUSE_BUTTON_RIGHT = 1,
-  MOUSE_BUTTON_MIDDLE = 2,
-  MOUSE_BUTTON_SIDE = 3,
-  MOUSE_BUTTON_EXTRA = 4,
-  MOUSE_BUTTON_FORWARD = 5,
-  MOUSE_BUTTON_BACK = 6,
+enum MouseInput {
+  Mouse_LEFT = 0,
+  Mouse_RIGHT = 1,
+  Mouse_MIDDLE = 2,
+  Mouse_SIDE = 3,
+  Mouse_EXTRA = 4,
+  Mouse_FORWARD = 5,
+  Mouse_BACK = 6,
 };
 
 struct Mouse {
-  MouseButton button;
+  MouseInput button;
   ButtonState state;
 };
 
@@ -34,7 +34,8 @@ struct MouseWheel {
   double horisontal;
 };
 
-class Input<Mouse> {
+template<>
+class cevy::ecs::Input<Mouse> {
   public:
   void update_keys();
   std::map<int, Mouse> just_pressed;

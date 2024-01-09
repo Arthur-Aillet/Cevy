@@ -7,7 +7,8 @@
 
 #include "Keyboard.hpp"
 
-void Input<KeyBoard>::update_keys() {
+template<>
+void cevy::ecs::Input<KeyBoard>::update_keys() {
   int keyval = GetKeyPressed();
   for (auto const &[key, val] : just_pressed) {
     if (pressed.find(key) != pressed.end()) {

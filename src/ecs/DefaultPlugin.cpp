@@ -7,8 +7,8 @@
 
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
-#include "Input/Keyboard.hpp"
-#include "Input/Mouse.hpp"
+#include "input/Keyboard.hpp"
+#include "input/Mouse.hpp"
 #include "Time.hpp"
 #include "ecs.hpp"
 

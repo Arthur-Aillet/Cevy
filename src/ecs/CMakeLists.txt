@@ -19,6 +19,8 @@ target_link_libraries(entity SparseVector)
 
 add_subdirectory(commands)
 
+add_subdirectory(input)
+
 add_library(world
   STATIC
   World.cpp
@@ -37,6 +39,9 @@ add_library(default_plugin
   DefaultPlugin.hpp
   )
 
+set(RAYLIB_FOLDER ${CMAKE_BINARY_DIR}/_deps/raylib-build/raylib/include)
+target_link_libraries(default_plugin input)
+
 add_library(time
   STATIC
   Time.cpp
@@ -52,7 +57,8 @@ add_library(app
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
 add_library(ecs SHARED ${CEVY_HEADERS})
-target_link_libraries(ecs SparseVector world commands app entity schedule default_plugin time)
+target_link_libraries(ecs SparseVector world commands input app entity schedule default_plugin time)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/commands)
+#target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/input)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
