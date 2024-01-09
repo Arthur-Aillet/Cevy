@@ -41,7 +41,7 @@ void render_models(ecs::Query<option<Position>, option<Rotation>, Handle<engine:
                          opt_diffuse.value().get().texture);
     }
     handle.mesh.transform =
-        MatrixRotateXYZ((Vector3){DEG2RAD * rot.x, DEG2RAD * rot.y, DEG2RAD * rot.z});
+        MatrixRotateXYZ((Vector3){DEG2RAD * -rot.y, DEG2RAD * -rot.x, DEG2RAD * rot.z});
     DrawModel(handle.mesh, pos, 2, ray_color);
     if (opt_diffuse) {
       handle.mesh.materialCount = 1;

@@ -14,7 +14,7 @@ class Position : public cevy::engine::Vector {
   using cevy::engine::Vector::Vector;
 
   public:
-  void operator=(Vector &v) {
+  void operator=(const Vector &v) {
     x = v.x;
     y = v.y;
     z = v.z;
