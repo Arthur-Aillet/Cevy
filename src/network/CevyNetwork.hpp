@@ -34,10 +34,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     Summon = 1,
   };
 
-  enum ClientActionResponses {
-    Action_Success = 1,
-    Action_Failure = 2,
-  };
 
   enum ActionFailureValue {
     Action_Unavailable = 1,
@@ -128,12 +124,20 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     _states_recv[id] = vec;
   }
 
-  void handle_action(size_t bytes, std::array<uint8_t, 512> &buffer) {
+  void handle_action_success(size_t bytes, std::array<uint8_t, 512> &buffer) {
     uint64_t id;
     std::memcpy(&id, &buffer[1], sizeof(id));
     std::vector<uint8_t> vec;
     vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
     _actions_recv[id] = vec;
+  }
+
+  void handle_action_failure(size_t bytes, std::array<uint8_t, 512> &buffer) {
+    uint64_t id;
+    uint8_t error_type;
+    std::memcpy(&id, &buffer[1], sizeof(id));
+    std::memcpy(&error_type, &buffer[2], size_t(error_type));
+    _actions_errors[id] = error_type;
   }
 
   using error_code = asio::error_code;
@@ -154,8 +158,11 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     if (buffer[0] == (uint8_t)Communication::State) {
       return handle_state(bytes, buffer);
     }
-    if (buffer[0] == (uint8_t)Communication::Action) {
-      return handle_action(bytes, buffer);
+    if (buffer[0] == (uint8_t)Communication::ActionSuccess) {
+      return handle_action_success(bytes, buffer);
+    }
+    if (buffer[0] == (uint8_t)Communication::ActionFailure) {
+      return handle_action_failure(bytes, buffer);
     }
     if (buffer[0] == (uint8_t)Communication::Event) {
       return handle_events(bytes, buffer);
@@ -168,6 +175,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 
   std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_recv;
   std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_send;
+  std::unordered_map<uint16_t, uint8_t> _actions_errors;
 
   std::unordered_map<uint16_t, uint8_t> _summon_recv;
   std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
