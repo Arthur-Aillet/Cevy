@@ -49,7 +49,7 @@ namespace ecs {};
 namespace engine {};
 
 /// @brief hold physics mechanism, depends on ecs
-namespace physic {};
+namespace physics {};
 
 } // namespace cevy
 

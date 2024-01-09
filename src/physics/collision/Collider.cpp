@@ -13,4 +13,4 @@
 #include <optional>
 #include <tuple>
 
-using namespace cevy::physic;
+using namespace cevy::physics;

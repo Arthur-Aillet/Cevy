@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** physic.hpp
+** physics.hpp
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 #include "Schedule.hpp"
 #include "ecs.hpp"
 
-namespace cevy::physic {
+namespace cevy::physics {
 using namespace cevy::ecs;
 class PhysicsPlugin : public Plugin {
    public:
