@@ -26,12 +26,10 @@ cevy::engine::Camera::operator Camera3D *() { return &this->camera; }
 
 cevy::engine::Camera::operator Camera3D() const { return this->camera; }
 
-void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>,
-                                    option<cevy::engine::Rotation>, option<cevy::engine::Target>>
+void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>, option<cevy::engine::Target>>
                        cams) {
-  for (auto [cam, opt_pos, opt_rot, opt_target] : cams) {
+  for (auto [cam, opt_pos, opt_target] : cams) {
     const auto &pos = opt_pos.value_or(cevy::engine::Position(0., 0., 0.));
-    const auto &rot = opt_rot.value_or(cevy::engine::Rotation(0., 0., 0.));
 
     cam.camera.position = pos;
 

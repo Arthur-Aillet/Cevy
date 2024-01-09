@@ -8,9 +8,11 @@
 #include "rendering.hpp"
 #include "Color.hpp"
 #include "Line.hpp"
-#include "Rotation.hpp"
+#include "Transform.hpp"
 #include "cevy.hpp"
 #include "raylib.hpp"
+#include <raylib.h>
+#include <raymath.h>
 
 using namespace cevy::engine;
 using namespace cevy;
@@ -24,12 +26,20 @@ void render_lines(ecs::Query<option<Position>, Line, option<cevy::engine::Color>
   }
 }
 
-void render_models(ecs::Query<option<Position>, option<Rotation>, Handle<engine::Mesh>,
+static void render_model(const Model& model, Matrix transform)
+{
+  transform = MatrixMultiply(model.transform, transform);
+  for (int i = 0; i < model.meshCount; ++i) {
+    DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], transform);
+  }
+}
+
+void render_models(ecs::Query<option<Position>, option<engine::Transform>, Handle<engine::Mesh>,
                               option<Handle<Diffuse>>, option<engine::Color>>
                        models) {
-  for (auto [opt_pos, opt_rot, mesh, opt_diffuse, opt_color] : models) {
+  for (auto [opt_pos, opt_tm, mesh, opt_diffuse, opt_color] : models) {
     const Position &pos = opt_pos.value_or(Position(0., 0., 0.));
-    const Rotation &rot = opt_rot.value_or(Rotation(0., 0., 0.));
+    const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform(pos));
     auto &handle = mesh.get();
     ::Color ray_color;
     if (opt_color) {
@@ -40,9 +50,7 @@ void render_models(ecs::Query<option<Position>, option<Rotation>, Handle<engine:
       SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE,
                          opt_diffuse.value().get().texture);
     }
-    handle.mesh.transform =
-        MatrixRotateXYZ((Vector3){DEG2RAD * -rot.y, DEG2RAD * -rot.x, DEG2RAD * rot.z});
-    DrawModel(handle.mesh, pos, 2, ray_color);
+    render_model(handle.mesh, tm);
     if (opt_diffuse) {
       handle.mesh.materialCount = 1;
       handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));

@@ -16,8 +16,8 @@
 #include "Line.hpp"
 #include "Position.hpp"
 #include "Resource.hpp"
-#include "Rotation.hpp"
 #include "Target.hpp"
+#include "Transform.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
@@ -47,7 +47,7 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
                    cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
                                     option<cevy::engine::Color>>
                        lines,
-                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
+                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Transform>,
                                     cevy::engine::Handle<cevy::engine::Mesh>,
                                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
                                     option<cevy::engine::Color>>
@@ -55,7 +55,7 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
   ClearBackground(WHITE);
   for (auto [cam] : cams) {
     BeginMode3D(cam);
-    // DrawGrid(100, 1.0f);
+    DrawGrid(100, 1.0f);
     render_models(models);
     render_lines(lines);
     EndMode3D();
@@ -75,7 +75,7 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_component<cevy::engine::Position>();
   app.init_component<cevy::engine::Target>();
   app.init_component<cevy::engine::Line>();
-  app.init_component<cevy::engine::Rotation>();
+  app.init_component<cevy::engine::Transform>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
