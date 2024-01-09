@@ -9,6 +9,7 @@
 #include "App.hpp"
 #include "input/Keyboard.hpp"
 #include "input/Mouse.hpp"
+#include "Event.hpp"
 #include "Time.hpp"
 #include "ecs.hpp"
 
@@ -26,8 +27,6 @@ void init_default_schedules(cevy::ecs::App &app) {
   app.add_stage<Schedule::Last>();
 }
 
-void init_timer(cevy::ecs::World &w) { w.insert_resource<cevy::ecs::Time>(cevy::ecs::Time()); }
-
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
   app.insert_resource(cevy::ecs::Control{.abort = false});
@@ -35,4 +34,5 @@ void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   app.insert_resource(Input<KeyBoard>());
   app.insert_resource(Input<Mouse>());
   app.add_system<cevy::ecs::Schedule::PreUpdate>(update_all_inputs);
+  app.add_system<cevy::ecs::Schedule::First>(update_timer);
 }

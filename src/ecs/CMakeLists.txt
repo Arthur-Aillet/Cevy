@@ -5,6 +5,8 @@
 ## ecs-cmake
 ##
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_library(SparseVector
   STATIC
   SparseVector.cpp
@@ -13,9 +15,12 @@ add_library(SparseVector
 add_library(entity
   STATIC
   Entity.cpp
+  Entity.hpp
   )
 
 target_link_libraries(entity SparseVector)
+
+include_directories(PUBLIC . ./commands ../)
 
 add_subdirectory(commands)
 
