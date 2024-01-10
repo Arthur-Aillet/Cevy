@@ -321,11 +321,6 @@ class cevy::ecs::World {
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
                is_event_reader<Args>, is_event_writer<Args>>()...),
         "type must be reference to query, world, commands, event reader, event writer or resource");
-#ifdef DEBUG
-    if (!schedule_defined<S>()) {
-      std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
-    }
-#endif
     auto sys = [&func, this]() mutable {
       func(get_super<Args>(0)...);
     };
