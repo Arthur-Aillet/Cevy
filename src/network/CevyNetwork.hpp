@@ -9,9 +9,7 @@
 
 #include <cstdint>
 #include <cstring>
-#include <list>
 #include <optional>
-#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -141,4 +139,4 @@ class cevy::ClientHandler : cevy::CevyNetwork {
                 cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint);
             }
         }
-}
+};

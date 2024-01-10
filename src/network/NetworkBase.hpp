@@ -21,36 +21,32 @@
 #include <vector>
 #include <stdint.h>
 
-// #include "../entity.hpp"
 #include "../ecs/SparseVector.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
 #include "network.hpp"
 
-/**NOTE - Utiliser des templates pour envoyer les données
- * prend donc n'importe qu'elle type en entré (on doit créer un prototype de la fonction pour chaque type possible)
- * sérializer l'objet avec devant son type (typeid())
- * cela permet de connaitre le type de l'objet a déserializer
- * recevoire l'objet serializer
- * prendre une taille fixe de la string envoyer pour retrouver le type de l'objet
- * deserialzer l'objet dans le type trouvée
-*/
-
 class cevy::NetworkBase
 {
     using tcp = asio::ip::tcp;
     using udp = asio::ip::udp;
 
-    class TcpConnexion
-    {
-        public:
-            tcp::socket socket;
-            std::string buffer;
+    public:
+        enum NetworkMode {
+            Server,
+            Client,
+        };
 
-            TcpConnexion(asio::io_context &socket) : socket(socket) {}
-            // ~TcpConnexion() {};
-    };
+        class TcpConnexion
+        {
+            public:
+                tcp::socket socket;
+                std::string buffer;
+
+                TcpConnexion(asio::io_context &socket) : socket(socket) {}
+                // ~TcpConnexion() {};
+        };
 
     private:
         template <typename Component>
@@ -98,18 +94,20 @@ class cevy::NetworkBase
             TcpConnexion tcp_connexion(io_context);
             tcp::acceptor tcp_acceptor(io_context, tcp::endpoint(tcp::v4(), 999));
             tcp_acceptor.async_accept(tcp_connexion.socket, [this, &io_context, &tcp_connexion](){
+                std::cout << "new tcp connexion accepted to the server" << std::endl; // REVIEW - debug message
                 _tcp_connexions.push_back(std::move(tcp_connexion));
                 tcp_accept_new_connexion(io_context);
             });
         }
 
-        void start_server() {
+        static void start_server() {
             asio::io_context io_context;
-            // tcp::socket tcp_socket(io_context, tcp::endpoint(tcp::v4(), 999));
-            tcp_accept_new_connexion(io_context);
 
             udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 13));
+
+            tcp::socket tcp_socket(io_context, tcp::endpoint(tcp::v4(), 999));
             NetworkBase server = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
+            server.tcp_accept_new_connexion(io_context);
             std::cout << "setting up read;" << std::endl;
             server.readUDP();
             std::cout << "running" << std::endl;
@@ -127,8 +125,8 @@ class cevy::NetworkBase
             udp::socket udp_socket(io_context);
             udp_socket.open(udp::v4());
             tcp::socket tcp_socket(io_context);
-            tcp::endpoint tcp_endpoint(asio::ip::address::from_string("127.0.0.1"), 999); // NOTE - ip to change
-            tcp_socket.connect(tcp_endpoint); // NOTE - actually sync, easier to test
+            tcp::endpoint tcp_endpoint(asio::ip::address::from_string("127.0.0.1"), 999); // REVIEW - ip to change
+            tcp_socket.connect(tcp_endpoint); // REVIEW - actually sync, easier to test
             NetworkBase client = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
             client._udp_endpoint = receiver_endpoint;
             while (std::cin.good()) {
@@ -172,7 +170,7 @@ class cevy::NetworkBase
             _nw_thread = std::thread([this](){while (!this->quit) this->_io_context.run();});
         }
 
-        NetworkBase(size_t port)
+        NetworkBase(NetworkMode mode, size_t port)
             :   _udp_endpoint(udp::v4(), port),
                 _tcp_endpoint(tcp::v4(), port),
                 _udp_socket(_io_context),
@@ -180,6 +178,10 @@ class cevy::NetworkBase
         {
             _udp_socket.open(udp::v4());
             _tcp_socket.open(tcp::v4());
+
+            if (mode == NetworkMode::Server) {
+                tcp_accept_new_connexion(_io_context);
+            }
 
 
             _nw_thread = std::thread([this](){while (!this->quit) this->_io_context.run();});
