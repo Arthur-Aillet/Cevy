@@ -8,6 +8,7 @@
 #pragma once
 
 #include <asio/error_code.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <list>
@@ -29,8 +30,26 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     ActionSuccess = 5,
     ActionFailure = 6,
   };
+
   enum class Event : unsigned short {
     Summon = 1,
+  };
+
+
+  enum ActionFailureValue {
+    Action_Unavailable = 1,
+    Action_Disabled = 2,
+    Action_Error = 3,
+    Action_Waiting = 4,
+    Action_Delayed = 5,
+    Busy = 6,
+  };
+
+  enum class ClientActions : short int {
+    Connection = 1,
+    Choose_Skine = 2,
+    Lobby_Connection = 3,
+    Move = 4,
   };
 
   CevyNetwork(const std::string &endpoint, size_t port) : NetworkBase(endpoint, port){};
@@ -45,6 +64,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 
     return p[n];
   };
+
+//----------------------------------- State -----------------------------------
 
   void sendState(uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
@@ -63,6 +84,27 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     return std::nullopt;
   }
 
+//----------------------------------- Action -----------------------------------
+
+  void sendAction(uint16_t id, const std::vector<uint8_t> &block) {
+    std::vector<uint8_t> fullblock = { uint8_t(Communication::Action), byte(id, 0), byte(id, 1) };
+    fullblock.insert(fullblock.end(), block.begin(), block.end());
+    _actions_send[id] = fullblock;
+    writeUDP(_actions_send[id], [this, id] { _actions_send.erase(id); });
+  }
+
+  std::optional<std::vector<uint8_t>> recvAction(uint16_t id) {
+    const auto &it = _actions_recv.find(id);
+    if (it != _actions_recv.end()) {
+      auto ret = it->second;
+      _actions_recv.erase(id);
+      return std::move(ret);
+    }
+    return std::nullopt;
+  }
+
+//----------------------------------- Summon -----------------------------------
+
   std::unordered_map<uint16_t, uint8_t> &recvSummon() { return _summon_recv; }
 
   void sendSummon(uint16_t id, uint8_t archetype) {
@@ -72,6 +114,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     writeUDP(_summon_send[id], [this, id]() { _summon_send.erase(id); });
   }
 
+
+
   private:
   void handle_state(size_t bytes, std::array<uint8_t, 512> &buffer) {
     uint64_t id;
@@ -79,6 +123,14 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     std::vector<uint8_t> vec;
     vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
     _states_recv[id] = vec;
+  }
+
+  void handle_action(size_t bytes, std::array<uint8_t, 512> &buffer) {
+    uint64_t id;
+    std::memcpy(&id, &buffer[1], sizeof(id));
+    std::vector<uint8_t> vec;
+    vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
+    _actions_recv[id] = vec;
   }
 
   using error_code = asio::error_code;
@@ -99,6 +151,11 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     if (buffer[0] == (uint8_t)Communication::State) {
       return handle_state(bytes, buffer);
     }
+    if (buffer[0] == (uint8_t)Communication::ActionSuccess ||
+        buffer[0] == (uint8_t)Communication::ActionFailure ||
+        buffer[0] == (uint8_t)Communication::Action) {
+      return handle_action(bytes, buffer);
+    }
     if (buffer[0] == (uint8_t)Communication::Event) {
       return handle_events(bytes, buffer);
     }
@@ -107,6 +164,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   private:
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
+
+  std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_recv;
+  std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_send;
 
   std::unordered_map<uint16_t, uint8_t> _summon_recv;
   std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
