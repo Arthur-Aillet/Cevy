@@ -17,19 +17,11 @@
 /**
  * @brief A container of app logic and data.
  *
- * Bundles together the necessary elements like World and Schedule to create an ECS-based
+ * Bundles together the necessary elements like data management with World (derived from) and processes management with Schedule (contained) to create an ECS-based
  * application.
- *
- * @warning For now App derive from the class World instead of containing a World, this is up to
- * change
  *
  */
 class cevy::ecs::App : public cevy::ecs::World {
-  public:
-  using World::ComponentId;
-  using system = Schedule::system;
-  // TODO: refactor to has-a ? Change App description
-  //  World world;
   private:
   /**
    * @brief Schedule represent the manager of Systems and \link cevy::ecs::Schedule::Stage
