@@ -81,7 +81,7 @@ class cevy::ecs::World {
   using command = std::function<void(World &)>;
   using component_data = std::tuple<std::any, erase_access>;
 
-  friend class cevy::ecs::Schedule;
+  friend class cevy::ecs::Scheduler;
   friend class cevy::ecs::Commands;
 
   private:

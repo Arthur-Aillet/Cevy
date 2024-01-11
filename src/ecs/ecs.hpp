@@ -9,11 +9,12 @@
 
 #include "cevy.hpp"
 
-namespace cevy::ecs {
+namespace cevy {
+namespace ecs {
 class App;
 class Entity;
 class Plugin;
-class Schedule;
+class Scheduler;
 class Commands;
 class Command;
 class EntityCommands;
@@ -23,4 +24,5 @@ template <typename Content>
 class Resource;
 template <class... Containers>
 class Query;
-} // namespace cevy::ecs
+} // namespace ecs
+} // namespace cevy

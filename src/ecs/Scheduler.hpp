@@ -2,10 +2,11 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** Schedule
+** Scheduler
 */
 
 #pragma once
+
 #include <algorithm>
 #include <functional>
 #include <list>
@@ -15,6 +16,7 @@
 #include <typeindex>
 
 #include "Event.hpp"
+#include "Stage.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
@@ -23,47 +25,7 @@ namespace cevy::ecs {
 typedef struct AppExit {
 } AppExit;
 
-class Schedule {
-  public:
-  struct IsStage {};
-
-  template <typename Before = std::nullopt_t, typename After = std::nullopt_t,
-            typename Repeat = std::true_type>
-  class Stage : public IsStage {
-    public:
-    using is_repeat = Repeat;
-    using previous = Before;
-    using next = After;
-
-    template <typename T>
-    using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
-
-    template <typename T>
-    using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
-  };
-
-  template <typename T>
-  using before = Stage<>::before<T>;
-  template <typename T>
-  using after = Stage<>::after<T>;
-
-  using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
-
-  class Startup : public at_start {};
-  class PreStartup : public before<Startup> {};
-  class PostStartup : public after<Startup> {};
-
-  class First : public Stage<> {};
-
-  class Update : public after<First> {};
-  class PreUpdate : public before<Update> {};
-  class PostUpdate : public after<Update> {};
-
-  class StateTransition : public before<Update> {};
-  class RunFixedUpdateLoop : public before<Update> {};
-
-  class Last : public after<PostUpdate> {};
-
+class Scheduler {
   using SystemId = size_t;
 
   private:
@@ -130,8 +92,8 @@ class Schedule {
   using system_function = std::function<void(World &)>;
   using system = std::tuple<system_function, std::type_index>;
   std::vector<system> _systems;
-  Schedule() : _stage(_at_start_schedule.begin()){};
-  ~Schedule() = default;
+  Scheduler() : _stage(_at_start_schedule.begin()){};
+  ~Scheduler() = default;
 
   void quit() const;
   void abort();

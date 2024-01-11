@@ -10,7 +10,7 @@
 #include <memory>
 
 #include "Plugin.hpp"
-#include "Schedule.hpp"
+#include "Scheduler.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
@@ -18,17 +18,17 @@
  * @brief A container of app logic and data.
  *
  * Bundles together the necessary elements like data management with World (derived from) and
- * processes management with Schedule (contained) to create an ECS-based application.
+ * processes management with Scheduler (contained) to create an ECS-based application.
  *
  */
 class cevy::ecs::App : public cevy::ecs::World {
   private:
   /**
-   * @brief Schedule represent the manager of Systems and \link cevy::ecs::Schedule::Stage
+   * @brief Scheduler represent the manager of Systems and \link cevy::ecs::Stage
    * Stages\endlink.
    *
    */
-  Schedule _scheduler;
+  Scheduler _scheduler;
   /**
    * @brief Store plugins
    *
@@ -74,19 +74,19 @@ class cevy::ecs::App : public cevy::ecs::World {
   }
 
   /**
-   * @brief Starts the application, launch the \link cevy::ecs::Schedule::Stage Stages\endlink and
+   * @brief Starts the application, launch the \link cevy::ecs::Stage Stages\endlink and
    * Systems loop
    */
   void run();
 
   /**
-   * @brief Add a stage to the pile of \link cevy::ecs::Schedule::Stage Stages\endlink.
-   * Each systems are assigned to a specific stage (\link cevy::ecs::Schedule::Update Update\endlink
-   * by Default) and are run in the stage order Look at \link cevy::ecs::Schedule::Stage Stage
+   * @brief Add a stage to the pile of \link cevy::ecs::Stage Stages\endlink.
+   * Each systems are assigned to a specific stage (\link cevy::ecs::Scheduler::Update
+   * Update\endlink by Default) and are run in the stage order Look at \link cevy::ecs::Stage Stage
    * \endlink to understand how to insert a stages in a given order
    *
    * @tparam Stage
-   * Have to be made from the \link cevy::ecs::Schedule::Stage Stage \endlink struct.
+   * Have to be made from the \link cevy::ecs::Stage Stage \endlink struct.
    */
   template <typename Stage>
   void add_stage() {
@@ -94,8 +94,8 @@ class cevy::ecs::App : public cevy::ecs::World {
   }
 
   /**
-   * @brief Move one or multiple systems in this app’s \link cevy::ecs::Schedule::Update
-   * Update\endlink Schedule.
+   * @brief Move one or multiple systems in this app’s \link cevy::ecs::Scheduler::Update
+   * Update\endlink Scheduler.
    *
    * @tparam System Could be any thing that have the Operator `()` implemented
    * @param system
@@ -107,7 +107,7 @@ class cevy::ecs::App : public cevy::ecs::World {
 
   /**
    * @brief Move one or multiple systems to the given schedule in this app’s \link
-   * cevy::ecs::Schedule Schedules\endlink.
+   * cevy::ecs::Scheduler Schedules\endlink.
    *
    * @tparam System Could be any thing that have the Operator `()` implemented
    * @param system
