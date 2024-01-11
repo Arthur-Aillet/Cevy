@@ -97,6 +97,9 @@ class cevy::ecs::App : public cevy::ecs::World {
    * @brief Move one or multiple systems in this app’s \link cevy::ecs::Scheduler::Update
    * Update\endlink Scheduler.
    *
+   * @warning If the Update Stage haven't been instancited, by hand or with DefaultPlugins
+   * this command will raise a warning and won't do anything until Update is instanciated
+   *
    * @tparam System Could be any thing that have the Operator `()` implemented
    * @param system
    */
