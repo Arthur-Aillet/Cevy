@@ -101,7 +101,6 @@ class cevy::ecs::App : public cevy::ecs::World {
    * this command will raise a warning and won't do anything until Update is instanciated
    *
    * @tparam System Could be any thing that have the Operator `()` implemented
-   * @param system
    */
   template <class... System>
   void add_systems(System &&...system) {
@@ -113,7 +112,6 @@ class cevy::ecs::App : public cevy::ecs::World {
    * cevy::ecs::Scheduler Schedules\endlink.
    *
    * @tparam System Could be any thing that have the Operator `()` implemented
-   * @param system
    */
   template <class Stage, class... System>
   void add_systems(System &&...system) {

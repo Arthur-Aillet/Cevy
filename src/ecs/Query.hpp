@@ -178,7 +178,6 @@ class cevy::ecs::Query {
   }
 
   private:
-  public:
   size_t _size;
   iterator _begin;
   iterator _end;
