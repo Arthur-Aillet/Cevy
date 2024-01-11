@@ -10,7 +10,7 @@
 #include "Time.hpp"
 
 void init_default_schedules(cevy::ecs::App &app) {
-  using namespace cevy::ecs;
+  using namespace cevy::ecs::core_stage;
 
   app.add_stage<Startup>();
   app.add_stage<PreStartup>();
@@ -26,6 +26,6 @@ void init_default_schedules(cevy::ecs::App &app) {
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
   app.add_event<AppExit>();
-  app.add_systems<cevy::ecs::PostStartup>(init_timer);
-  app.add_systems<cevy::ecs::First>(update_timer);
+  app.add_systems<cevy::ecs::core_stage::PostStartup>(init_timer);
+  app.add_systems<cevy::ecs::core_stage::First>(update_timer);
 }

@@ -100,7 +100,7 @@ class Scheduler {
 
   template <class R, class... Args>
   void add_system(R (&&func)(Args...)) {
-    add_system<Update>(func);
+    add_system<core_stage::Update>(func);
   }
 
   template <class S, class R, class... Args>

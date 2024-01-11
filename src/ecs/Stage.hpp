@@ -12,6 +12,10 @@
 
 namespace cevy::ecs {
 /**
+ * @brief Hold the stage utilities and base stages
+ */
+namespace core_stage {
+/**
  * @brief Base class for Stage used as Id for type checking
  */
 struct IsStage {};
@@ -112,4 +116,5 @@ class StateTransition : public before<Update> {};
 class RunFixedUpdateLoop : public before<Update> {};
 
 class Last : public after<PostUpdate> {};
+} // namespace core_stage
 } // namespace cevy::ecs
