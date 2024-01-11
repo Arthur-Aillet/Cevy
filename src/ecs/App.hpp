@@ -17,8 +17,8 @@
 /**
  * @brief A container of app logic and data.
  *
- * Bundles together the necessary elements like data management with World (derived from) and processes management with Schedule (contained) to create an ECS-based
- * application.
+ * Bundles together the necessary elements like data management with World (derived from) and
+ * processes management with Schedule (contained) to create an ECS-based application.
  *
  */
 class cevy::ecs::App : public cevy::ecs::World {
