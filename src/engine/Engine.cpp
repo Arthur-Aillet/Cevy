@@ -13,10 +13,10 @@
 #include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
+#include "Event.hpp"
 #include "Position.hpp"
-#include "Resource.hpp"
 #include "Rotation.hpp"
-#include "World.hpp"
+#include "Schedule.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
 #include "raylib.hpp"
@@ -36,9 +36,9 @@ void init_window() {
   rlImGuiSetup(true);
 }
 
-void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
+void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
   if (WindowShouldClose())
-    control.get().abort = true;
+    close.send(cevy::ecs::AppExit{});
 }
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,

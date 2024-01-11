@@ -45,15 +45,9 @@ struct is_world<const cevy::ecs::World &> : public std::true_type {};
 template <typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
 
-namespace cevy {
-namespace ecs {
+namespace cevy::ecs {
 class Commands;
-
-struct Control {
-  bool abort;
-};
-} // namespace ecs
-} // namespace cevy
+} // namespace cevy::ecs
 
 template <class T>
 struct is_commands : public std::false_type {};
@@ -89,7 +83,10 @@ class cevy::ecs::World {
 
   friend class cevy::ecs::Schedule;
   friend class cevy::ecs::Commands;
+
+  private:
   std::queue<command> _command_queue;
+
   /* Bevy-compliant */
   public:
   /// @brief Id refering to a specific component

@@ -18,7 +18,15 @@
 #include "World.hpp"
 #include "ecs.hpp"
 
-class cevy::ecs::Schedule {
+namespace cevy::ecs {
+
+typedef struct AppExit {
+} AppExit;
+
+typedef struct AppAbort {
+} AppAbort;
+
+class Schedule {
   public:
   struct IsStage {};
 
@@ -169,3 +177,4 @@ class cevy::ecs::Schedule {
   public:
   void run(World &world);
 };
+} // namespace cevy::ecs

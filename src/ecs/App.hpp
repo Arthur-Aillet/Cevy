@@ -17,7 +17,8 @@
 /**
  * @brief A container of app logic and data.
  *
- * Bundles together the necessary elements like World and Schedule to create an ECS-based application.
+ * Bundles together the necessary elements like World and Schedule to create an ECS-based
+ * application.
  */
 class cevy::ecs::App : public cevy::ecs::World {
   public:
@@ -30,7 +31,6 @@ class cevy::ecs::App : public cevy::ecs::World {
   std::vector<std::shared_ptr<Plugin>> _plugins;
 
   private:
-
   /**
    * @brief Add a Plugin.
    *

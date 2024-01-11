@@ -6,6 +6,7 @@
 */
 
 #include "Schedule.hpp"
+#include "Event.hpp"
 #include "World.hpp"
 
 using cevy::ecs::Schedule;
@@ -47,15 +48,14 @@ void Schedule::run(World &world) {
       world._command_queue.pop();
       func(world);
     }
-    auto c = world.get_resource<Control>();
-    if (c && c.value().get().abort)
-      abort();
+    auto close = world.get_resource<Event<AppExit>>();
+    auto abort = world.get_resource<Event<AppAbort>>();
+    if (close && close.value().get().event_queue.size() > 0) {
+      _stop = true;
+    }
+    if (abort && abort.value().get().event_queue.size() > 0) {
+      _stop = true;
+      _abort = true;
+    }
   }
-}
-
-void Schedule::quit() const { _stop = true; }
-
-void Schedule::abort() {
-  _abort = true;
-  _stop = true;
 }
