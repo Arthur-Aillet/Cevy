@@ -10,10 +10,11 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
+#include <algorithm>
 
+#include "Pointer.hpp"
 #include "Vector.hpp"
 #include "cevy.hpp"
-#include "Pointer.hpp"
 
 namespace cevy {
 namespace engine {
@@ -81,6 +82,11 @@ class cevy::engine::Transform {
     return {v.x, v.y, v.z};
   }
 
+  Vector xyz() const {
+    const Matrix &m = *this;
+    return { m.m12, m.m13, m.m14 };
+  }
+
   Vector fwd() const {
     Vector3 v{0, 0, 1};
     v = Vector3Transform(v, *this);
@@ -105,6 +111,64 @@ class cevy::engine::Transform {
   }
 
   protected:
+  template<typename F>
+  Transform &map(F f) {
+    _m.m0  = f(_m.m0);
+    _m.m1  = f(_m.m1);
+    _m.m2  = f(_m.m2);
+    _m.m3  = f(_m.m3);
+    _m.m4  = f(_m.m4);
+    _m.m5  = f(_m.m5);
+    _m.m6  = f(_m.m6);
+    _m.m7  = f(_m.m7);
+    _m.m8  = f(_m.m8);
+    _m.m9  = f(_m.m9);
+    _m.m10 = f(_m.m10);
+    _m.m11 = f(_m.m11);
+    _m.m12 = f(_m.m12);
+    _m.m13 = f(_m.m13);
+    _m.m14 = f(_m.m14);
+    _m.m15 = f(_m.m15);
+    return *this;
+  }
+
+  template<typename F, typename... T>
+  static Transform map(F f, T... t) {
+    Transform ret;
+    ret._m.m0  = f(t._m.m0...);
+    ret._m.m1  = f(t._m.m1...);
+    ret._m.m2  = f(t._m.m2...);
+    ret._m.m3  = f(t._m.m3...);
+    ret._m.m4  = f(t._m.m4...);
+    ret._m.m5  = f(t._m.m5...);
+    ret._m.m6  = f(t._m.m6...);
+    ret._m.m7  = f(t._m.m7...);
+    ret._m.m8  = f(t._m.m8...);
+    ret._m.m9  = f(t._m.m9...);
+    ret._m.m10 = f(t._m.m10...);
+    ret._m.m11 = f(t._m.m11...);
+    ret._m.m12 = f(t._m.m12...);
+    ret._m.m13 = f(t._m.m13...);
+    ret._m.m14 = f(t._m.m14...);
+    ret._m.m15 = f(t._m.m15...);
+    return ret;
+  }
+
+  static Transform lerp(const Transform& a, const Transform& b, float s) {
+    Transform a1 = a;
+    Transform b1 = b;
+
+    a1.map([s](float x) -> float { return x * (1 - s); });
+    b1.map([s](float x) -> float { return x * s; });
+
+    a1 = Transform::map([](auto a, auto b){return a + b;}, a1, b1);
+    return a1;
+  }
+
+  float determinant() const {
+    return MatrixDeterminant(_m);
+  }
+
   inline void invalidate() const { _cache_validity = false; }
 
   inline bool cache_valid() const {
