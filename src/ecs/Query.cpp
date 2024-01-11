@@ -2,7 +2,5 @@
 ** Agartha-Software, 2023
 ** C++evy
 ** File description:
-** SparseVector
+** Queries
 */
-
-#include "./SparseVector.hpp"
