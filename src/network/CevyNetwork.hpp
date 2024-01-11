@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <array>
 #include <asio/error_code.hpp>
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +23,8 @@
 
 class cevy::CevyNetwork : protected cevy::NetworkBase {
   public:
-  enum class Communication {
+  struct Communication {
+  enum ECommunication {
     State = 1,
     StateRequest = 2,
     Event = 3,
@@ -30,13 +32,17 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     ActionSuccess = 5,
     ActionFailure = 6,
   };
-
-  enum class Event : unsigned short {
-    Summon = 1,
   };
 
+  struct Event {
+  enum EEvent : uint16_t {
+    Summon = 1,
+    FREE,
+  };
+  };
 
-  enum ActionFailureValue {
+  struct ActionFailureValue {
+  enum EActionFailureValue {
     Action_Unavailable = 1,
     Action_Disabled = 2,
     Action_Error = 3,
@@ -44,12 +50,16 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     Action_Delayed = 5,
     Busy = 6,
   };
+  };
 
-  enum class ClientActions : short int {
+  struct ClientActions {
+  enum EClientActions : short int {
     Connection = 1,
     Choose_Skine = 2,
     Lobby_Connection = 3,
     Move = 4,
+    FREE,
+  };
   };
 
   CevyNetwork(const std::string &endpoint, size_t port) : NetworkBase(endpoint, port){};
@@ -77,71 +87,85 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
     const auto &it = _states_recv.find(id);
     if (it != _states_recv.end()) {
-      auto ret = it->second;
+      auto ret = std::move(it->second);
       _states_recv.erase(id);
+      ret.erase(ret.begin(), ret.begin() + 2);
       return std::move(ret);
     }
     return std::nullopt;
   }
+
+//----------------------------------- State -----------------------------------
+
+  void sendEvent(uint16_t id, const std::vector<uint8_t> &block) {
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::Event), byte(id, 0), byte(id, 1)};
+    fullblock.insert(fullblock.end(), block.begin(), block.end());
+    auto it = _events_send.emplace(_events_send.begin(), fullblock);
+    writeUDP(*it, [this, it]() { _events_send.erase(it); });
+  }
+
+  // std::optional<std::vector<uint8_t>> recvEvent(uint16_t id) {
+  //   const auto &it = std::find_if(_events_recv.begin(), _events_recv.end(),
+  //     [id](std::vector<uint8_t>& a) { return a[0] == byte(id, 0) && a[1] == byte(id, 1);});
+  //   if (it != _events_recv.end()) {
+  //     auto ret = std::move(*it);
+  //     _events_recv.erase(it);
+  //     ret.erase(ret.begin(), ret.begin() + 2);
+  //     return std::move(ret);
+  //   }
+  //   return std::nullopt;
+  // }
+
 
 //----------------------------------- Action -----------------------------------
 
   void sendAction(uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = { uint8_t(Communication::Action), byte(id, 0), byte(id, 1) };
     fullblock.insert(fullblock.end(), block.begin(), block.end());
-    _actions_send[id] = fullblock;
-    writeUDP(_actions_send[id], [this, id] { _actions_send.erase(id); });
+    auto it = _events_send.emplace(_actions_send.begin(), fullblock);
+    writeUDP(*it, [this, it] { _actions_send.erase(it); });
   }
 
-  std::optional<std::vector<uint8_t>> recvAction(uint16_t id) {
-    const auto &it = _actions_recv.find(id);
-    if (it != _actions_recv.end()) {
-      auto ret = it->second;
-      _actions_recv.erase(id);
-      return std::move(ret);
-    }
-    return std::nullopt;
-  }
+  // std::optional<std::vector<uint8_t>> recvAction(uint16_t id) {
+  //   const auto &it = std::find_if(_actions_recv.begin(), _actions_recv.end(),
+  //     [id](std::vector<uint8_t>& a) { return a[0] == byte(id, 0) && a[1] == byte(id, 1);});
+
+  //   if (it != _actions_recv.end()) {
+  //     auto ret = std::move(*it);
+  //     _actions_recv.erase(it);
+  //     ret.erase(ret.begin(), ret.begin() + 2);
+  //     return std::move(ret);
+  //   }
+  //   return std::nullopt;
+  // }
 
 //----------------------------------- Summon -----------------------------------
 
-  std::unordered_map<uint16_t, uint8_t> &recvSummon() { return _summon_recv; }
-
   void sendSummon(uint16_t id, uint8_t archetype) {
     half h = {.h = id};
-    std::vector<uint8_t> fullblock = {h.b.b0, h.b.b1, archetype};
-    _summon_send[id] = fullblock;
-    writeUDP(_summon_send[id], [this, id]() { _summon_send.erase(id); });
+    std::vector<uint8_t> fullblock = {byte(id, 0), byte(id, 1), archetype};
+    sendEvent(Event::Summon, fullblock);
   }
-
-
 
   private:
   void handle_state(size_t bytes, std::array<uint8_t, 512> &buffer) {
     uint64_t id;
     std::memcpy(&id, &buffer[1], sizeof(id));
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
+    vec.insert(vec.begin(), buffer.begin() + 3, buffer.begin() + bytes - 3);
     _states_recv[id] = vec;
   }
 
   void handle_action(size_t bytes, std::array<uint8_t, 512> &buffer) {
-    uint64_t id;
-    std::memcpy(&id, &buffer[1], sizeof(id));
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin() + 2, buffer.begin() + bytes - 3);
-    _actions_recv[id] = vec;
+    vec.insert(vec.begin(), buffer.begin(), buffer.begin() + bytes);
+    _actions_recv.push_front(vec);
   }
 
-  using error_code = asio::error_code;
-
   void handle_events(size_t bytes, std::array<uint8_t, 512> &buffer) {
-    half h = {.b = {buffer[1], buffer[2]}};
-    if (h.h == static_cast<uint16_t>(Event::Summon)) {
-      uint16_t id = h.h;
-      uint8_t archetype = buffer[3];
-      _summon_recv[id] = archetype;
-    }
+    std::vector<uint8_t> vec;
+    vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes - 1);
+    _events_recv.push_front(vec);
   }
 
   protected:
@@ -162,12 +186,18 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   }
 
   private:
+  // the data part contains only pure state data
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
 
-  std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_recv;
-  std::unordered_map<uint16_t, std::vector<uint8_t>> _actions_send;
+  using data_list = std::list<std::vector<uint8_t>>;
 
-  std::unordered_map<uint16_t, uint8_t> _summon_recv;
-  std::unordered_map<uint16_t, std::vector<uint8_t>> _summon_send;
+  // the data part contains the action status as 1 byte
+  // and the name_descriptor/id data, as a prefix of 2 bytes
+  data_list _actions_recv;
+  data_list _actions_send;
+
+  // the data part contains the name_descriptor/id data, as a prefix of 2 bytes
+  data_list _events_recv;
+  data_list _events_send;
 };
