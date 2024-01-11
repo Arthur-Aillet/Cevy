@@ -25,6 +25,7 @@
 #include "asio/io_context.hpp"
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
+#include "asio/read.hpp"
 #include "network.hpp"
 
 class cevy::NetworkBase
@@ -98,6 +99,12 @@ class cevy::NetworkBase
                 _tcp_connexions.push_back(std::move(tcp_connexion));
                 tcp_accept_new_connexion(io_context);
             });
+        }
+
+        void close_all_tcp() {
+            for (auto &i : _tcp_connexions) {
+                i.socket.close();
+            }
         }
 
         static void start_server() {
@@ -196,6 +203,23 @@ class cevy::NetworkBase
             );
         }
 
+        void read_one_TCP (TcpConnexion &co) {
+            asio::async_read(
+                co.socket,
+                asio::buffer(co.buffer),
+                [this, &co](asio::error_code error, size_t bytes) {
+                    tcp_receive(error, bytes, co);
+                    read_one_TCP(co);
+                }
+            );
+        }
+
+        void readTCP() {
+            for (auto &co : _tcp_connexions) {
+                read_one_TCP(co);
+            }
+        }
+
         template<typename Function>
         void writeUDP(const std::vector<uint8_t>& data, Function&& func) {
             _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint, [this](asio::error_code error, size_t bytes) {
@@ -203,6 +227,16 @@ class cevy::NetworkBase
             });
         }
 
+        virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) {
+            if (!error) {
+                std::cout << "revieved " << bytes << " bytes:" << std::endl;
+                std::cout << co.buffer << std::endl;
+                // for (size_t i = 0; i < bytes; ++i) {
+                //     std:: cout << std::hex << _udp_recv[i];
+                // }
+                std::cout << std::endl << std::endl;
+            }
+        }
         virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512>& buffer, udp::endpoint udp_endpoint) {
             if (!error) {
                 std::cout << "revieved " << bytes << " bytes:" << std::endl;
@@ -210,34 +244,33 @@ class cevy::NetworkBase
                     std:: cout << std::hex << _udp_recv[i];
                 }
                 std::cout << std::endl << std::endl;
-                readUDP();
             }
         }
 
-        template <typename Component>
-        void writeTCP(tcp::socket &socket, Component const &component) {
-            std::function<void(std::error_code, std::size_t)> handler = [&socket](std::error_code error, std::size_t bytes) {
-                if (error) {
-                    std::cerr << "Error: Component of the socket " << &socket << " is not sent.\n"
-                    << error.message() << std::endl;
-                    socket.close();
-                }
-            };
-            socket.async_write_some(asio::buffer(serialization(component), sizeof(std::stringstream)), handler);
-        }
+        // template <typename Component>
+        // void writeTCP(tcp::socket &socket, Component const &component) {
+        //     std::function<void(std::error_code, std::size_t)> handler = [&socket](std::error_code error, std::size_t bytes) {
+        //         if (error) {
+        //             std::cerr << "Error: Component of the socket " << &socket << " is not sent.\n"
+        //             << error.message() << std::endl;
+        //             socket.close();
+        //         }
+        //     };
+        //     socket.async_write_some(asio::buffer(serialization(component), sizeof(std::stringstream)), handler);
+        // }
 
-        template <typename Component>
-        std::tuple<std::string, Component> readTCP(tcp::socket &socket) {
-            std::string buffer;
-            std::function<void(std::error_code, std::size_t)> handler = [&](std::error_code error, std::size_t bytes) {
-                if (!error) {
-                    std::istringstream iss(buffer);
-                    return unserialization<Component>(iss);
-                } else {
-                    std::cerr << "Error: " << error.message() << std::endl;
-                    return nullptr;
-                }
-            };
-            socket.async_read_some(asio::buffer(buffer), handler);
-        }
+        // template <typename Component>
+        // std::tuple<std::string, Component> readTCP(tcp::socket &socket) {
+        //     std::string buffer;
+        //     std::function<void(std::error_code, std::size_t)> handler = [&](std::error_code error, std::size_t bytes) {
+        //         if (!error) {
+        //             std::istringstream iss(buffer);
+        //             return unserialization<Component>(iss);
+        //         } else {
+        //             std::cerr << "Error: " << error.message() << std::endl;
+        //             return nullptr;
+        //         }
+        //     };
+        //     socket.async_read_some(asio::buffer(buffer), handler);
+        // }
 };

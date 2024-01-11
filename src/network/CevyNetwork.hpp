@@ -103,7 +103,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
             if (buffer[0] == (uint8_t)Communication::Event) {
                 return handle_events(bytes, buffer);
             }
-
         }
 
     private:
