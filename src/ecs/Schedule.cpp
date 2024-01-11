@@ -27,14 +27,14 @@ void Schedule::runStage(World &world) {
 
 void Schedule::runStartStages(World &world) {
   _stage = _at_start_schedule.begin();
-  while (_stage != _at_start_schedule.end() && !_abort) {
+  while (_stage != _at_start_schedule.end()) {
     runStage(world);
   }
 }
 
 void Schedule::runStages(World &world) {
   _stage = _schedule.begin();
-  while (_stage != _schedule.end() && !_abort) {
+  while (_stage != _schedule.end()) {
     runStage(world);
   }
 }
@@ -49,13 +49,8 @@ void Schedule::run(World &world) {
       func(world);
     }
     auto close = world.get_resource<Event<AppExit>>();
-    auto abort = world.get_resource<Event<AppAbort>>();
     if (close && close.value().get().event_queue.size() > 0) {
       _stop = true;
-    }
-    if (abort && abort.value().get().event_queue.size() > 0) {
-      _stop = true;
-      _abort = true;
     }
   }
 }

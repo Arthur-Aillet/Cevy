@@ -23,9 +23,6 @@ namespace cevy::ecs {
 typedef struct AppExit {
 } AppExit;
 
-typedef struct AppAbort {
-} AppAbort;
-
 class Schedule {
   public:
   struct IsStage {};
@@ -165,7 +162,6 @@ class Schedule {
 
   protected:
   mutable bool _stop = false;
-  mutable bool _abort = false;
   std::list<std::type_index>::iterator _stage;
 
   void runStartStages(World &world);
