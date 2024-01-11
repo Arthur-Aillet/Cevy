@@ -27,6 +27,6 @@ void init_default_schedules(cevy::ecs::App &app) {
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
   app.add_event<AppExit>();
-  app.add_system<cevy::ecs::Schedule::PostStartup>(init_timer);
-  app.add_system<cevy::ecs::Schedule::First>(update_timer);
+  app.add_systems<cevy::ecs::Schedule::PostStartup>(init_timer);
+  app.add_systems<cevy::ecs::Schedule::First>(update_timer);
 }

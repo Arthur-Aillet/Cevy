@@ -72,10 +72,9 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_component<cevy::engine::Rotation>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
-  app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
-  app.add_system<cevy::engine::PreRenderStage>(close_game);
-  app.add_system<cevy::engine::PreRenderStage>(update_camera);
-  app.add_system<cevy::engine::RenderStage>(update_window);
+  app.add_systems<cevy::engine::PreStartupRenderStage>(init_window);
+  app.add_systems<cevy::engine::PreRenderStage>(close_game, update_camera);
+  app.add_systems<cevy::engine::RenderStage>(update_window);
 }
 
 /*

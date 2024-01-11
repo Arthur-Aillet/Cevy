@@ -84,14 +84,14 @@ class cevy::ecs::App : public cevy::ecs::World {
     _scheduler.insert_schedule<Stage>();
   }
 
-  template <class S, class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
-    _scheduler.add_system<S>(func);
+  template <class ...System>
+  void add_systems(System&&... func) {
+    (_scheduler.add_system(func), ...);
   }
 
-  template <class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
-    _scheduler.add_system(func);
+  template <class Stage, class ...System>
+  void add_systems(System&&... func) {
+    (_scheduler.add_system<Stage>(func), ...);
   }
 
   template <typename T>
