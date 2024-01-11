@@ -67,8 +67,6 @@ class cevy::ecs::App : public cevy::ecs::World {
   }
 
   void run();
-  void quit();
-  void abort();
 
   template <typename T>
   void add_stage() {
