@@ -9,6 +9,8 @@
 
 #include "ecs.hpp"
 
+#include <cstddef>
+
 class cevy::ecs::Entity {
   private:
   std::size_t _id;

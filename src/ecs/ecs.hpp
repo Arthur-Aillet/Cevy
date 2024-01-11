@@ -7,9 +7,15 @@
 
 #pragma once
 
-#include "cevy.hpp"
-
 namespace cevy {
+/**
+ * @brief Holds the entity components system
+ *
+ * Access each classes for a complete description
+ *
+ * note: here classes are being forward declared
+ * they will be expanded by their relevant files
+ */
 namespace ecs {
 class App;
 class Entity;
@@ -26,3 +32,4 @@ template <class... Containers>
 class Query;
 } // namespace ecs
 } // namespace cevy
+

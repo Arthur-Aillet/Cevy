@@ -13,6 +13,7 @@
 #include <optional>
 
 #include "SparseVector.hpp"
+#include "cevy.hpp"
 #include "ecs.hpp"
 
 template <class T>
