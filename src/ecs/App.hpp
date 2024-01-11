@@ -66,11 +66,22 @@ class cevy::ecs::App : public cevy::ecs::World {
     ((add_plugin(std::forward<const GivenPlugin &>(plugins))), ...);
   }
 
+  /**
+   * @brief Starts the application, launch the \link cevy::ecs::Schedule::Stage Stages\endlink and Systems loop
+   */
   void run();
 
-  template <typename T>
+  /**
+   * @brief Add a stage to the pile of \link cevy::ecs::Schedule::Stage Stages\endlink.
+   * Each systems are assigned to a specific stage (\link cevy::ecs::Schedule::Update Update\endlink by Default) and are run in the stage order
+   * Look at \link cevy::ecs::Schedule::Stage Stage \endlink to understand how to insert a stages in a given order
+   *
+   * @tparam Stage
+   * Must made from the \link cevy::ecs::Schedule::Stage Stage \endlink struct
+   */
+  template <typename Stage>
   void add_stage() {
-    _scheduler.insert_schedule<T>();
+    _scheduler.insert_schedule<Stage>();
   }
 
   template <class S, class R, class... Args>
