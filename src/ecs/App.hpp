@@ -14,6 +14,11 @@
 #include "World.hpp"
 #include "ecs.hpp"
 
+/**
+ * @brief A container of app logic and data.
+ *
+ * Bundles together the necessary elements like World and Schedule to create an ECS-based application.
+ */
 class cevy::ecs::App : public cevy::ecs::World {
   public:
   using World::ComponentId;
@@ -25,6 +30,17 @@ class cevy::ecs::App : public cevy::ecs::World {
   std::vector<std::shared_ptr<Plugin>> _plugins;
 
   private:
+
+  /**
+   * @brief Add a Plugin.
+   *
+   * C++evy follows Bevy’s core principle of modularity.
+   * All Bevy engine features are implemented as Plugins.
+   * This includes internal features like the renderer.
+   * @tparam GivenPlugin
+   * GivenPlugin type has to derive from the Plugin Abstract class
+   * @param plugin
+   */
   template <typename GivenPlugin>
   void add_plugin(const GivenPlugin &plugin) {
     static_assert(std::is_base_of_v<Plugin, GivenPlugin>,
@@ -35,6 +51,16 @@ class cevy::ecs::App : public cevy::ecs::World {
   }
 
   public:
+  /**
+   * @brief Adds one or more \link Plugin Plugins\endlink.
+   *
+   * C++evy follows Bevy’s core principle of modularity.
+   * All Bevy engine features are implemented as Plugins.
+   * This includes internal features like the renderer.
+   * @tparam GivenPlugin
+   * All the GivenPlugin types have to derive from the Plugin Abstract class
+   * @param plugin
+   */
   template <typename... GivenPlugin>
   void add_plugins(const GivenPlugin &...plugins) {
     ((add_plugin(std::forward<const GivenPlugin &>(plugins))), ...);
