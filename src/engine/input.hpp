@@ -1,14 +1,14 @@
 #pragma once
 
-#include "raylib.h"
+#include "raylib.hpp"
 
 namespace cevy {
-    class Keyboard {
-        private:
-            /* data */
-        public:
-        static bool keyPressed(int key) {return (IsKeyPressed(key));};
-        static bool keyReleased(int key) {return (IsKeyPressed(key));};
-        static bool keyDown(int key) {return (IsKeyDown(key));};
-    };
-}
+class Keyboard {
+  private:
+  /* data */
+  public:
+  static bool keyPressed(int key) { return (IsKeyPressed(key)); };
+  static bool keyReleased(int key) { return (IsKeyPressed(key)); };
+  static bool keyDown(int key) { return (IsKeyDown(key)); };
+};
+} // namespace cevy

@@ -16,4 +16,5 @@ namespace cevy {
     class ClientHandler;
     class ServerHandler;
     using Network = CevyNetwork;
-}
+    class NetworkActions;
+} // namespace cevy

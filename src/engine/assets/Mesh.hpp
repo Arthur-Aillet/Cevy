@@ -2,15 +2,18 @@
 ** Agartha-Software, 2023
 ** Cevy
 ** File description:
-** position
+** Mesh
 */
 
 #pragma once
 
-#include "Vector.hpp"
+#include "raylib.hpp"
 
 namespace cevy::engine {
-class Position : public cevy::engine::Vector {
-  using cevy::engine::Vector::Vector;
+class Mesh {
+  public:
+  Model mesh;
+
+  Mesh(const Model &mesh) : mesh(mesh){};
 };
 } // namespace cevy::engine

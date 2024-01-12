@@ -5,25 +5,20 @@
 ** rotation
 */
 
-#include <math.h>
-#include <vector>
+#pragma once
 
 #include "Vector.hpp"
 
-#pragma once
+namespace cevy::engine {
+class Rotation : public cevy::engine::Vector {
+  using cevy::engine::Vector::Vector;
 
-namespace cevy {
-    class Rotation : public Vector{
-        private:
-        public:
-            Rotation(double x = 0, double y = 0, double z = 0) : Vector(x, y, z) {};
-            ~Rotation() {};
-            Rotation fowards() {
-                return(Rotation(0.0, 1.0, 0.0));
-            };
-            Rotation up() {
-                return(Rotation(0.0, 0.0, 1.0));
-            };
-            Rotation to_rad() {return Rotation(x * (M_PI / 180.0), y * (M_PI / 180.0), z * (M_PI / 180.0));};
-    };
-}
+  public:
+  float &yaw() const { return const_cast<float &>(x); };
+  float &pitch() const { return const_cast<float &>(y); };
+  float &roll() const { return const_cast<float &>(z); };
+  float &yaw() { return x; };
+  float &pitch() { return y; };
+  float &roll() { return z; };
+};
+} // namespace cevy::engine

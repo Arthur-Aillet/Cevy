@@ -7,53 +7,52 @@
 
 #pragma once
 
-#include "World.hpp"
 #include "Command.hpp"
-#include <typeindex>
+#include "Entity.hpp"
+#include "World.hpp"
 
 namespace cevy {
-    namespace ecs {
-        class EntityCommands;
-    }
+namespace ecs {
+class EntityCommands;
 }
+} // namespace cevy
 
 class cevy::ecs::Commands {
-    private:
-        friend class cevy::ecs::World;
+  private:
+  friend class cevy::ecs::World;
 
-        cevy::ecs::World& _world_access;
-        Commands(cevy::ecs::World& world_access) : _world_access(world_access) {};
-    public:
-        template<typename GivenCommand, typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
-        void add(const GivenCommand &a) {
-            auto l = [a] (cevy::ecs::World &w) {
-                a.apply(w);
-            };
-            _world_access._command_queue.push(l);
-        }
+  cevy::ecs::World &_world_access;
+  Commands(cevy::ecs::World &world_access) : _world_access(world_access){};
 
-        void add(std::function<void (cevy::ecs::World &w)>&& f);
+  public:
+  template <typename GivenCommand,
+            typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
+  void add(const GivenCommand &a) {
+    auto l = [a](cevy::ecs::World &w) { a.apply(w); };
+    _world_access._command_queue.push(l);
+  }
 
-        template<typename R>
-        void insert_resource(const R& value) {
-            add([value] (cevy::ecs::World &w) {
-                w.insert_resource(value);
-            });
-        }
+  void add(std::function<void(cevy::ecs::World &w)> &&f);
 
-        cevy::ecs::EntityCommands spawn_empty();
+  template <typename R>
+  void insert_resource(const R &value) {
+    add([value](cevy::ecs::World &w) { w.insert_resource(value); });
+  }
 
-        template<typename... Ts>
-        cevy::ecs::EntityCommands spawn(Ts... a);
+  cevy::ecs::EntityCommands spawn_empty();
 
-        template<typename T>
-        cevy::ecs::EntityCommands spawn_archetype();
+  template <typename... Ts>
+  cevy::ecs::EntityCommands spawn(Ts... a);
 
-        cevy::ecs::EntityCommands spawn_archetype(std::type_index type);
+  EntityCommands entity(const Entity &e);
+
+  template <class R, class... Args>
+  R system(R (&&func)(Args...)) {
+    return std::forward<R>(_world_access.run_system(func));
+  }
 };
 
-template<typename C,
-    typename std::enable_if_t<is_commands<C>::value, bool>>
-C cevy::ecs::World::get_super() {
-    return cevy::ecs::Commands(*this);
+template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>
+C cevy::ecs::World::get_super(size_t _last_id) {
+  return cevy::ecs::Commands(*this);
 }
