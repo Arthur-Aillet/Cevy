@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Queries
 */
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <bitset>
 #include <cstddef>
 #include <optional>
@@ -68,7 +69,7 @@ class Query {
       incr_all();
       return *this;
     };
-    iterator &operator++(int) {
+    iterator operator++(int) {
       auto old = *this;
       incr_all();
       return old;
@@ -178,6 +179,50 @@ class Query {
     }
     (resize_optional<T>(containers, current_size), ...);
     return current_size;
+  }
+
+  public:
+  size_t size() {
+    return _size;
+  }
+
+  typename iterator::value_type single() {
+    return *begin();
+  }
+
+  std::optional<typename iterator::value_type> get_single() {
+    if (_size <= 0) {
+      return std::nullopt;
+    }
+    return single();
+  }
+
+  private:
+  template<size_t N>
+  typename iterator::value_type progress_it(iterator &it) {
+    auto last = it;
+    it++;
+    return *last;
+  }
+
+  template<size_t N, size_t ...I>
+  std::array<typename iterator::value_type, N> multiple_impl(std::index_sequence<I...>) {
+    auto it = begin();
+    return { progress_it<I>(it)... };
+  }
+
+  public:
+  template<size_t N, typename Indicies = std::make_index_sequence<N>>
+  std::array<typename iterator::value_type, N> multiple() {
+    return multiple_impl<N>(Indicies{});
+  }
+
+  template<size_t N>
+  std::optional<std::array<typename iterator::value_type, N>> get_multiple() {
+    if (_size < N) {
+      return std::nullopt;
+    }
+    return multiple<N>();
   }
 
   private:

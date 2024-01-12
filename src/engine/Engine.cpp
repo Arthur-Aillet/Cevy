@@ -10,15 +10,17 @@
 #include "AssetManager.hpp"
 #include "Camera.hpp"
 #include "Color.hpp"
-#include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
+#include "Line.hpp"
+#include "Position.hpp"
+#include "Target.hpp"
+#include "Transform.hpp"
+#include "Velocity.hpp"
 #include "Event.hpp"
 #include "Position.hpp"
-#include "Rotation.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
-#include "raylib.hpp"
 
 #include "rendering.hpp"
 #include "rlImGui.h"
@@ -41,18 +43,20 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
 }
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
-                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
+                   cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
+                                    option<cevy::engine::Color>>
+                       lines,
+                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Transform>,
                                     cevy::engine::Handle<cevy::engine::Mesh>,
                                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
                                     option<cevy::engine::Color>>
                        models) {
-  DrawGrid(100, 1.0f);
-
   ClearBackground(WHITE);
   for (auto [cam] : cams) {
     BeginMode3D(cam);
     DrawGrid(100, 1.0f);
     render_models(models);
+    render_lines(lines);
     EndMode3D();
   }
   EndDrawing();
@@ -68,12 +72,18 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PostRenderStage>();
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Position>();
-  app.init_component<cevy::engine::Rotation>();
+  app.init_component<cevy::engine::Velocity>();
+  app.init_component<cevy::engine::Target>();
+  app.init_component<cevy::engine::Line>();
+  app.init_component<cevy::engine::Transform>();
+  app.init_component<cevy::engine::TransformVelocity>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_systems<cevy::engine::PreStartupRenderStage>(init_window);
-  app.add_systems<cevy::engine::PreRenderStage>(close_game, update_camera);
+  app.add_systems<cevy::engine::PreRenderStage>(close_game);
+  app.add_systems<cevy::engine::PreRenderStage>(update_camera);
   app.add_systems<cevy::engine::RenderStage>(update_window);
+  app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
 }
 
 /*

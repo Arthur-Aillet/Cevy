@@ -11,11 +11,12 @@ add_library(rendering
   Color.cpp
   )
 
+target_include_directories(rendering PRIVATE ${RAYLIB_FOLDER})
+
 target_include_directories(rendering PUBLIC
   ../../ecs
   ../assets
   ../math
   .
   ..
-  ${RAYLIB_FOLDER}
   )
