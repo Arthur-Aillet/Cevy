@@ -77,6 +77,13 @@ Vector Vector::scale(const Vector &rhs) const {
 
 #else
 
+std::ostream& cevy::engine::operator<<(std::ostream& cout, const Vector &vec)
+{
+    cout << "{ " << vec.x << ", " << vec.y << ", " << vec.z << " }";
+
+    return cout;
+}
+
 float Vector::eval() const { return (x * x + y * y + z * z); }
 
 Vector &Vector::operator+=(const Vector &rhs) {

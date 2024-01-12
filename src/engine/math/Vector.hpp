@@ -8,6 +8,7 @@
 #pragma once
 
 #include "raylib.hpp"
+#include <ostream>
 
 namespace cevy::engine {
 /**
@@ -114,4 +115,8 @@ class Vector {
   static Vector random(float degree = 1, const Vector &source = Vector(0, 0, 0));
 #endif
 };
+
+std::ostream& operator<<(std::ostream& cout, const Vector &vec);
+
 } // namespace cevy::engine
+
