@@ -12,6 +12,7 @@
 #include <list>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
 
 #include "App.hpp"
 #include "Plugin.hpp"
@@ -44,44 +45,55 @@ public:
         };
         static const uint8_t value = N;
         static const Presume presume = Presume::idk;
+
+        enum class Act {
+            Shoot,
+            FlyUp,
+            FlyDown,
+        };
     };
 
+    virtual void build(cevy::ecs::App& app) = 0;
 
     void add_action(F function) {
-        _actions[A::value] = function;
+        _actions[A::value].first = function;
+        _actions[A::value].seconde = nullptr;
     };
 
     template<typename F0, typename F1, typename F2>
     void add_action(F client_success, F client_fail) {
-        if (A::presume == Action<>::Presume::fail) {
-            _actions[A::value] = client_fail;
-        }
-        if (A::presume == Action<>::Presume::success) {
-            _actions[A::value] = client_success;
-        }
+            _actions[A::value].first = client_fail;
+            _actions[A::value].seconde = client_success;
     };
+
 
     void add_event(A action, F function) {
         _events[A::value] = function;
     };
 
-    virtual void build(cevy::ecs::App& app) = 0;
+    //add_system
+    //passer la fonction en pointeur sur fonction et getsuper rempli les sytemes
+    //une closure qui prend commands executer commands.system et qui permet d'executer un system
+    void system_action() {
+
+    }
 
 protected:
-    std::unordered_map<A, F> _actions;
-    std::unordered_map<A, F> _events;
+    std::unordered_map<A, std::pair<F, F>> _actions;
+    std::unordered_map<A, std::pair<F, F>> _events;
     Mode _mode;
     cevy::CevyNetwork _net;
 
 private:
 };
 
+template <typename A, typename F>
 class cevy::NetworkActions::ShipActions {
 public:
     ShipActions(NetworkActions::Mode mode, NetworkActions &netAct, CevyNetwork &net)
         : _mode(mode), _netAct(netAct), _net(net) {};
-    struct Shoot : Action<5> {};
-    struct FlyUp : Action<6> {
+    struct Shoot : Action<A::Act::Shoot> {};
+    struct FlyUp : Action<A::Act::FlyUp> {
         Presume presume = Presume::success;
     };
 

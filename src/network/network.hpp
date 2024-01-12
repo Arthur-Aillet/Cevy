@@ -13,6 +13,6 @@ namespace cevy {
 class Synchroniser;
 class CevyNetwork;
 class NetworkBase;
-class NetworkActions;
 using Network = CevyNetwork;
+class NetworkActions;
 } // namespace cevy
