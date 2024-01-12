@@ -85,19 +85,7 @@ class ResourceManager {
       return std::any_cast<Content &>(_resources_map[std::type_index(typeid(Content))]);
     return std::nullopt;
   }
-  /* TODO:
-          template <typename Content>
-          std::optional<std::reference_wrapper<const Content>>
-     get_resource() { auto it =
-     _resources_map.find(std::type_index(typeid(Content)));
 
-              if (it != _resources_map.end()) {
-                  return std::any_cast<const
-     Content&>(_resources_map[std::type_index(typeid(Content))]);
-              }
-              return std::nullopt;
-          }
-  */
   template <typename Content>
   cevy::ecs::Resource<Content> get() {
     return cevy::ecs::Resource(

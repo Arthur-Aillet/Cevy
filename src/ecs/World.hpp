@@ -74,6 +74,9 @@ class cevy::ecs::World {
     template <typename... Ts>
     EntityWorldRef insert(Ts... args);
 
+    template <typename... Ts>
+    EntityWorldRef remove();
+
     operator Entity &() { return entity; };
   };
 
@@ -314,6 +317,12 @@ class cevy::ecs::World {
 template <typename... Ts>
 cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::insert(Ts... args) {
   (world.add_component(entity, std::forward<Ts>(args)), ...);
+  return *this;
+}
+
+template <typename... Ts>
+cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::remove() {
+  (world.remove_component<Ts>(entity), ...);
   return *this;
 }
 

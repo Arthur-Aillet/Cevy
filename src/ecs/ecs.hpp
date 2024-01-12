@@ -32,4 +32,3 @@ template <class... Containers>
 class Query;
 } // namespace ecs
 } // namespace cevy
-
