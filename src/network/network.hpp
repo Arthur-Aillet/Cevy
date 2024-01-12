@@ -12,6 +12,7 @@
 namespace cevy {
 class NetworkPlugin;
 class Synchroniser;
+class NetworkActions;
 class CevyNetwork;
 class NetworkBase;
 using Network = CevyNetwork;

@@ -11,7 +11,6 @@
 #include <cstdint>
 #include <functional>
 #include <list>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 
@@ -96,7 +95,6 @@ protected:
     // Mode _mode;
     cevy::CevyNetwork &_net;
 
-private:
 };
 
 template<typename R, typename... Args>
