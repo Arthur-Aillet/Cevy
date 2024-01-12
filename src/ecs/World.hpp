@@ -95,6 +95,7 @@ class cevy::ecs::World {
   friend class cevy::ecs::Scheduler;
   friend class cevy::ecs::Commands;
   friend class EntityWorldRef;
+  friend class cevy::ecs::EntityCommands;
 
   private:
   std::queue<command> _command_queue;

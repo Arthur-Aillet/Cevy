@@ -27,6 +27,13 @@ class cevy::ecs::EntityCommands {
     return *this;
   }
 
+  template <typename... Components>
+  cevy::ecs::EntityCommands &remove(const Components &...c) {
+    _commands.add(
+        [c..., e = _entity](cevy::ecs::World &w) mutable { w.remove_component<Components...>(e); });
+    return *this;
+  }
+
   cevy::ecs::Entity id();
 
   void despawn();
