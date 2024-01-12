@@ -93,10 +93,12 @@ class cevy::NetworkBase {
   virtual void on_client_tcp_connect() { std::cout << "client: tcp connected" << std::endl; }
 
   void tcp_client_connect() {
+    std::cout << "async tcp connect" << std::endl;
     _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
         ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"),
-                                             999), // REVIEW - ip to change
+                                             54321), // REVIEW - ip to change
                                [this](asio::error_code error) {
+              std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
                                  on_client_tcp_connect();
                                  read_one_TCP(*(_tcp_connexions.end()));
                                });
@@ -104,7 +106,7 @@ class cevy::NetworkBase {
 
   void tcp_accept_new_connexion() {
     TcpConnexion tcp_connexion(_io_context);
-    tcp::acceptor tcp_acceptor(_io_context, tcp::endpoint(tcp::v4(), 999));
+    tcp::acceptor tcp_acceptor(_io_context, _tcp_endpoint);
     tcp_acceptor.async_accept(tcp_connexion.socket, [this, &tcp_connexion](asio::error_code error) {
       std::cout << "new tcp connexion accepted to the server"
                 << std::endl; // REVIEW - debug message
@@ -122,13 +124,13 @@ class cevy::NetworkBase {
     _tcp_connexions.erase(_tcp_connexions.begin(), _tcp_connexions.end());
   }
 
-  static void start_server() {
+  static void start_server(tcp::endpoint _tcp_endpoint) {
     asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context from
                                  // the class instead
 
-    udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 13));
+    udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 12345));
 
-    tcp::socket tcp_socket(io_context, tcp::endpoint(tcp::v4(), 999));
+    tcp::socket tcp_socket(io_context, _tcp_endpoint);
     NetworkBase server = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
     std::cout << "setting up acceptor;" << std::endl;
     server.tcp_accept_new_connexion();
@@ -150,15 +152,17 @@ class cevy::NetworkBase {
     udp_socket.open(udp::v4());
     tcp::socket tcp_socket(io_context);
     tcp::endpoint tcp_endpoint(asio::ip::address::from_string("127.0.0.1"),
-                               999); // REVIEW - ip to change
+                               54321); // REVIEW - ip to change
     try {
       tcp_socket.connect(tcp_endpoint); // REVIEW - actually sync, easier to test
       std::cout << "tcp connexion successful :)" << std::endl;
     } catch (asio::system_error e) {
-      std::cout << "tcp connexion fail :(" << std::endl;
+      std::cout << "tcp connexion fail :(" << std::endl << e.code() << " bonjour" << e.what() << std::endl;
     }
     NetworkBase client = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
     client._udp_endpoint = receiver_endpoint;
+    client._tcp_endpoint = tcp_endpoint;
+    client.tcp_client_connect();
     while (std::cin.good()) {
       std::string line;
       std::cin >> line;
@@ -167,7 +171,7 @@ class cevy::NetworkBase {
     }
   }
 
-  protected:
+  public: // FIXME - public to facilitate tests
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
@@ -193,7 +197,7 @@ class cevy::NetworkBase {
       : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
 
   NetworkBase(const std::string &endpoint, size_t port)
-      : _udp_endpoint(asio::ip::udp::v4(), port), _tcp_endpoint(asio::ip::tcp::v4(), port),
+      : _udp_endpoint(asio::ip::udp::v4(), port), _tcp_endpoint(asio::ip::tcp::v4(), 54321), // FIXME - tcp port
         _udp_socket(_io_context), _tcp_socket(_io_context) {
     _udp_socket.open(asio::ip::udp::v4());
     _tcp_socket.open(asio::ip::tcp::v4());
