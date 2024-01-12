@@ -26,6 +26,14 @@ World::EntityWorldRef World::spawn_empty() {
   return ref;
 }
 
+World::EntityWorldRef::operator Entity &() {
+  return entity;
+};
+
+Entity World::EntityWorldRef::id() {
+  return entity;
+};
+
 bool World::despawn(Entity const &e) {
   for (auto const &[type, data] : _components_arrays) {
     std::get<1>(data)(*this, e);

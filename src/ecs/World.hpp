@@ -77,7 +77,9 @@ class cevy::ecs::World {
     template <typename... Ts>
     EntityWorldRef remove();
 
-    operator Entity &() { return entity; };
+    Entity id();
+
+    operator Entity &();
   };
 
   using erase_access = std::function<void(World &, Entity const &)>;
