@@ -215,7 +215,7 @@ class cevy::ecs::Query {
   }
 
   template<size_t N>
-  std::optional<typename iterator::value_type> get_multiple() {
+  std::optional<std::array<typename iterator::value_type, N>> get_multiple() {
     if (_size < N) {
       return std::nullopt;
     }
