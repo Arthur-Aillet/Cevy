@@ -154,6 +154,8 @@ class cevy::NetworkBase
 
         udp::socket _udp_socket;
         tcp::socket _tcp_socket;
+        std::vector<TcpConnexion> _tcp_connexions;
+
 
   std::array<uint8_t, 512> _udp_recv;
   std::vector<uint8_t> _tcp_recv;
@@ -276,31 +278,4 @@ class cevy::NetworkBase
                 std::cout << std::endl << std::endl;
             }
         }
-
-        // template <typename Component>
-        // void writeTCP(tcp::socket &socket, Component const &component) {
-        //     std::function<void(std::error_code, std::size_t)> handler = [&socket](std::error_code error, std::size_t bytes) {
-        //         if (error) {
-        //             std::cerr << "Error: Component of the socket " << &socket << " is not sent.\n"
-        //             << error.message() << std::endl;
-        //             socket.close();
-        //         }
-        //     };
-        //     socket.async_write_some(asio::buffer(serialization(component), sizeof(std::stringstream)), handler);
-        // }
-
-        // template <typename Component>
-        // std::tuple<std::string, Component> readTCP(tcp::socket &socket) {
-        //     std::string buffer;
-        //     std::function<void(std::error_code, std::size_t)> handler = [&](std::error_code error, std::size_t bytes) {
-        //         if (!error) {
-        //             std::istringstream iss(buffer);
-        //             return unserialization<Component>(iss);
-        //         } else {
-        //             std::cerr << "Error: " << error.message() << std::endl;
-        //             return nullptr;
-        //         }
-        //     };
-        //     socket.async_read_some(asio::buffer(buffer), handler);
-        // }
 };
