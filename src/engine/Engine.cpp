@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Engine
 */
@@ -10,19 +10,17 @@
 #include "AssetManager.hpp"
 #include "Camera.hpp"
 #include "Color.hpp"
-#include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
 #include "Line.hpp"
 #include "Position.hpp"
-#include "Resource.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
 #include "Velocity.hpp"
-#include "World.hpp"
+#include "Event.hpp"
+#include "Position.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
-#include "raylib.hpp"
 
 #include "rendering.hpp"
 #include "rlImGui.h"
@@ -39,9 +37,9 @@ void init_window() {
   rlImGuiSetup(true);
 }
 
-void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
+void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
   if (WindowShouldClose())
-    control.get().abort = true;
+    close.send(cevy::ecs::AppExit{});
 }
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
@@ -81,11 +79,11 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_component<cevy::engine::TransformVelocity>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
-  app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
-  app.add_system<cevy::engine::PreRenderStage>(close_game);
-  app.add_system<cevy::engine::PreRenderStage>(update_camera);
-  app.add_system<cevy::engine::RenderStage>(update_window);
-  app.add_system<Schedule::Update>(TransformVelocity::system);
+  app.add_systems<cevy::engine::PreStartupRenderStage>(init_window);
+  app.add_systems<cevy::engine::PreRenderStage>(close_game);
+  app.add_systems<cevy::engine::PreRenderStage>(update_camera);
+  app.add_systems<cevy::engine::RenderStage>(update_window);
+  app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
 }
 
 /*
