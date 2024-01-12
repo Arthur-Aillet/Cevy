@@ -26,6 +26,7 @@
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
 #include "asio/read.hpp"
+#include "asio/system_error.hpp"
 #include "network.hpp"
 
 class cevy::NetworkBase {
@@ -93,25 +94,32 @@ class cevy::NetworkBase {
 
   void tcp_client_connect() {
     _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
-        ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 999),
-                               [this]() { on_client_tcp_connect(); });
+        ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"),
+                                             999), // REVIEW - ip to change
+                               [this](asio::error_code error) {
+                                 on_client_tcp_connect();
+                                 read_one_TCP(*(_tcp_connexions.end()));
+                               });
   }
 
   void tcp_accept_new_connexion() {
     TcpConnexion tcp_connexion(_io_context);
     tcp::acceptor tcp_acceptor(_io_context, tcp::endpoint(tcp::v4(), 999));
-    tcp_acceptor.async_accept(tcp_connexion.socket, [this, &tcp_connexion]() {
+    tcp_acceptor.async_accept(tcp_connexion.socket, [this, &tcp_connexion](asio::error_code error) {
       std::cout << "new tcp connexion accepted to the server"
                 << std::endl; // REVIEW - debug message
       _tcp_connexions.push_back(std::move(tcp_connexion));
+      read_one_TCP(*(_tcp_connexions.end()));
       tcp_accept_new_connexion();
     });
   }
 
   void close_all_tcp() {
+    std::cout << "closing tcp connexions" << std::endl; // REVIEW - debug print
     for (auto &i : _tcp_connexions) {
       i.socket.close();
-    } // TODO - remove the actual connexion from the vector
+    }
+    _tcp_connexions.erase(_tcp_connexions.begin(), _tcp_connexions.end());
   }
 
   static void start_server() {
@@ -122,8 +130,9 @@ class cevy::NetworkBase {
 
     tcp::socket tcp_socket(io_context, tcp::endpoint(tcp::v4(), 999));
     NetworkBase server = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
+    std::cout << "setting up acceptor;" << std::endl;
     server.tcp_accept_new_connexion();
-    std::cout << "setting up read;" << std::endl;
+    std::cout << "setting up udp read;" << std::endl;
     server.readUDP();
     std::cout << "running" << std::endl;
     while (true) {
@@ -141,8 +150,13 @@ class cevy::NetworkBase {
     udp_socket.open(udp::v4());
     tcp::socket tcp_socket(io_context);
     tcp::endpoint tcp_endpoint(asio::ip::address::from_string("127.0.0.1"),
-                               999);  // REVIEW - ip to change
-    tcp_socket.connect(tcp_endpoint); // REVIEW - actually sync, easier to test
+                               999); // REVIEW - ip to change
+    try {
+      tcp_socket.connect(tcp_endpoint); // REVIEW - actually sync, easier to test
+      std::cout << "tcp connexion successful :)" << std::endl;
+    } catch (asio::system_error e) {
+      std::cout << "tcp connexion fail :(" << std::endl;
+    }
     NetworkBase client = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
     client._udp_endpoint = receiver_endpoint;
     while (std::cin.good()) {
@@ -168,6 +182,7 @@ class cevy::NetworkBase {
   std::array<uint8_t, 512> _udp_recv;
   std::vector<uint8_t> _tcp_recv;
 
+  public:
   NetworkBase(NetworkBase &&rhs)
       : _nw_thread(std::move(rhs._nw_thread)), _udp_endpoint(std::move(rhs._udp_endpoint)),
         _tcp_endpoint(std::move(rhs._tcp_endpoint)), _udp_socket(std::move(rhs._udp_socket)),
@@ -212,6 +227,7 @@ class cevy::NetworkBase {
     }
   }
 
+  protected:
   template <typename Function>
   void writeUDP(const std::vector<uint8_t> &data, Function &&func) {
     _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint,
@@ -247,18 +263,10 @@ class cevy::NetworkBase {
                      });
   }
 
-  void readTCP() {
+  void readTCP() { // REVIEW - useful ?
     for (auto &co : _tcp_connexions) {
       read_one_TCP(co);
     }
-  }
-
-  template <typename Function>
-  void writeUDP(const std::vector<uint8_t> &data, Function &&func) {
-    _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint,
-                              [this](asio::error_code error, size_t bytes) {
-                                std::cout << "fonction à remplacer" << std::endl;
-                              });
   }
 
   virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) {
