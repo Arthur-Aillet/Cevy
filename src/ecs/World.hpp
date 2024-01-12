@@ -77,6 +77,9 @@ class cevy::ecs::World {
     template <typename... Ts>
     EntityWorldRef remove();
 
+    template <typename T>
+    T &get();
+
     Entity id();
 
     operator Entity &();
@@ -326,6 +329,11 @@ template <typename... Ts>
 cevy::ecs::World::EntityWorldRef cevy::ecs::World::EntityWorldRef::remove() {
   (world.remove_component<Ts>(entity), ...);
   return *this;
+}
+
+template <typename T>
+T &cevy::ecs::World::EntityWorldRef::get() {
+  return world.get<T>(entity);
 }
 
 template <typename... T>
