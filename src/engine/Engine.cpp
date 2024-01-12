@@ -18,6 +18,7 @@
 #include "Resource.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
+#include "Velocity.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
@@ -73,15 +74,18 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PostRenderStage>();
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Position>();
+  app.init_component<cevy::engine::Velocity>();
   app.init_component<cevy::engine::Target>();
   app.init_component<cevy::engine::Line>();
   app.init_component<cevy::engine::Transform>();
+  app.init_component<cevy::engine::TransformVelocity>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
   app.add_system<cevy::engine::PreRenderStage>(close_game);
   app.add_system<cevy::engine::PreRenderStage>(update_camera);
   app.add_system<cevy::engine::RenderStage>(update_window);
+  app.add_system<Schedule::Update>(TransformVelocity::system);
 }
 
 /*
