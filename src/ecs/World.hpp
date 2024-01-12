@@ -209,7 +209,7 @@ class cevy::ecs::World {
   };
 
   template <typename Component>
-  typename SparseVector<Component>::reference_type &add_component(Entity const &to,
+  std::optional<Component> &add_component(Entity const &to,
                                                                   const Component &c) {
     auto &array = get_components<Component>();
 
@@ -217,7 +217,7 @@ class cevy::ecs::World {
   }
 
   template <typename Component, typename... Params>
-  typename SparseVector<Component>::reference_type &emplace_component(Entity const &to,
+  std::optional<Component> &emplace_component(Entity const &to,
                                                                       Params &&...p) {
 
     auto &array = get_components<Component>();
