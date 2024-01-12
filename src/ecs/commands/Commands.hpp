@@ -50,6 +50,11 @@ class cevy::ecs::Commands {
   R system(R (&&func)(Args...)) {
     return std::forward<R>(_world_access.run_system(func));
   }
+
+  template <class R, class... Args>
+  R system(std::function<R(Args...)> func) {
+    return std::forward<R>(_world_access.run_system(func));
+  }
 };
 
 template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>

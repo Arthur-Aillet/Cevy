@@ -9,17 +9,21 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <list>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
 
 #include "App.hpp"
+#include "Commands.hpp"
 #include "Plugin.hpp"
+#include "Position.hpp"
+#include "Query.hpp"
 #include "network/CevyNetwork.hpp"
 
-template <typename A, typename F>
-class NetworkActions {
+// template <typename A, typename F>
+class cevy::NetworkActions : public ecs::Plugin {
 public:
     class ShipActions;
 
@@ -28,12 +32,10 @@ public:
         Client,
     };
 
+    NetworkActions(CevyNetwork& net) : _net(net) {};
     NetworkActions(const NetworkActions &) = delete;
     NetworkActions &operator=(const NetworkActions &) = delete;
     NetworkActions &operator=(NetworkActions &&) = delete;
-    NetworkActions(NetworkActions &&rhs) : _net(std::move(rhs._net)) {}
-    NetworkActions(Mode mode, const std::string &host = std::string(""))
-        : _mode(mode), _net(host, 4995){};
     ~NetworkActions();
 
     template<size_t N = 0>
@@ -43,69 +45,81 @@ public:
             fail,
             success,
         };
-        static const uint8_t value = N;
+        static const uint16_t value = N;
         static const Presume presume = Presume::idk;
-
-        enum class Act {
-            Shoot,
-            FlyUp,
-            FlyDown,
-        };
     };
 
-    virtual void build(cevy::ecs::App& app) = 0;
+    virtual void build(cevy::ecs::App& app) override {
 
-    void add_action(F function) {
-        _actions[A::value].first = function;
-        _actions[A::value].seconde = nullptr;
     };
 
-    template<typename F0, typename F1, typename F2>
-    void add_action(F client_success, F client_fail) {
-            _actions[A::value].first = client_fail;
-            _actions[A::value].seconde = client_success;
+    // template <typename A, typename F>
+    // void add_action(F function) {
+    //     _actions[A::value].first = function;
+    //     _actions[A::value].seconde = nullptr;
+    // };
+
+    template<typename A,
+        typename R0 = void, typename... Arg0,
+        typename R1 = void, typename... Arg1,
+        typename R2 = void, typename... Arg2>
+    void add_action(R0 (&&server)(Arg0...), R1 (&&client_success)(Arg1...), R2 (&&client_fail)(Arg2...)) {
+            _actions[A::value] = std::make_tuple(
+                [server](ecs::Commands cmd) mutable {cmd.system(server); },
+                [client_success](ecs::Commands cmd) mutable {cmd.system(client_success); },
+                [client_fail](ecs::Commands cmd) mutable {cmd.system(client_fail); }
+            );
     };
 
-
-    void add_event(A action, F function) {
-        _events[A::value] = function;
-    };
-
-    //add_system
-    //passer la fonction en pointeur sur fonction et getsuper rempli les sytemes
-    //une closure qui prend commands executer commands.system et qui permet d'executer un system
-    void system_action() {
-
+        template<typename A,
+        typename R0 = void, typename... Arg0,
+        typename R1 = void, typename... Arg1,
+        typename R2 = void, typename... Arg2>
+    void add_action(std::function<R0(Arg0...)> server, std::function<R1(Arg1...)> client_success = [](){}, std::function<R2(Arg2...)>  client_fail = [](){}) {
+            _actions[A::value] = std::make_tuple(
+                [server](ecs::Commands cmd) mutable {cmd.system(server); },
+                [client_success](ecs::Commands cmd) mutable {cmd.system(client_success); },
+                [client_fail](ecs::Commands cmd) mutable {cmd.system(client_fail); }
+            );
     }
 
+    template <typename E, typename F>
+    void add_event(F func) {
+        _events[E::value] = [func](ecs::Commands cmd){cmd.system(func); };
+    };
+
+
 protected:
-    std::unordered_map<A, std::pair<F, F>> _actions;
-    std::unordered_map<A, std::pair<F, F>> _events;
-    Mode _mode;
-    cevy::CevyNetwork _net;
+    using system = std::function<void(ecs::Commands)>;
+    std::unordered_map<uint16_t, std::tuple<system, system, system>> _actions;
+    std::unordered_map<uint16_t, system> _events;
+    // Mode _mode;
+    cevy::CevyNetwork &_net;
 
 private:
 };
 
-template <typename A, typename F>
-class cevy::NetworkActions::ShipActions {
+template<typename R, typename... Args>
+constexpr std::function<R(Args...)> make_function(R (&&func)(Args...)) { return std::function<R(Args...)>(func); };
+
+class ShipActions : cevy::NetworkActions {
 public:
-    ShipActions(NetworkActions::Mode mode, NetworkActions &netAct, CevyNetwork &net)
-        : _mode(mode), _netAct(netAct), _net(net) {};
-    struct Shoot : Action<A::Act::Shoot> {};
-    struct FlyUp : Action<A::Act::FlyUp> {
+    ShipActions(cevy::CevyNetwork &net) : NetworkActions(net) {};
+
+    enum Act {
+        shoot,
+        flyUp,
+        flyDown,
+    };
+    struct Shoot : Action<Act::shoot> {};
+    struct FlyUp : Action<Act::flyUp> {
         Presume presume = Presume::success;
     };
 
     void build(cevy::ecs::App& app) override {
-        add_action<Shoot>(shootAction);
+        add_action<Shoot>(make_function(shootAction));
     }
 
-    static void shootAction(cevy::ecs::App& app) {};
-
+    static void shootAction(cevy::ecs::Query<cevy::engine::Position> q) {};
 private:
-    CevyNetwork &_net;
-    NetworkActions &_netAct;
-    Mode _mode;
-
 };
