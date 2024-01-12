@@ -89,31 +89,40 @@ class cevy::NetworkBase {
     } b;
   };
 
-  void tcp_accept_new_connexion(asio::io_context &io_context) {
-    TcpConnexion tcp_connexion(io_context);
-    tcp::acceptor tcp_acceptor(io_context, tcp::endpoint(tcp::v4(), 999));
-    tcp_acceptor.async_accept(tcp_connexion.socket, [this, &io_context, &tcp_connexion]() {
+  virtual void on_client_tcp_connect() { std::cout << "client: tcp connected" << std::endl; }
+
+  void tcp_client_connect() {
+    _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
+        ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 999),
+                               [this]() { on_client_tcp_connect(); });
+  }
+
+  void tcp_accept_new_connexion() {
+    TcpConnexion tcp_connexion(_io_context);
+    tcp::acceptor tcp_acceptor(_io_context, tcp::endpoint(tcp::v4(), 999));
+    tcp_acceptor.async_accept(tcp_connexion.socket, [this, &tcp_connexion]() {
       std::cout << "new tcp connexion accepted to the server"
                 << std::endl; // REVIEW - debug message
       _tcp_connexions.push_back(std::move(tcp_connexion));
-      tcp_accept_new_connexion(io_context);
+      tcp_accept_new_connexion();
     });
   }
 
   void close_all_tcp() {
     for (auto &i : _tcp_connexions) {
       i.socket.close();
-    }
+    } // TODO - remove the actual connexion from the vector
   }
 
   static void start_server() {
-    asio::io_context io_context;
+    asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context from
+                                 // the class instead
 
     udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 13));
 
     tcp::socket tcp_socket(io_context, tcp::endpoint(tcp::v4(), 999));
     NetworkBase server = NetworkBase(std::move(udp_socket), std::move(tcp_socket));
-    server.tcp_accept_new_connexion(io_context);
+    server.tcp_accept_new_connexion();
     std::cout << "setting up read;" << std::endl;
     server.readUDP();
     std::cout << "running" << std::endl;
@@ -123,7 +132,8 @@ class cevy::NetworkBase {
   }
 
   static void start_client(const std::string &host) {
-    asio::io_context io_context;
+    asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context from
+                                 // the class instead
     udp::resolver resolver(io_context);
     udp::endpoint receiver_endpoint = *resolver.resolve(udp::v4(), host, "daytime").begin();
 
@@ -198,7 +208,7 @@ class cevy::NetworkBase {
     _tcp_socket.open(tcp::v4());
 
     if (mode == NetworkMode::Server) {
-      tcp_accept_new_connexion(_io_context);
+      tcp_accept_new_connexion();
     }
   }
 
@@ -272,3 +282,13 @@ class cevy::NetworkBase {
     }
   }
 };
+
+// class TcpClient : cevy::NetworkBase {
+//   const std::string server_ip;
+//   const int server_port;
+//   tcp::socket socket;
+
+//   TcpClient(std::string server_ip, int server_port) : cevy::NetworkBase(), server_ip(server_ip),
+//   server_port(server_port), socket(_io_context) {};
+
+// };
