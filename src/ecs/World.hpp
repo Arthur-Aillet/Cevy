@@ -188,16 +188,6 @@ class cevy::ecs::World {
 
   /*
   **
-  ** EVENTS
-  **
-  */
-
-  /// send an event TODO: DO
-  template <typename E>
-  void send_event(const E &event) {}
-
-  /*
-  **
   ** COMPONENTS
   **
   */
