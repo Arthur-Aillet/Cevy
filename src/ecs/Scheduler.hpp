@@ -95,9 +95,6 @@ class Scheduler {
   Scheduler() : _stage(_at_start_schedule.begin()){};
   ~Scheduler() = default;
 
-  void quit() const;
-  void abort();
-
   template <class R, class... Args>
   void add_system(R (&&func)(Args...)) {
     add_system<core_stage::Update>(func);
