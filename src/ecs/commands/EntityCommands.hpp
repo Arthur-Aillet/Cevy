@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Commands.hpp"
+#include "ecs.hpp"
 
 class cevy::ecs::EntityCommands {
   private:
@@ -25,6 +26,12 @@ class cevy::ecs::EntityCommands {
         [c..., e = _entity](cevy::ecs::World &w) mutable { (w.add_component(e, c), ...); });
     return *this;
   }
+
+  cevy::ecs::Entity id();
+
+  void despawn();
+
+  cevy::ecs::Commands &commands();
 };
 
 template <typename... Ts>

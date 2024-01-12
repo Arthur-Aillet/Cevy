@@ -14,3 +14,9 @@ cevy::ecs::EntityCommands cevy::ecs::Commands::spawn_empty() {
   _world_access._entities.insert_at(pos, new_e);
   return (cevy::ecs::EntityCommands(*this, new_e));
 }
+
+cevy::ecs::Entity cevy::ecs::EntityCommands::id() { return _entity; }
+
+void cevy::ecs::EntityCommands::despawn() { _commands.despawn(_entity); }
+
+cevy::ecs::Commands &cevy::ecs::EntityCommands::commands() { return _commands; }

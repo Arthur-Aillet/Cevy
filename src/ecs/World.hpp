@@ -208,14 +208,16 @@ class cevy::ecs::World {
   };
 
   template <typename Component>
-  Component &add_component(Entity const &to, const Component &c) {
+  typename SparseVector<Component>::reference_type &add_component(Entity const &to,
+                                                                  const Component &c) {
     auto &array = get_components<Component>();
 
     return array.insert_at(to, c);
   }
 
   template <typename Component, typename... Params>
-  Component &emplace_component(Entity const &to, Params &&...p) {
+  typename SparseVector<Component>::reference_type &emplace_component(Entity const &to,
+                                                                      Params &&...p) {
 
     auto &array = get_components<Component>();
     return array.emplace_at(to, p...);

@@ -30,7 +30,7 @@ World::EntityWorldRef::operator Entity &() { return entity; };
 
 Entity World::EntityWorldRef::id() { return entity; };
 
-bool World::despawn(Entity const &e) {
+bool World::despawn(const Entity &e) {
   for (auto const &[type, data] : _components_arrays) {
     std::get<1>(data)(*this, e);
   }
