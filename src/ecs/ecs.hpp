@@ -1,19 +1,26 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** ecs namespace
 */
 
 #pragma once
 
-#include "cevy.hpp"
-
-namespace cevy::ecs {
+namespace cevy {
+/**
+ * @brief Holds the entity components system
+ *
+ * Access each classes for a complete description
+ *
+ * note: here classes are being forward declared
+ * they will be expanded by their relevant files
+ */
+namespace ecs {
 class App;
 class Entity;
 class Plugin;
-class Schedule;
+class Scheduler;
 class Commands;
 class Command;
 class EntityCommands;
@@ -23,4 +30,5 @@ template <typename Content>
 class Resource;
 template <class... Containers>
 class Query;
-} // namespace cevy::ecs
+} // namespace ecs
+} // namespace cevy

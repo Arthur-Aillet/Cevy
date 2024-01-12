@@ -13,7 +13,10 @@
 #include <optional>
 
 #include "SparseVector.hpp"
+#include "cevy.hpp"
 #include "ecs.hpp"
+
+namespace cevy::ecs {
 
 template <class T>
 struct is_query : public std::false_type {};
@@ -34,7 +37,7 @@ template <typename Type>
 using remove_optional = eval_cond_t<is_optional<Type>::value, inner_optional, Type, Type>;
 
 template <class... T>
-class cevy::ecs::Query {
+class Query {
   using Containers = std::tuple<SparseVector<remove_optional<T>>...>;
 
   public:
@@ -178,8 +181,8 @@ class cevy::ecs::Query {
   }
 
   private:
-  public:
   size_t _size;
   iterator _begin;
   iterator _end;
 };
+} // namespace cevy::ecs

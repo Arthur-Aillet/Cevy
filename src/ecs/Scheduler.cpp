@@ -1,16 +1,17 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
-** Schedule
+** Scheduler
 */
 
-#include "Schedule.hpp"
+#include "Scheduler.hpp"
+#include "Event.hpp"
 #include "World.hpp"
 
-using cevy::ecs::Schedule;
+using cevy::ecs::Scheduler;
 
-void Schedule::runStage(World &world) {
+void Scheduler::runStage(World &world) {
   std::vector<std::reference_wrapper<system>> curr_sys;
 
   std::copy_if(_systems.begin(), _systems.end(), std::back_inserter(curr_sys),
@@ -24,21 +25,21 @@ void Schedule::runStage(World &world) {
   _stage++;
 }
 
-void Schedule::runStartStages(World &world) {
+void Scheduler::runStartStages(World &world) {
   _stage = _at_start_schedule.begin();
-  while (_stage != _at_start_schedule.end() && !_abort) {
+  while (_stage != _at_start_schedule.end()) {
     runStage(world);
   }
 }
 
-void Schedule::runStages(World &world) {
+void Scheduler::runStages(World &world) {
   _stage = _schedule.begin();
-  while (_stage != _schedule.end() && !_abort) {
+  while (_stage != _schedule.end()) {
     runStage(world);
   }
 }
 
-void Schedule::run(World &world) {
+void Scheduler::run(World &world) {
   runStartStages(world);
   while (!_stop) {
     runStages(world);
@@ -47,15 +48,9 @@ void Schedule::run(World &world) {
       world._command_queue.pop();
       func(world);
     }
-    auto c = world.get_resource<Control>();
-    if (c && c.value().get().abort)
-      abort();
+    auto close = world.get_resource<Event<AppExit>>();
+    if (close && close.value().get().event_queue.size() > 0) {
+      _stop = true;
+    }
   }
-}
-
-void Schedule::quit() const { _stop = true; }
-
-void Schedule::abort() {
-  _abort = true;
-  _stop = true;
 }
