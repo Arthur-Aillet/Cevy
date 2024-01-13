@@ -15,12 +15,8 @@
 #include "Query.hpp"
 #include "Transform.hpp"
 #include "cevy.hpp"
+#include "ecs.hpp"
 
-void render_models(cevy::ecs::Query<
-                   option<cevy::engine::Transform>, cevy::engine::Handle<cevy::engine::Mesh>,
-                   option<cevy::engine::Handle<cevy::engine::Diffuse>>, option<cevy::engine::Color>>
-                       models);
+void render_models(cevy::ecs::World &world);
 
-void render_lines(cevy::ecs::Query<cevy::engine::Line, option<cevy::engine::Transform>,
-                                   option<cevy::engine::Color>>
-                      lines);
+void render_lines(cevy::ecs::World &w);

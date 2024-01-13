@@ -7,9 +7,11 @@
 
 #include "rendering.hpp"
 #include "Color.hpp"
+#include "World.hpp"
 #include "Line.hpp"
 #include "Transform.hpp"
 #include "cevy.hpp"
+#include "ecs.hpp"
 #include "raylib.hpp"
 #include <raylib.h>
 #include <raymath.h>
@@ -17,7 +19,8 @@
 using namespace cevy::engine;
 using namespace cevy;
 
-void render_lines(ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>> lines) {
+void render_lines(cevy::ecs::World &w) {
+  auto lines = ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>>::query(w);
   for (auto [line, opt_transform, opt_color] : lines) {
     const cevy::engine::Transform &trans = opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
     const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));
@@ -36,9 +39,10 @@ static void render_model(const Model &model, engine::Transform transform) {
   }
 }
 
-void render_models(ecs::Query<option<engine::Transform>, Handle<engine::Mesh>,
-                              option<Handle<Diffuse>>, option<engine::Color>>
-                       models) {
+void render_models(cevy::ecs::World &w) {
+  auto models = ecs::Query<option<engine::Transform>, Handle<engine::Mesh>,
+                              option<Handle<Diffuse>>, option<engine::Color>>::query(w);
+
   for (auto [opt_tm, mesh, opt_diffuse, opt_color] : models) {
     const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform());
     auto &handle = mesh.get();

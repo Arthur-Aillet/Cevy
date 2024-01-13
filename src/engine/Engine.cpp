@@ -43,20 +43,14 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
 
 void update_window(
     cevy::ecs::Query<cevy::engine::Camera> cams,
-    cevy::ecs::Query<cevy::engine::Line, option<cevy::engine::Transform>,
-                     option<cevy::engine::Color>>
-        lines,
-    cevy::ecs::Query<option<cevy::engine::Transform>, cevy::engine::Handle<cevy::engine::Mesh>,
-                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
-                     option<cevy::engine::Color>>
-        models,
+    cevy::ecs::World &w,
     cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
   ClearBackground(clearcolor.get());
   for (auto [cam] : cams) {
     BeginMode3D(cam);
     DrawGrid(10000, 1.0f);
-    render_models(models);
-    render_lines(lines);
+    render_models(w);
+    render_lines(w);
     EndMode3D();
   }
   EndDrawing();
