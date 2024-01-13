@@ -25,6 +25,6 @@ class Camera {
 };
 } // namespace cevy::engine
 
-void update_camera(cevy::ecs::Query<cevy::engine::Camera,
-                                    option<cevy::engine::Target>, option<cevy::engine::Transform>>
+void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Target>,
+                                    option<cevy::engine::Transform>>
                        cams);

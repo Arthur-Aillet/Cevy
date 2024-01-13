@@ -17,13 +17,15 @@
 using namespace cevy::engine;
 using namespace cevy;
 
-void render_lines(ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>> lines) {
+void render_lines(
+    ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>> lines) {
   for (auto [line, opt_transform, opt_color] : lines) {
-    const cevy::engine::Transform &trans = opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
+    const cevy::engine::Transform &trans =
+        opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
     const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));
     Vector3 end = Vector3RotateByQuaternion(line.end - line.start, trans.rotation);
     end = Vector3Add(end, line.start + trans.position);
-    DrawCylinderEx(line.start + trans.position,  end, 0.1, 0.1, 4, (::Color)col);
+    DrawCylinderEx(line.start + trans.position, end, 0.1, 0.1, 4, (::Color)col);
   }
 }
 
