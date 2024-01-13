@@ -33,11 +33,7 @@ public:
         _action = std::make_unique<A>(std::move(a));
     }
 
-    void build(ecs::App& app) override {
-        app.init_resource<NetworkCommands>(NetworkCommands(*_action, *_sync));
-        _sync->build(app);
-        _action->build(app);
-    };
+    void build(ecs::App& app) override;
 
 protected:
     NetworkPlugin();

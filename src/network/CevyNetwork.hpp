@@ -147,6 +147,17 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     sendEvent(Event::Summon, fullblock);
   }
 
+  // std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
+  //   const auto &it = _states_recv.find(id);
+  //   if (it != _states_recv.end()) {
+  //     auto ret = std::move(it->second);
+  //     _states_recv.erase(id);
+  //     ret.erase(ret.begin(), ret.begin() + 2);
+  //     return std::move(ret);
+  //   }
+  //   return std::nullopt;
+  // }
+
   private:
   void handle_state(size_t bytes, std::array<uint8_t, 512> &buffer) {
     uint64_t id;

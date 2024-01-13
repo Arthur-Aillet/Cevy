@@ -7,11 +7,17 @@
 
 add_library(network
   STATIC
-  NetworkBase.hpp
-  CevyNetwork.hpp
+  NetworkPlugin.cpp
   # network.cpp
 )
 
 set(ASIO_FOLDER ${CMAKE_BINARY_DIR}/_deps/asio)
 
-target_link_libraries(network PUBLIC asio SparseVector)
+target_link_libraries(network PUBLIC asio SparseVector ecs)
+
+
+target_include_directories(network PUBLIC
+  ../ecs
+  ../ecs/commands
+  .
+)
