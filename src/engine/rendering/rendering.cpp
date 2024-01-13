@@ -45,21 +45,21 @@ void render_models(cevy::ecs::World &w) {
 
   for (auto [opt_tm, mesh, opt_diffuse, opt_color] : models) {
     const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform());
-    auto &handle = mesh.get();
+    auto handle = mesh.get();
     ::Color ray_color;
     if (opt_color) {
       ray_color = opt_color.value();
     } else
       ray_color = ::WHITE;
     if (opt_diffuse) {
-      SetMaterialTexture(handle.mesh.materials, MATERIAL_MAP_DIFFUSE,
-                         opt_diffuse.value().get().texture);
+      SetMaterialTexture(handle->mesh.materials, MATERIAL_MAP_DIFFUSE,
+                         opt_diffuse.value().get()->texture);
     }
-    render_model(handle.mesh, tm);
+    render_model(handle->mesh, tm);
     if (opt_diffuse) {
-      handle.mesh.materialCount = 1;
-      handle.mesh.materials = (Material *)RL_CALLOC(handle.mesh.materialCount, sizeof(Material));
-      handle.mesh.materials[0] = LoadMaterialDefault();
+      handle->mesh.materialCount = 1;
+      handle->mesh.materials = (Material *)RL_CALLOC(handle->mesh.materialCount, sizeof(Material));
+      handle->mesh.materials[0] = LoadMaterialDefault();
     }
   }
 }
