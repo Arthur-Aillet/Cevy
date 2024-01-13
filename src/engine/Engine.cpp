@@ -84,7 +84,7 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_systems<cevy::engine::PreRenderStage>(close_game);
   app.add_systems<cevy::engine::PreRenderStage>(update_camera);
   app.add_systems<cevy::engine::RenderStage>(update_window);
-  // app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
+  app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
 }
 
 /*
