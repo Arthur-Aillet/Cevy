@@ -38,35 +38,35 @@ class Velocity : public Vector {
 class TransformVelocity : public engine::Transform {
   public:
   TransformVelocity(){};
-  TransformVelocity(const Transform& tm) : engine::Transform(tm) {};
+  TransformVelocity(const Transform &tm) : engine::Transform(tm){};
   ~TransformVelocity(){};
 
-    /// delta scale
-    TransformVelocity &operator*=(float s) {
-      invalidate();
+  /// delta scale
+  TransformVelocity &operator*=(float s) {
+    invalidate();
 
-      rotation = QuaternionNlerp(QuaternionIdentity(), rotation, s);
-      position *= s;
+    rotation = QuaternionNlerp(QuaternionIdentity(), rotation, s);
+    position *= s;
 
-      return *this;
+    return *this;
+  }
+
+  /// delta scale
+  TransformVelocity operator*(float s) {
+    TransformVelocity ret = *this;
+    ret *= s;
+    return ret;
+  }
+
+  static void system(ecs::Query<engine::Transform, TransformVelocity> q,
+                     ecs::Resource<cevy::ecs::Time> time) {
+    float delta_t = time.get().delta_seconds() * 60;
+    float decay = 0.995;
+    for (auto [tm, vel] : q) {
+      tm *= vel * delta_t;
+      vel *= powf(decay, delta_t);
     }
-
-    /// delta scale
-    TransformVelocity operator*(float s) {
-      TransformVelocity ret = *this;
-      ret *= s;
-      return ret;
-    }
-
-    static void system(ecs::Query<engine::Transform, TransformVelocity> q,
-                       ecs::Resource<cevy::ecs::Time> time) {
-      float delta_t = time.get().delta_seconds() * 60;
-      float decay = 0.995;
-      for (auto [tm, vel] : q) {
-        tm *= vel * delta_t;
-        vel *= powf(decay, delta_t);
-      }
-    }
+  }
 
   protected:
   private:

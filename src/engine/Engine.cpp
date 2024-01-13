@@ -41,10 +41,8 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
     close.send(cevy::ecs::AppExit{});
 }
 
-void update_window(
-    cevy::ecs::Query<cevy::engine::Camera> cams,
-    cevy::ecs::World &w,
-    cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
+void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World &w,
+                   cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
   ClearBackground(clearcolor.get());
   for (auto [cam] : cams) {
     BeginMode3D(cam);

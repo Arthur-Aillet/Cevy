@@ -9,12 +9,12 @@
 #include "Color.hpp"
 #include "Diffuse.hpp"
 #include "Handle.hpp"
-#include "Mesh.hpp"
-#include "World.hpp"
 #include "Line.hpp"
-#include "Transform.hpp"
-#include "cevy.hpp"
+#include "Mesh.hpp"
 #include "Query.hpp"
+#include "Transform.hpp"
+#include "World.hpp"
+#include "cevy.hpp"
 #include "ecs.hpp"
 #include "raylib.hpp"
 
@@ -22,13 +22,15 @@ using namespace cevy::engine;
 using namespace cevy;
 
 void render_lines(cevy::ecs::World &w) {
-  auto lines = ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>>::query(w);
+  auto lines =
+      ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>>::query(w);
   for (auto [line, opt_transform, opt_color] : lines) {
-    const cevy::engine::Transform &trans = opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
+    const cevy::engine::Transform &trans =
+        opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
     const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));
     Vector3 end = Vector3RotateByQuaternion(line.end - line.start, trans.rotation);
     end = Vector3Add(end, line.start + trans.position);
-    DrawCylinderEx(line.start + trans.position,  end, 0.1, 0.1, 4, (::Color)col);
+    DrawCylinderEx(line.start + trans.position, end, 0.1, 0.1, 4, (::Color)col);
   }
 }
 
@@ -42,8 +44,8 @@ static void render_model(const Model &model, engine::Transform transform) {
 }
 
 void render_models(cevy::ecs::World &w) {
-  auto models = ecs::Query<option<engine::Transform>, Handle<engine::Mesh>,
-                              option<Handle<Diffuse>>, option<engine::Color>>::query(w);
+  auto models = ecs::Query<option<engine::Transform>, Handle<engine::Mesh>, option<Handle<Diffuse>>,
+                           option<engine::Color>>::query(w);
 
   for (auto [opt_tm, mesh, opt_diffuse, opt_color] : models) {
     const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform());

@@ -33,8 +33,7 @@ class Transform {
         _cache_quaternion = QuaternionMultiply(p_rot, _cache_quaternion);
         auto v = Vector3RotateByQuaternion(position, _cache_quaternion);
         _cache_vector += Vector(v);
-      }
-      else {
+      } else {
         _cache_quaternion = rotation;
         _cache_vector = Vector3RotateByQuaternion(position, _cache_quaternion);
       }
@@ -183,9 +182,7 @@ class Transform {
     return {v.x, v.y, v.z};
   }
 
-  Vector xyz() const {
-    return position;
-  }
+  Vector xyz() const { return position; }
 
   Vector fwd() const {
     Vector3 v{0, 0, 1};
@@ -207,7 +204,6 @@ class Transform {
     v = Vector3RotateByQuaternion(v, rot);
     return v;
   }
-
 
   Transform &parent(const Transform &other) {
     invalidate();
@@ -233,7 +229,6 @@ class Transform {
   mutable Vector _cache_vector;
   mutable Quaternion _cache_quaternion;
   mutable bool _cache_validity;
-
 };
 } // namespace engine
 } // namespace cevy
