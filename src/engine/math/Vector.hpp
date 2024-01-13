@@ -8,6 +8,7 @@
 #pragma once
 
 #include "raylib.hpp"
+#include "../network/network.hpp"
 
 namespace cevy::engine {
 /**
@@ -115,3 +116,15 @@ class Vector {
 #endif
 };
 } // namespace cevy::engine
+
+template<>
+struct cevy::serialized_size<cevy::engine::Vector> : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
+
+
+template<>
+inline std::vector<uint8_t>& cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t>& vec, const engine::Vector& t) {
+    serialize(vec, t.x);
+    serialize(vec, t.y);
+    serialize(vec, t.z);
+    return vec;
+}
