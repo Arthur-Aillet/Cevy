@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
-#include <algorithm>
 
 #include "Pointer.hpp"
 #include "Vector.hpp"
@@ -18,174 +18,115 @@
 
 namespace cevy {
 namespace engine {
-class Transform;
-}
-} // namespace cevy
-
-class cevy::engine::Transform {
+class Transform {
   public:
-  Transform() : _m(MatrixIdentity()){};
-  Transform(Matrix &&m) : _m(m){};
-  Transform(const Vector &v) : _m(MatrixTranslate(v.x, v.y, v.z)){};
-  ~Transform(){};
+  Quaternion rotation;
+  Vector position;
 
-  inline operator const Matrix &() const {
-    if (!cache_valid()) {
-      if (_parent)
-        _cache = MatrixMultiply(_m, *_parent);
-      else
-        _cache = _m;
-    }
-    return _cache;
-  }
+  Transform() : rotation(QuaternionIdentity()), position({0, 0, 0}) {}
+  Transform(float x, float y, float z) : rotation(QuaternionIdentity()), position({x, y, z}) {}
+  Transform(const Vector &vec) : rotation(QuaternionIdentity()), position({vec.x, vec.y, vec.z}) {}
+  Transform(const Quaternion &quat) : rotation(quat), position({0, 0, 0}) {}
 
-  Transform &operator*=(const Transform &other) {
-    invalidate();
-    _m = MatrixMultiply(other, _m);
+  Transform &rotateX(float deg) {
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(deg, 0, 0));
     return *this;
   }
 
-  Vector operator*(const Vector &v) const {
-    Vector3 w{v.x, v.y, v.z};
-    w = Vector3Transform(w, *this);
-    return Vector(w.x, w.y, w.z);
-  }
-
-  Transform &rotateXYZ(const Vector &v) {
-    invalidate();
-    *this *= MatrixRotateXYZ(v);
+  Transform &rotateY(float deg) {
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(0, deg, 0));
     return *this;
   }
 
-  Transform &rotateAxis(const Vector &v, float angle) {
-    invalidate();
-    *this *= MatrixRotate(v, angle);
+  Transform &rotateZ(float deg) {
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(0, 0, deg));
     return *this;
   }
 
-  Transform &translateXYZ(const Vector &v) {
-    invalidate();
-    *this *= MatrixTranslate(v.x, v.y, v.z);
+  Transform &rotateXYZ(float x, float y, float z) {
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(x, y, z));
     return *this;
   }
 
-  Transform &translateAxis(Vector v, float distance) {
-    invalidate();
-    v = v.normalize() * distance;
-    *this *= MatrixTranslate(v.x, v.y, v.z);
+  Transform &rotateXYZ(const Vector &vec) {
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(vec.x, vec.y, vec.z));
     return *this;
   }
 
-  Vector euler() const {
-    auto q = QuaternionFromMatrix(*this);
-    auto v = QuaternionToEuler(q);
-    return {v.x, v.y, v.z};
-  }
-
-  Vector xyz() const {
-    const Matrix &m = *this;
-    return { m.m12, m.m13, m.m14 };
-  }
-
-  Vector fwd() const {
-    Vector3 v{0, 0, 1};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
-  }
-
-  Vector tan() const {
-    Vector3 v{1, 0, 0};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
-  }
-
-  Vector cotan() const {
-    Vector3 v{0, 1, 0};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
-  }
-
-  Transform &parent(const Transform &other) {
-    _parent = pointer<Transform>(other._lock, other);
+  Transform &setRotationX(float deg) {
+    rotation = QuaternionFromEuler(deg, 0, 0);
     return *this;
   }
 
-  protected:
-  template<typename F>
-  Transform &map(F f) {
-    _m.m0  = f(_m.m0);
-    _m.m1  = f(_m.m1);
-    _m.m2  = f(_m.m2);
-    _m.m3  = f(_m.m3);
-    _m.m4  = f(_m.m4);
-    _m.m5  = f(_m.m5);
-    _m.m6  = f(_m.m6);
-    _m.m7  = f(_m.m7);
-    _m.m8  = f(_m.m8);
-    _m.m9  = f(_m.m9);
-    _m.m10 = f(_m.m10);
-    _m.m11 = f(_m.m11);
-    _m.m12 = f(_m.m12);
-    _m.m13 = f(_m.m13);
-    _m.m14 = f(_m.m14);
-    _m.m15 = f(_m.m15);
+  Transform &setRotationY(float deg) {
+    rotation = QuaternionFromEuler(0, deg, 0);
     return *this;
   }
 
-  template<typename F, typename... T>
-  static Transform map(F f, T... t) {
-    Transform ret;
-    ret._m.m0  = f(t._m.m0...);
-    ret._m.m1  = f(t._m.m1...);
-    ret._m.m2  = f(t._m.m2...);
-    ret._m.m3  = f(t._m.m3...);
-    ret._m.m4  = f(t._m.m4...);
-    ret._m.m5  = f(t._m.m5...);
-    ret._m.m6  = f(t._m.m6...);
-    ret._m.m7  = f(t._m.m7...);
-    ret._m.m8  = f(t._m.m8...);
-    ret._m.m9  = f(t._m.m9...);
-    ret._m.m10 = f(t._m.m10...);
-    ret._m.m11 = f(t._m.m11...);
-    ret._m.m12 = f(t._m.m12...);
-    ret._m.m13 = f(t._m.m13...);
-    ret._m.m14 = f(t._m.m14...);
-    ret._m.m15 = f(t._m.m15...);
-    return ret;
+  Transform &setRotationZ(float deg) {
+    rotation = QuaternionFromEuler(0, 0, deg);
+    return *this;
   }
 
-  static Transform lerp(const Transform& a, const Transform& b, float s) {
-    Transform a1 = a;
-    Transform b1 = b;
-
-    a1.map([s](float x) -> float { return x * (1 - s); });
-    b1.map([s](float x) -> float { return x * s; });
-
-    a1 = Transform::map([](auto a, auto b){return a + b;}, a1, b1);
-    return a1;
+  Transform &setRotationXYZ(float x, float y, float z) {
+    rotation = QuaternionFromEuler(x, y, z);
+    return *this;
   }
 
-  float determinant() const {
-    return MatrixDeterminant(_m);
+  Transform &setRotationXYZ(const Vector &vec) {
+    rotation = QuaternionFromEuler(vec.x, vec.y, vec.z);
+    return *this;
   }
 
-  inline void invalidate() const { _cache_validity = false; }
-
-  inline bool cache_valid() const {
-    if (!_cache_validity) {
-      return false;
-    }
-    if (_parent)
-      return _parent->cache_valid();
-    else
-      return true;
+  Transform &translateX(float x) {
+    position.x += x;
+    return *this;
   }
 
-  pointer<Transform> _parent;
-  std::shared_ptr<int> _lock = std::make_shared<int>();
-  Matrix _m;
-  mutable Matrix _cache;
-  mutable bool _cache_validity;
+  Transform &translateY(float y) {
+    position.y = y;
+    return *this;
+  }
 
-  private:
+  Transform &translateZ(float z) {
+    position.z = z;
+    return *this;
+  }
+
+  Transform &translateXYZ(float x, float y, float z) {
+    position += Vector(x, y, z);
+    return *this;
+  }
+
+  Transform &translateXYZ(const Vector &vec) {
+    position += vec;
+    return *this;
+  }
+
+  Transform &setPositionX(float x) {
+    position.x = x;
+    return *this;
+  }
+
+  Transform &setPositionY(float y) {
+    position.y = y;
+    return *this;
+  }
+
+  Transform &setPositionZ(float z) {
+    position.z = z;
+    return *this;
+  }
+
+  Transform &setPositionXYZ(float x, float y, float z) {
+    position = Vector(x, y, z);
+    return *this;
+  }
+
+  Transform &setPositionXYZ(const Vector &vec) {
+    position = vec;
+    return *this;
+  }
 };
+} // namespace engine
+} // namespace cevy

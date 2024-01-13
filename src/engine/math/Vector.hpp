@@ -106,6 +106,7 @@ class Vector {
   Vector cross(const Vector &rhs) const;
 
   void rotate(const Vector &rot);
+  void rotate(const Quaternion &rot);
   void rotateR(const Vector &rot);
 
   Vector reflect(const Vector &normal) const;
@@ -116,7 +117,6 @@ class Vector {
 #endif
 };
 
-std::ostream& operator<<(std::ostream& cout, const Vector &vec);
+std::ostream &operator<<(std::ostream &cout, const Vector &vec);
 
 } // namespace cevy::engine
-

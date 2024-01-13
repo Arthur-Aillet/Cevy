@@ -77,11 +77,10 @@ Vector Vector::scale(const Vector &rhs) const {
 
 #else
 
-std::ostream& cevy::engine::operator<<(std::ostream& cout, const Vector &vec)
-{
-    cout << "{ " << vec.x << ", " << vec.y << ", " << vec.z << " }";
+std::ostream &cevy::engine::operator<<(std::ostream &cout, const Vector &vec) {
+  cout << "{ " << vec.x << ", " << vec.y << ", " << vec.z << " }";
 
-    return cout;
+  return cout;
 }
 
 float Vector::eval() const { return (x * x + y * y + z * z); }
@@ -182,13 +181,19 @@ Vector Vector::operator/(const Vector &rhs) const {
   return v;
 }
 
-Vector Vector::cross(const Vector & rhs) const
-{
-    Vector p;
-    p.x = (y * rhs.z) - (z * rhs.y);
-    p.y = -((x * rhs.z) - (z * rhs.x));
-    p.z = (x * rhs.y) - (y * rhs.x);
-    return p;
+Vector Vector::cross(const Vector &rhs) const {
+  Vector p;
+  p.x = (y * rhs.z) - (z * rhs.y);
+  p.y = -((x * rhs.z) - (z * rhs.x));
+  p.z = (x * rhs.y) - (y * rhs.x);
+  return p;
+}
+
+void Vector::rotate(const Quaternion &rot) {
+  Vector3 rotated = Vector3RotateByQuaternion(*this, rot);
+  this->x = rotated.x;
+  this->y = rotated.y;
+  this->z = rotated.z;
 }
 
 void Vector::rotate(const Vector &rot) {

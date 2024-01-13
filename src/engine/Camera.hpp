@@ -10,9 +10,9 @@
 #include "Position.hpp"
 #include "Query.hpp"
 #include "Target.hpp"
+#include "Transform.hpp"
 #include "cevy.hpp"
 #include "raylib.hpp"
-#include <optional>
 
 namespace cevy::engine {
 class Camera {
@@ -27,5 +27,5 @@ class Camera {
 } // namespace cevy::engine
 
 void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>,
-                                    option<cevy::engine::Target>>
+                                    option<cevy::engine::Target>, option<cevy::engine::Transform>>
                        cams);

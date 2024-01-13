@@ -26,11 +26,12 @@ void render_lines(ecs::Query<option<Position>, Line, option<cevy::engine::Color>
   }
 }
 
-static void render_model(const Model& model, Matrix transform)
-{
-  transform = MatrixMultiply(model.transform, transform);
+static void render_model(const Model &model, engine::Transform transform) {
+  Matrix rot = QuaternionToMatrix(transform.rotation);
+  Matrix pos = MatrixTranslate(transform.position.x, transform.position.y, transform.position.z);
+  Matrix final = MatrixMultiply(rot, pos);
   for (int i = 0; i < model.meshCount; ++i) {
-    DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], transform);
+    DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], final);
   }
 }
 

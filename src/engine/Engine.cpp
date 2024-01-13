@@ -12,13 +12,12 @@
 #include "Color.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
+#include "Event.hpp"
 #include "Line.hpp"
 #include "Position.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
 #include "Velocity.hpp"
-#include "Event.hpp"
-#include "Position.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
 
@@ -83,7 +82,7 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_systems<cevy::engine::PreRenderStage>(close_game);
   app.add_systems<cevy::engine::PreRenderStage>(update_camera);
   app.add_systems<cevy::engine::RenderStage>(update_window);
-  app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
+  // app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
 }
 
 /*
