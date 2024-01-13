@@ -14,7 +14,6 @@
 #include "EntityCommands.hpp"
 #include "Event.hpp"
 #include "Line.hpp"
-#include "Position.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
 #include "Velocity.hpp"
@@ -42,10 +41,10 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
 }
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
-                   cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
+                   cevy::ecs::Query<cevy::engine::Line, option<cevy::engine::Transform>,
                                     option<cevy::engine::Color>>
                        lines,
-                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Transform>,
+                   cevy::ecs::Query<option<cevy::engine::Transform>,
                                     cevy::engine::Handle<cevy::engine::Mesh>,
                                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
                                     option<cevy::engine::Color>>
@@ -70,7 +69,6 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PreRenderStage>();
   app.add_stage<PostRenderStage>();
   app.init_component<cevy::engine::Camera>();
-  app.init_component<cevy::engine::Position>();
   app.init_component<cevy::engine::Velocity>();
   app.init_component<cevy::engine::Target>();
   app.init_component<cevy::engine::Line>();

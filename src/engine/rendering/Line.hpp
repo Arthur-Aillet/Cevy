@@ -7,15 +7,14 @@
 
 #pragma once
 
-#include "Position.hpp"
+#include "Vector.hpp"
 
-/// /!\ Rotation not supported
 namespace cevy::engine {
 class Line {
   public:
-  Position start;
-  Position end;
+  Vector start;
+  Vector end;
 
-  Line(Position start, Position end) : start(start), end(end) {}
+  Line(Vector start, Vector end) : start(start), end(end) {}
 };
 } // namespace cevy::engine

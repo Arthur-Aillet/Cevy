@@ -119,4 +119,5 @@ class Vector {
 
 std::ostream &operator<<(std::ostream &cout, const Vector &vec);
 
+
 } // namespace cevy::engine

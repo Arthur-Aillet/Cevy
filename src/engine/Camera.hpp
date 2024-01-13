@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Position.hpp"
 #include "Query.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
@@ -26,6 +25,6 @@ class Camera {
 };
 } // namespace cevy::engine
 
-void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>,
+void update_camera(cevy::ecs::Query<cevy::engine::Camera,
                                     option<cevy::engine::Target>, option<cevy::engine::Transform>>
                        cams);

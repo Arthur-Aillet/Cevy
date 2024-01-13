@@ -29,10 +29,10 @@ cevy::engine::Camera::operator Camera3D *() { return &this->camera; }
 
 cevy::engine::Camera::operator Camera3D() const { return this->camera; }
 
-void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>,
+void update_camera(cevy::ecs::Query<cevy::engine::Camera,
                                     option<cevy::engine::Target>, option<cevy::engine::Transform>>
                        cams) {
-  for (auto [cam, opt_pos, opt_target, opt_transform] : cams) {
+  for (auto [cam, opt_target, opt_transform] : cams) {
     // if (opt_pos && !opt_transform) {
     //   cam.camera.position = opt_pos.value();
     // }

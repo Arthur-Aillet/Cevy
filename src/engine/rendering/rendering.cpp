@@ -17,12 +17,13 @@
 using namespace cevy::engine;
 using namespace cevy;
 
-void render_lines(ecs::Query<option<Position>, Line, option<cevy::engine::Color>> lines) {
-  for (auto [opt_pos, lines, opt_color] : lines) {
-    const Position &pos = opt_pos.value_or(Position(0., 0., 0.));
+void render_lines(ecs::Query<Line, option<cevy::engine::Transform>, option<cevy::engine::Color>> lines) {
+  for (auto [line, opt_transform, opt_color] : lines) {
+    const cevy::engine::Transform &trans = opt_transform.value_or(cevy::engine::Transform(0., 0., 0.));
     const cevy::engine::Color &col = opt_color.value_or(cevy::engine::Color(0., 255., 60));
-
-    DrawCylinderEx(lines.start + pos, lines.end + pos, 0.1, 0.1, 4, (::Color)col);
+    Vector3 end = Vector3RotateByQuaternion(line.end - line.start, trans.rotation);
+    end = Vector3Add(end, line.start + trans.position);
+    DrawCylinderEx(line.start + trans.position,  end, 0.1, 0.1, 4, (::Color)col);
   }
 }
 
@@ -35,12 +36,11 @@ static void render_model(const Model &model, engine::Transform transform) {
   }
 }
 
-void render_models(ecs::Query<option<Position>, option<engine::Transform>, Handle<engine::Mesh>,
+void render_models(ecs::Query<option<engine::Transform>, Handle<engine::Mesh>,
                               option<Handle<Diffuse>>, option<engine::Color>>
                        models) {
-  for (auto [opt_pos, opt_tm, mesh, opt_diffuse, opt_color] : models) {
-    const Position &pos = opt_pos.value_or(Position(0., 0., 0.));
-    const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform(pos));
+  for (auto [opt_tm, mesh, opt_diffuse, opt_color] : models) {
+    const cevy::engine::Transform &tm = opt_tm.value_or(cevy::engine::Transform());
     auto &handle = mesh.get();
     ::Color ray_color;
     if (opt_color) {
