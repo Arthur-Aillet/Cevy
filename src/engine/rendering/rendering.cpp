@@ -7,14 +7,16 @@
 
 #include "rendering.hpp"
 #include "Color.hpp"
+#include "Diffuse.hpp"
+#include "Handle.hpp"
+#include "Mesh.hpp"
 #include "World.hpp"
 #include "Line.hpp"
 #include "Transform.hpp"
 #include "cevy.hpp"
+#include "Query.hpp"
 #include "ecs.hpp"
 #include "raylib.hpp"
-#include <raylib.h>
-#include <raymath.h>
 
 using namespace cevy::engine;
 using namespace cevy;

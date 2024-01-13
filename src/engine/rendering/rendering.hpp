@@ -7,14 +7,6 @@
 
 #pragma once
 
-#include "Color.hpp"
-#include "Diffuse.hpp"
-#include "Handle.hpp"
-#include "Line.hpp"
-#include "Mesh.hpp"
-#include "Query.hpp"
-#include "Transform.hpp"
-#include "cevy.hpp"
 #include "ecs.hpp"
 
 void render_models(cevy::ecs::World &world);

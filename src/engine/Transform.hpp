@@ -7,14 +7,11 @@
 
 #pragma once
 
-#include <algorithm>
 #include <raylib.h>
 #include <raymath.h>
-#include <string>
 
 #include "Pointer.hpp"
 #include "Vector.hpp"
-#include "cevy.hpp"
 
 namespace cevy {
 namespace engine {
