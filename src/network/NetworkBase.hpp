@@ -122,8 +122,7 @@ class cevy::NetworkBase {
     _temp_tcp_co = TcpConnexion(_io_context);
 
     _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this](asio::error_code error) {
-      std::cout << "new tcp connexion accepted to the server"
-                << std::endl; // REVIEW - debug message
+      std::cout << "new tcp connexion accepted to the server" << std::endl;
       _tcp_connexions.push_back(std::move(_temp_tcp_co));
       read_one_TCP(_tcp_connexions.back());
       tcp_accept_new_connexion();
@@ -132,7 +131,7 @@ class cevy::NetworkBase {
   }
 
   void close_all_tcp() {
-    std::cout << "closing tcp connexions" << std::endl; // REVIEW - debug print
+    std::cout << "closing tcp connexions" << std::endl;
     for (auto &i : _tcp_connexions) {
       i.socket.close();
     }
@@ -140,7 +139,7 @@ class cevy::NetworkBase {
   }
 
   void close_dead_tcp() {
-    std::cout << "closing dead tcp connexions" << std::endl; // REVIEW - debug print
+    std::cout << "closing dead tcp connexions" << std::endl;
     auto to_erase =
         std::remove_if(_tcp_connexions.begin(), _tcp_connexions.end(), [](TcpConnexion &co) {
           if (!co.socket.is_open())
@@ -172,9 +171,7 @@ class cevy::NetworkBase {
 
   public:
   void start_thread() {
-    _nw_thread = std::thread([this]() {
-    this->_io_context.run();
-    });
+    _nw_thread = std::thread([this]() { this->_io_context.run(); });
   }
 
   NetworkBase(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
