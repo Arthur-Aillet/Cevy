@@ -35,6 +35,46 @@ FetchContent_Populate(cevy)
 ```
 
 
+# Setup
+
+## C++ Setup
+All Cevy app and engine is written in C++. This means that before we begin, we need to set up our C++ development environment.
+
+You can check that you have installed C++ on our linux computer with this command:
+
+``` gcc --version```
+
+### Installing C++
+
+1. On **Debian**, **Ubuntu**, **Linux Mint**, **Deepin**
+
+``` sudo apt-get install gcc```
+
+2. On **Arch Linux**, **Manjaro**, **ArkOS**, **EndeavourOS**
+
+``` sudo pacman -S gcc```
+
+3. On **RedHat Enterprise Linux**, **Fedora**, **CentOS**, **SUSE**
+
+``` sudo dnf install gcc```
+
+
+### Install OS dependencies
+
+#### Linux
+
+##### Ubuntu
+
+``` sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libglfw3-dev```
+
+##### Fedora
+
+``` sudo dnf install alsa-lib-devel xorg-x11-server-devel libXrandr-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXcursor-devel libXinerama-devel glfw-devel```
+
+##### Pacman
+
+``` sudo pacman -S alsa-lib xorg-server libxrandr libxi mesa libglu libxcursor xorg-server-common libxinerama glfw-x11```
+
 
 
 
