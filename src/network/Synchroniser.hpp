@@ -21,7 +21,7 @@
 #include "Indirect.hpp"
 #include "Plugin.hpp"
 #include "Query.hpp"
-#include "Schedule.hpp"
+#include "Scheduler.hpp"
 #include "cevy.hpp"
 #include "commands/Commands.hpp"
 #include "commands/EntityCommands.hpp"
@@ -30,8 +30,8 @@
 
 class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   public:
-  class SummonStage : public ecs::Schedule::before<ecs::Schedule::PreUpdate> {};
-  class SyncStage : public ecs::Schedule::after<SummonStage> {};
+  class SummonStage : public ecs::core_stage::before<ecs::core_stage::PreUpdate> {};
+  class SyncStage : public ecs::core_stage::after<SummonStage> {};
   struct SyncId {
     size_t id = unset;
     size_t type = 0;

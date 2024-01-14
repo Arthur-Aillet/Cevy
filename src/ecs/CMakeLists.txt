@@ -32,8 +32,9 @@ add_library(world
 
 add_library(schedule
   STATIC
-  Schedule.cpp
-  Schedule.hpp
+  Scheduler.cpp
+  Scheduler.hpp
+  Stage.hpp
   )
 
 add_library(default_plugin

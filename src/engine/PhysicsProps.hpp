@@ -1,19 +1,28 @@
 /*
 ** EPITECH PROJECT, 2024
-** rtype
+** C++evy
 ** File description:
 ** PhysicsProps
 */
 
 #pragma once
 
+namespace cevy {
+namespace engine {
 class PhysicsProps {
-public:
-    float mass = 1;
-    float decay = 0.995;
-    PhysicsProps() {};
-    ~PhysicsProps() {};
+  public:
+  float mass = 1;
+  float decay = 0.005;
+  PhysicsProps(){};
+  ~PhysicsProps(){};
 
-protected:
-private:
+  PhysicsProps &setDecay(float val) {
+    decay = val;
+    return *this;
+  }
+
+  protected:
+  private:
 };
+} // namespace engine
+} // namespace cevy

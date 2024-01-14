@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** time
 */
@@ -11,26 +11,21 @@
 #include <chrono>
 #include <ratio>
 
-using namespace std::chrono;
-
 namespace cevy::ecs {
 class Time {
   private:
-  time_point<high_resolution_clock> _first_update;
-  time_point<high_resolution_clock> _last_update;
-  duration<double, std::ratio<1>> _last_update_delta;
+  std::chrono::time_point<std::chrono::high_resolution_clock> _first_update;
+  std::chrono::time_point<std::chrono::high_resolution_clock> _last_update;
+  std::chrono::duration<double, std::ratio<1>> _last_update_delta;
 
   public:
-  duration<double, std::ratio<1>> startup() { return high_resolution_clock::now() - _first_update; }
+  std::chrono::duration<double, std::ratio<1>> startup();
 
-  void update_with_instant(time_point<high_resolution_clock> &&instant) {
-    _last_update_delta = instant - _last_update;
-    _last_update = instant;
-  }
+  void update_with_instant(std::chrono::time_point<std::chrono::high_resolution_clock> &&instant);
 
-  duration<double, std::ratio<1>> delta() { return _last_update_delta; }
+  std::chrono::duration<double, std::ratio<1>> delta();
 
-  double delta_seconds() { return _last_update_delta.count(); }
+  double delta_seconds();
 
   Time();
 };

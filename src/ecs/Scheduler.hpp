@@ -1,11 +1,12 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
-** Schedule
+** Scheduler
 */
 
 #pragma once
+
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -14,52 +15,19 @@
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
+#include <iostream>
 
 #include "Event.hpp"
+#include "Stage.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
-class cevy::ecs::Schedule {
-  public:
-  struct IsStage {};
+namespace cevy::ecs {
 
-  template <typename Before = std::nullopt_t, typename After = std::nullopt_t,
-            typename Repeat = std::true_type>
-  class Stage : public IsStage {
-    public:
-    using is_repeat = Repeat;
-    using previous = Before;
-    using next = After;
+typedef struct AppExit {
+} AppExit;
 
-    template <typename T>
-    using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
-
-    template <typename T>
-    using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
-  };
-
-  template <typename T>
-  using before = Stage<>::before<T>;
-  template <typename T>
-  using after = Stage<>::after<T>;
-
-  using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
-
-  class Startup : public at_start {};
-  class PreStartup : public before<Startup> {};
-  class PostStartup : public after<Startup> {};
-
-  class First : public Stage<> {};
-
-  class Update : public after<First> {};
-  class PreUpdate : public before<Update> {};
-  class PostUpdate : public after<Update> {};
-
-  class StateTransition : public before<Update> {};
-  class RunFixedUpdateLoop : public before<Update> {};
-
-  class Last : public after<PostUpdate> {};
-
+class Scheduler {
   using SystemId = size_t;
 
   private:
@@ -126,11 +94,8 @@ class cevy::ecs::Schedule {
   using system_function = std::function<void(World &)>;
   using system = std::tuple<system_function, std::type_index>;
   std::vector<system> _systems;
-  Schedule() : _stage(_at_start_schedule.begin()){};
-  ~Schedule() = default;
-
-  void quit() const;
-  void abort();
+  Scheduler() : _stage(_at_start_schedule.begin()){};
+  ~Scheduler() = default;
 
   template <class F, class S, class... Args>
   void add_class_system(const F &func) {
@@ -148,7 +113,7 @@ class cevy::ecs::Schedule {
 
   template <class R, class... Args>
   void add_system(R (&&func)(Args...)) {
-    add_system<Update>(func);
+    add_system<core_stage::Update>(func);
   }
 
   template <class S, class R, class... Args>
@@ -184,7 +149,6 @@ class cevy::ecs::Schedule {
 
   protected:
   mutable bool _stop = false;
-  mutable bool _abort = false;
   std::list<std::type_index>::iterator _stage;
 
   void runStartStages(World &world);
@@ -196,3 +160,4 @@ class cevy::ecs::Schedule {
   public:
   void run(World &world);
 };
+} // namespace cevy::ecs
