@@ -53,6 +53,11 @@ class Timer {
 
   inline const DurationType &duration() { return _duration; }
 
+  inline Timer &setDuration(float duration) {
+    _duration = DurationType(duration);
+    return *this;
+  }
+
   inline Timer &setDuration(const DurationType &duration) {
     _duration = duration;
     return *this;
