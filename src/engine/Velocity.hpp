@@ -76,3 +76,25 @@ class TransformVelocity : public engine::Transform {
   private:
 };
 } // namespace cevy::engine
+
+template <>
+struct cevy::serialized_size<cevy::engine::TransformVelocity>
+    : public std::integral_constant<size_t, serialized_size<engine::Vector>::value + serialized_size<engine::Vector>::value + serialized_size<Quaternion>::value> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec,
+                                                                   const cevy::engine::TransformVelocity &t) {
+  serialize(vec, t.position);
+  serialize(vec, t.rotation);
+  serialize(vec, t.scale);
+  return vec;
+}
+
+template <>
+inline cevy::engine::TransformVelocity cevy::deserialize<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec) {
+  cevy::engine::Transform t;
+  t.scale = deserialize<engine::Vector>(vec);
+  t.rotation = deserialize<Quaternion>(vec);
+  t.position = deserialize<engine::Vector>(vec);
+  return t;
+}

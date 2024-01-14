@@ -125,7 +125,7 @@ std::ostream &operator<<(std::ostream &cout, const Vector &vec);
 
 template <>
 struct cevy::serialized_size<cevy::engine::Vector>
-    : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
+    : public std::integral_constant<size_t, 3 * serialized_size<float>::value> {};
 
 template <>
 inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t> &vec,
@@ -134,4 +134,13 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<u
   serialize(vec, t.y);
   serialize(vec, t.z);
   return vec;
+}
+
+template <>
+inline cevy::engine::Vector cevy::deserialize<cevy::engine::Vector>(std::vector<uint8_t> &vec) {
+  engine::Vector t;
+  t.z = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
+  return t;
 }

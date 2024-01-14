@@ -13,6 +13,8 @@
 #include "Pointer.hpp"
 #include "Vector.hpp"
 
+#include "network/network.hpp"
+
 namespace cevy {
 namespace engine {
 class Transform {
@@ -329,3 +331,49 @@ class Transform {
 };
 } // namespace engine
 } // namespace cevy
+
+template <>
+struct cevy::serialized_size<Quaternion>
+    : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<Quaternion>(std::vector<uint8_t> &vec,
+                                                                   const Quaternion &t) {
+  serialize(vec, t.x);
+  serialize(vec, t.y);
+  serialize(vec, t.z);
+  serialize(vec, t.w);
+  return vec;
+}
+
+template <>
+inline Quaternion cevy::deserialize<Quaternion>(std::vector<uint8_t> &vec) {
+  Quaternion t;
+  t.w = deserialize<float>(vec);
+  t.z = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
+  return t;
+}
+
+template <>
+struct cevy::serialized_size<cevy::engine::Transform>
+    : public std::integral_constant<size_t, serialized_size<engine::Vector>::value + serialized_size<engine::Vector>::value + serialized_size<Quaternion>::value> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Transform>(std::vector<uint8_t> &vec,
+                                                                   const cevy::engine::Transform &t) {
+  serialize(vec, t.position);
+  serialize(vec, t.rotation);
+  serialize(vec, t.scale);
+  return vec;
+}
+
+template <>
+inline cevy::engine::Transform cevy::deserialize<cevy::engine::Transform>(std::vector<uint8_t> &vec) {
+  cevy::engine::Transform t;
+  t.scale = deserialize<engine::Vector>(vec);
+  t.rotation = deserialize<Quaternion>(vec);
+  t.position = deserialize<engine::Vector>(vec);
+  return t;
+}
