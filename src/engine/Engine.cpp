@@ -46,7 +46,6 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World
   ClearBackground(clearcolor.get());
   for (auto [cam] : cams) {
     BeginMode3D(cam);
-    DrawGrid(10000, 1.0f);
     render_models(w);
     render_lines(w);
     EndMode3D();

@@ -191,6 +191,20 @@ class Transform {
     return v;
   }
 
+  Vector up() const {
+    Vector3 v{0, 1, 0};
+    auto [vec, rot] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
+  }
+
+  Vector right() const {
+    Vector3 v{0, 1, 0};
+    auto [vec, rot] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
+  }
+
   Vector tan() const {
     Vector3 v{1, 0, 0};
     auto [vec, rot] = get();
