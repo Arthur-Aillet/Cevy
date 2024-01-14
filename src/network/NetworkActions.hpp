@@ -168,7 +168,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       std::function<R2(typename A::Arg, Arg2...)> client_fail = []() {}) {
     using server_ftype = std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>;
     using ftype = std::function<void(ecs::Commands &, typename A::Arg)>;
-    _super_actions[A::value] = std::make_tuple(
+    _super_actions[std::type_index(typeid(A))] = std::make_tuple(
         std::make_any<server_ftype>([server](ecs::Commands &cmd, typename A::Arg given) mutable {
           return cmd.system_with(server, given);
         }),
@@ -203,7 +203,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       R2 (&&client_fail)(typename A::Arg, Arg2...) = []() {}) {
     using server_ftype = std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>;
     using ftype = std::function<void(ecs::Commands &, typename A::Arg)>;
-    _super_actions[A::value] = std::make_tuple(
+    _super_actions[std::type_index(typeid(A))] = std::make_tuple(
         std::make_any<server_ftype>([server](ecs::Commands &cmd, typename A::Arg given) mutable {
           cmd.system_with(server, given);
         }),

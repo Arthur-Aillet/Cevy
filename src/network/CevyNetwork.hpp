@@ -230,6 +230,26 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
     }
   }
 
+  void tcp_receive(std::error_code error, size_t bytes, TcpConnexion &co) override {
+    if (error) {
+      std::cerr << "(ERROR)tcp_rcv:" << error << std::endl;
+      return;
+    }
+    if (bytes <= 0)
+      return;
+    if (co.buffer[0] == (uint8_t)Communication::State) {
+      return handle_state(bytes, co.buffer);
+    }
+    if (co.buffer[0] == (uint8_t)Communication::ActionSuccess ||
+        co.buffer[0] == (uint8_t)Communication::ActionFailure ||
+        co.buffer[0] == (uint8_t)Communication::Action) {
+      return handle_action(bytes, co.buffer);
+    }
+    if (co.buffer[0] == (uint8_t)Communication::Event) {
+      return handle_events(bytes, co.buffer);
+    }
+  }
+
   private:
   // the data part contains only pure state data
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;

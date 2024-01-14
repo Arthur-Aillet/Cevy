@@ -45,7 +45,7 @@ class cevy::NetworkBase {
   class TcpConnexion {
     public:
     tcp::socket socket;
-    std::vector<uint8_t> buffer = std::vector<uint8_t>(1024, 0);
+    std::array<uint8_t, 512> buffer;
 
     TcpConnexion(asio::io_context &socket) : socket(socket) {}
   };

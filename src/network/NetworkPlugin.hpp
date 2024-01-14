@@ -14,30 +14,35 @@
 #include "App.hpp"
 #include "Synchroniser.hpp"
 #include "network.hpp"
+#include "network/network.hpp"
 
+template<typename S, typename A, typename N = cevy::CevyNetwork>
 class cevy::NetworkPlugin : ecs::Plugin {
 public:
     ~NetworkPlugin();
 
-    template<typename S, typename A>
-    static void construct(S&& s, A&& a) {
-        NetworkPlugin this_;
-        this_._sync = std::make_unique<S>(std::move(s));
-        this_._action = std::make_unique<A>(std::move(a));
 
-    }
+    NetworkPlugin(N&& net)
+     : _net(std::move(net)),
+        _sync(_net),
+        _action(_net) {};
 
-    template<typename S, typename A>
-    NetworkPlugin(S&& s, A&& a) {
-        _sync = std::make_unique<S>(std::move(s));
-        _action = std::make_unique<A>(std::move(a));
-    }
+    // template<typename S, typename A>
+    // NetworkPlugin(S&& s, A&& a) {
+    //     _sync = std::make_unique<S>(std::move(s));
+    //     _action = std::make_unique<A>(std::move(a));
+    // }
 
-    void build(ecs::App& app) override;
+    void build(cevy::ecs::App& app) {
+        app.init_resource<cevy::NetworkCommands>(cevy::NetworkCommands(*_action, *_sync, app));
+        _sync.build(app);
+        _action.build(app);
+    };
 
 protected:
     NetworkPlugin();
-    std::unique_ptr<Synchroniser> _sync;
-    std::unique_ptr<NetworkActions> _action;
+    N _net;
+    S _sync;
+    A _action;
 private:
 };
