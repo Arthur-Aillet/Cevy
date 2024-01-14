@@ -177,7 +177,7 @@ Cevy programs are referred to as `App`s. The simplest Cevy app look like this:
 int main() {
     App app;
     app.run();
-    return 0,
+    return 0;
 }
 ```
 
@@ -193,7 +193,7 @@ For example, one entity might have a `Position` and `Velocity` component, wherea
 
 The ECS pattern encourages clean, decoupled designs by forcing you to break up your app data and logic into its core components. It also helps make your code faster by optimizing memory access patterns and making parallelism easier.
 
-# Your First System
+## Your First System
 
 Past the following function into your `main.cpp` file:
 ```cpp
@@ -210,13 +210,13 @@ int main() {
     App app;
     app.add_systems<core_stage::Update>(hello_world);
     app.run();
-    return 0,
+    return 0;
 }
 ```
 The `add_systems` function adds the system to your App's `Update Shedule`, but we'll cover that more later.
 Now you can run your app again using. You should see `Hello World!` printed once in your terminal.
 
-# Your First Components
+## Your First Components
 Greeting the whole world is great, but what if we want to greet specific people? In ECS, you would generally model people as entities with a set of components that define them. Let's start simple with a `Person` component.
 
 Create your class `Person`
@@ -265,11 +265,11 @@ int main() {
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world);
     app.run();
-    return 0,
+    return 0;
 }
 ```
 
-# Yout First Query
+## Yout First Query
 We could run this now and the `add_people` system would run first, followed by `hello_world`. But our new people don't have anything to do yet! Let's make a system that properly greets the new citizens of our `World`
 
 ```cpp
@@ -295,7 +295,7 @@ int main() {
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world, greet_people);
     app.run();
-    return 0,
+    return 0;
 }
 ```
 Running our app will result in the following output:
@@ -309,6 +309,78 @@ Marvelous!
 ```
 
 Quick Note: "hello world!" might show up in a different order than it does above. This is because systems run in parallel by default whenever possible.
+
+# Plugins
+One of Cevy's core principales is modularity. All Cevy engine features are implemented as plugins.This includes internal features like the renderer, but games themselves are also implemented as plugins! This empowers developers to pick and choose which features they want. Don't need a UI? Don't register the UiPlugin. Want to build a headless server? Don't register the RenderPlugin.
+
+This also means you are free to replace any components you don't like. If you feel the need, you are welcome to build your own UiPlugin, but consider contributing it back to Cevy if you think it would be useful!
+
+However, most developers don't need a custom experience and just want the "full engine" experience with no hassle. For this, Cevy provides a set of "default plugins".
+
+## Cevy's Default Plugins
+Let's make our app more interesting by adding the "default Cevy plugins".
+
+```cpp
+int main() {
+    App app;
+    app.add_plugins(DefaultPlugins());
+    app.init_component<Name>();
+    app.init_component<Person>();
+    app.add_systems<core_stage::Startup>(add_people);
+    app.add_systems<core_stage::Update>(hello_world, greet_people);
+    app.run();
+    return 0;
+}
+```
+
+## Creating your first plugin
+For better organization, let's move all of our "hello" logic to a plugin. To create a plugin we just need to implement the Plugin interface. Add the following code to your `main.cpp` file:
+
+```cpp
+#include "Plugin.hpp"
+
+class HelloPlugin : public Plugin {
+    public:
+    void build(App &app) {
+        // add things to your app here
+    }
+};
+```
+Then register the plugin in your App like this:
+
+```cpp
+int main() {
+    App app;
+    app.add_plugins(DefaultPlugins(), HelloPlugin());
+    app.init_component<Name>();
+    app.init_component<Person>();
+    app.add_systems<core_stage::Startup>(add_people);
+    app.add_systems<core_stage::Update>(hello_world, greet_people);
+    app.run();
+    return 0;
+}
+```
+Note add_plugins can add any number of plugins (or plugin groups like DefaultPlugins) by passing in a tuple of them. Now all that's left is to move our systems into HelloPlugin, which is just a matter of cut and paste. The app variable in our plugin's build() function is the same builder type we use in our main() function:
+
+```cpp
+class HelloPlugin : public Plugin {
+    public:
+    void build(App &app) {
+        app.init_component<Name>();
+        app.init_component<Person>();
+        app.add_systems<core_stage::Startup>(add_people);
+        app.add_systems<core_stage::Update>(hello_world, greet_people);
+    }
+};
+
+int main() {
+    App app;
+    app.add_plugins(DefaultPlugins(), HelloPlugin());
+    app.run();
+    return 0;
+}
+```
+Try running the app again. It should do exactly what it did before. In the next section, we'll fix the "hello" spam using Resources.
 
 [1]: https://github.com/Arthur-Aillet/Cevy "Title"
 [2]: https://github.com/Arthur-Aillet/RType "Title"
