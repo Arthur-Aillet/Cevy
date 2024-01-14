@@ -222,21 +222,35 @@ Greeting the whole world is great, but what if we want to greet specific people?
 Create your class `Person`
 
 ```cpp
-class Person {
+class Name {
     private:
         std::string _name;
 
     public:
-        Person(std::string name) : _name(name) {}
+        Name(std::string) : _name(name) {}
+        ~Name() {}
+
+        std::string getName() { return _name; }
+};
+
+class Person {
+    private:
+        Name& _name;
+
+    public:
+        Person(Name& name) : _name(name) {}
         ~Person() {}
+
+        Name& getName() { return _name.getName(); }
 };
 ```
 We can then add people to our `World` using a "startup system". Startup systems are just like normal systems, but they run exactly once, before all other systems, right when our app starts. Let's use `Commands` to spawn some entities into our `World`:
 
 ```cpp
 void add_people(Commands &cmd) {
-    auto p1 = Person("Elaine Proctor");
-    cmd.spawn(p1);
+    cmd.spawn(Person("Elaine Proctor"));
+    cmd.spawn(Person("Renzo Hume"));
+    cmd.spawn(Person("Zayna Nieves"));
 }
 ```
 Now register the startup system like this:
@@ -246,6 +260,7 @@ Now register the startup system like this:
 
 int main() {
     App app;
+    app.init_component<Name>();
     app.init_component<Person>();
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world);
@@ -254,7 +269,46 @@ int main() {
 }
 ```
 
+# Yout First Query
+We could run this now and the `add_people` system would run first, followed by `hello_world`. But our new people don't have anything to do yet! Let's make a system that properly greets the new citizens of our `World`
 
+```cpp
+void greet_people(Query<Name> persons) {
+    for p : persons {
+        std::cout << "hello " << p.getName() << std::endl;
+    }
+}
+```
+The parameters we pass into a "system function" define what data the system runs on. In this case, `greet_people` will run on all entities with the `Person` and `Name` component.
+
+You can interpret the `Query` above as: "iterate over every `Name` component for entities that also have a `Person` component".
+
+Now we just register the system in our `App`. Note that you can pass more than one system into an add_systems call by using a tuple!
+
+```cpp
+#include "App.hpp"
+
+int main() {
+    App app;
+    app.init_component<Name>();
+    app.init_component<Person>();
+    app.add_systems<core_stage::Startup>(add_people);
+    app.add_systems<core_stage::Update>(hello_world, greet_people);
+    app.run();
+    return 0,
+}
+```
+Running our app will result in the following output:
+
+```
+hello world!
+hello Elaina Proctor!
+hello Renzo Hume!
+hello Zayna Nieves!
+Marvelous!
+```
+
+Quick Note: "hello world!" might show up in a different order than it does above. This is because systems run in parallel by default whenever possible.
 
 [1]: https://github.com/Arthur-Aillet/Cevy "Title"
 [2]: https://github.com/Arthur-Aillet/RType "Title"
