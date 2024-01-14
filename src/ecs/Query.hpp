@@ -11,6 +11,7 @@
 #include <bitset>
 #include <cstddef>
 #include <optional>
+#include <type_traits>
 
 #include "Entity.hpp"
 #include "SparseVector.hpp"
@@ -56,12 +57,12 @@ class cevy::ecs::Query {
     using iterator_tuple = std::tuple<iterator_t<SparseVector<remove_optional<T>>>...>;
 
     iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0)
-        : current(it_tuple), _max(max), _idx(idx) {
+        : current(it_tuple), _max(max), _idx(idx), _entity(_idx) {
       sync();
     };
 
     public:
-    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx){};
+    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx), _entity(_idx) {};
 
     iterator operator++() {
       incr_all();
@@ -115,21 +116,22 @@ class cevy::ecs::Query {
 
     template <typename Current>
     Current &a_value() {
-      if constexpr (is_optional<Current>::value) {
+      if constexpr (std::is_same<Current, Entity>::value) {
+        return _entity;
+      } else if constexpr (is_optional<Current>::value) {
         return *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
       } else {
         return std::get<iterator_t<SparseVector<Current>>>(current)->value();
       }
     }
 
-    const value_type to_value() { return std::tuple<T &...>{a_value<T>()...}; }
-
-    operator Entity() { return Entity(_idx); }
+    const value_type to_value() { return value_type{a_value<T>()...}; }
 
     private:
     iterator_tuple current;
     size_t _max;
     size_t _idx;
+    Entity _entity;
   };
   using iterator_tuple = typename iterator::iterator_tuple;
 

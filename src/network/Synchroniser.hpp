@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <functional>
 #include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
@@ -16,6 +17,7 @@
 
 #include "App.hpp"
 #include "CevyNetwork.hpp"
+#include "Entity.hpp"
 #include "Indirect.hpp"
 #include "Plugin.hpp"
 #include "Query.hpp"
@@ -23,10 +25,10 @@
 #include "cevy.hpp"
 #include "commands/Commands.hpp"
 #include "commands/EntityCommands.hpp"
+#include "ecs.hpp"
 #include "network.hpp"
 
 class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
-  friend NetworkPlugin;
   public:
   class SummonStage : public ecs::Schedule::before<ecs::Schedule::PreUpdate> {};
   class SyncStage : public ecs::Schedule::after<SummonStage> {};
@@ -42,6 +44,11 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   enum class Mode {
     Server,
     Client,
+  };
+
+  template<size_t N, typename... T>
+  class Spawnable {
+    static const uint16_t value = N;
   };
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
@@ -65,28 +72,63 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     // } (), ...);
   }
 
-  template <typename... T>
-  void add_spawnable(uint8_t i, T... args) {
-    _spawnCommands[i] = [args...](ecs::EntityCommands e) { e.insert(T(args)...); };
+  template <typename S, typename... T>
+  void add_spawnable(T... args) {
+    _spawnCommands[S::value] = [args...](ecs::EntityCommands e) { e.insert(T(args)...); };
   }
 
-  // void system_summon(cevy::ecs::Commands command, cevy::ecs::Query<SyncId> q) {
-  //   auto x = _net.recvSummon();
-  //   for (auto it : x) {
-  //     auto e = command.spawn_empty();
-  //     _spawnCommands[it.second](e);
-  //     e.insert(SyncId{it.first, it.second});
-  //     _occupancy[it.first] = true;
-  //   }
-  //   for (auto e : q) {
-  //     if (std::get<SyncId &>(e).id == SyncId::unset) {
-  //       std::get<SyncId &>(e).id = first_free();
-  //       _net.sendSummon(std::get<SyncId &>(e).id, std::get<SyncId &>(e).type);
-  //     }
-  //   }
-  // }
+  template<typename T>
+  void summon(cevy::ecs::Commands& command) {
+    auto e = command.spawn_empty();
+    _spawnCommands[T::value](e);
+    auto id = first_free();
+    _occupancy[id] = true;
+    e.insert(SyncId({id, T::value}));
+    _net.sendSummon(id, T::value);
+  }
+
+  void dismiss(cevy::ecs::Commands& command, SyncId syncId) {
+    auto target = syncId.id;
+    std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor = [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
+      for (auto [id, e] : q) {
+        if (id.id == target) {
+          command.entity(e).despawn();
+        }
+      }
+    };
+    command.system(deletor);
+    _occupancy[target] = false;
+    _net.sendDismiss(target);
+  }
 
   protected:
+  void system_summon(cevy::ecs::Commands command) {
+    while (true) {
+      auto x = _net.recvSummon();
+      if (!x)
+        break;
+      auto pair = x.value();
+      auto e = command.spawn_empty();
+      _spawnCommands[pair.second](e);
+      e.insert(SyncId{pair.first, pair.second});
+      _occupancy[pair.first] = true;
+    };
+    while (true) {
+      auto x = _net.recvDismiss();
+      if (!x)
+        break;
+      auto target = x.value();
+      std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor = [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
+        for (auto [id, e] : q) {
+          if (id.id == target) {
+            command.entity(e).despawn();
+          }
+        }
+      };
+      command.system(deletor);
+      _occupancy[target] = false;
+    };
+  }
   uint16_t first_free() {
     int i = -1;
     for (auto it : _occupancy) {
@@ -107,16 +149,10 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   protected:
   void build(cevy::ecs::App &app) override {
-    // struct SyncSubSystem {
-    //   Synchroniser &_sync;
-    //   void operator()(cevy::ecs::Commands cmd, cevy::ecs::Query<SyncId> q) const {
-    //     // _sync.system_summon(cmd, q);
-    //   };
-    // };
-    // SyncSubSystem sys{*this};
-    // app.add_class_system<SyncSubSystem, SummonStage>(std::move(sys));
-    // app.add_class_system<SyncSubSystem, SummonStage, cevy::ecs::Commands, cevy::ecs::Query<SyncId>>(
-        // std::move(sys));
+    app.add_stage<SummonStage>();
+    app.add_stage<SyncStage>();
+    std::function<void(ecs::Commands)> func = [this](cevy::ecs::Commands cmd){ this->system_summon(cmd);};
+    app.add_class_system<std::function<void(ecs::Commands)>, SummonStage, cevy::ecs::Commands>(func);
     build_custom(app);
   }
 };

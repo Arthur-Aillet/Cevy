@@ -10,6 +10,7 @@
 #include "ecs.hpp"
 #include "network.hpp"
 #include "NetworkActions.hpp"
+#include "Synchroniser.hpp"
 
 /**
  * @brief Commands helper for facilitating network related actions
@@ -95,6 +96,15 @@ class cevy::NetworkCommands : protected ecs::Commands {
   void event_with(typename E::Arg given) {
     _actions.event_with<E>(*this, given);
   };
+
+  template<typename T>
+  void summon() {
+    _sync.summon<T>(*this);
+  };
+
+  void dismiss(Synchroniser::SyncId id) {
+    _sync.dismiss(*this, id);
+  }
 
   protected:
   NetworkActions& _actions;

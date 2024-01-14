@@ -32,6 +32,11 @@ class cevy::ecs::EntityCommands {
         [e = _entity](cevy::ecs::World &w) mutable { (w.remove_component<Components>(e), ...); });
     return *this;
   }
+
+  void despawn() {
+    _commands.add(
+        [e = _entity](cevy::ecs::World &w) mutable { (w.despawn(e)); });
+  }
 };
 
 template <typename... Ts>

@@ -38,6 +38,7 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
   struct Event {
   enum EEvent : uint16_t {
     Summon = 1,
+    Dismiss = 1,
     FREE,
   };
   };
@@ -106,17 +107,17 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
     writeUDP(*it, [this, it]() { _events_send.erase(it); });
   }
 
-  // std::optional<std::vector<uint8_t>> recvEvent(uint16_t id) {
-  //   const auto &it = std::find_if(_events_recv.begin(), _events_recv.end(),
-  //     [id](std::vector<uint8_t>& a) { return a[0] == byte(id, 0) && a[1] == byte(id, 1);});
-  //   if (it != _events_recv.end()) {
-  //     auto ret = std::move(*it);
-  //     _events_recv.erase(it);
-  //     ret.erase(ret.begin(), ret.begin() + 2);
-  //     return std::move(ret);
-  //   }
-  //   return std::nullopt;
-  // }
+  std::optional<std::vector<uint8_t>> recvEvent(uint16_t id) {
+    const auto &it = std::find_if(_events_recv.begin(), _events_recv.end(),
+      [id](std::vector<uint8_t>& a) { return a[0] == byte(id, 0) && a[1] == byte(id, 1);});
+    if (it != _events_recv.end()) {
+      auto ret = std::move(*it);
+      _events_recv.erase(it);
+      ret.erase(ret.begin(), ret.begin() + 2);
+      return std::move(ret);
+    }
+    return std::nullopt;
+  }
 
 
 //----------------------------------- Action -----------------------------------
@@ -158,20 +159,34 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
 //----------------------------------- Summon -----------------------------------
 
   void sendSummon(uint16_t id, uint8_t archetype) {
-    std::vector<uint8_t> fullblock = {byte(id, 0), byte(id, 1), archetype};
+    std::vector<uint8_t> fullblock;
+    serialize(fullblock, id);
+    serialize(fullblock, archetype);
     sendEvent(Event::Summon, fullblock);
   }
 
-  // std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
-  //   const auto &it = _states_recv.find(id);
-  //   if (it != _states_recv.end()) {
-  //     auto ret = std::move(it->second);
-  //     _states_recv.erase(id);
-  //     ret.erase(ret.begin(), ret.begin() + 2);
-  //     return std::move(ret);
-  //   }
-  //   return std::nullopt;
-  // }
+  std::optional<std::pair<uint16_t, uint8_t>> recvSummon() {
+      auto buff = recvEvent(Event::Summon);
+      if (!buff.has_value())
+        return std::nullopt;
+      uint8_t type = deserialize<uint8_t>(buff.value());
+      uint16_t id = deserialize<uint16_t>(buff.value());
+      return std::make_pair(id, type);
+  }
+
+  void sendDismiss(uint16_t id) {
+    std::vector<uint8_t> fullblock;
+    serialize(fullblock, id);
+    sendEvent(Event::Dismiss, fullblock);
+  }
+
+  std::optional<uint16_t> recvDismiss() {
+      auto buff = recvEvent(Event::Dismiss);
+      if (!buff.has_value())
+        return std::nullopt;
+      uint16_t id = deserialize<uint16_t>(buff.value());
+      return id;
+  }
 
   private:
   void handle_state(size_t bytes, std::array<uint8_t, 512> &buffer) {
