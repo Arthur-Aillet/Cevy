@@ -1,19 +1,19 @@
-name-template: 'v$NEXT_MAJOR_VERSION ☀️'
+name-template: '🌌 v$NEXT_MAJOR_VERSION'
 tag-template: 'v$NEXT_MAJOR_VERSION'
 categories:
-  - title: '🏹 Features'
+  - title: '🚀 Features'
     labels:
       - 'feature'
       - 'feat'
       - 'enhancement'
-  - title: '📜 Documentation'
+  - title: '🛰️ Documentation'
     labels: 'documentation'
-  - title: '⚕️ Bug Fixes'
+  - title: '🐰 Bug Fixes'
     labels:
       - 'fix'
       - 'bugfix'
       - 'bug'
-  - title: '🌿 Maintenance'
+  - title: '👾 Maintenance'
     label:
       - 'chore'
       - 'chores'

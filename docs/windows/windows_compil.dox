@@ -1,0 +1,33 @@
+/** \page Windows
+
+<h2>Windows Compilation</h2>
+<p>
+  This page detail the way to compile Cevy games on Windows
+</p>
+
+<h3>
+  Requirements (on Windows)
+</h3>
+<p>
+- MSYS2 https://www.msys2.org/ with mingw64 on it. Prefer the given default paths for everything as it will make the use of others tools easier
+- CMake
+</p>
+
+<code>
+    cd build \
+</code>
+<br>
+<code>
+    && cmake .. -G "MinGW Makefiles" \
+</code>
+<br>
+<code>
+    && cmake --build . \
+</code>
+<br>
+<code>
+    && cd ..
+</code>
+
+<p>You now should have a new bin folder with the .exe generated.</p>
+*/

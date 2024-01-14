@@ -20,6 +20,8 @@ add_library(entity
 
 target_link_libraries(entity SparseVector)
 
+include_directories(PUBLIC . ./commands ../)
+
 add_subdirectory(commands)
 
 add_library(world
@@ -30,8 +32,9 @@ add_library(world
 
 add_library(schedule
   STATIC
-  Schedule.cpp
-  Schedule.hpp
+  Scheduler.cpp
+  Scheduler.hpp
+  Stage.hpp
   )
 
 add_library(default_plugin

@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** GameEngine
 */
@@ -8,22 +8,28 @@
 #pragma once
 
 #include "Plugin.hpp"
-#include "Schedule.hpp"
+#include "Stage.hpp"
 #include "ecs.hpp"
 
 namespace cevy::engine {
-using namespace cevy::ecs;
 
-class StartupRenderStage : public Schedule::after<Schedule::PreStartup> {};
-class PreStartupRenderStage : public Schedule::before<StartupRenderStage> {};
-class PostStartupRenderStage : public Schedule::after<StartupRenderStage> {};
+#ifdef DEBUG
+struct DebugWindow {
+  bool open;
+};
+#endif
 
-class RenderStage : public Schedule::after<Schedule::PostUpdate> {};
-class PreRenderStage : public Schedule::before<RenderStage> {};
-class PostRenderStage : public Schedule::after<RenderStage> {};
+class StartupRenderStage : public cevy::ecs::core_stage::after<cevy::ecs::core_stage::PreStartup> {
+};
+class PreStartupRenderStage : public cevy::ecs::core_stage::before<StartupRenderStage> {};
+class PostStartupRenderStage : public cevy::ecs::core_stage::after<StartupRenderStage> {};
 
-class Engine : public Plugin {
+class RenderStage : public cevy::ecs::core_stage::after<cevy::ecs::core_stage::PostUpdate> {};
+class PreRenderStage : public cevy::ecs::core_stage::before<RenderStage> {};
+class PostRenderStage : public cevy::ecs::core_stage::after<RenderStage> {};
+
+class Engine : public cevy::ecs::Plugin {
   public:
-  void build(App &app);
+  void build(cevy::ecs::App &app);
 };
 } // namespace cevy::engine

@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** EntityCommands
 */
@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Commands.hpp"
+#include "ecs.hpp"
 
 class cevy::ecs::EntityCommands {
   private:
@@ -25,6 +26,19 @@ class cevy::ecs::EntityCommands {
         [c..., e = _entity](cevy::ecs::World &w) mutable { (w.add_component(e, c), ...); });
     return *this;
   }
+
+  template <typename... Components>
+  cevy::ecs::EntityCommands &remove() {
+    _commands.add(
+        [e = _entity](cevy::ecs::World &w) mutable { (w.remove_component<Components>(e), ...); });
+    return *this;
+  }
+
+  void despawn();
+
+  cevy::ecs::Entity id();
+
+  cevy::ecs::Commands &commands();
 };
 
 template <typename... Ts>

@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Entity
 */
@@ -8,6 +8,8 @@
 #pragma once
 
 #include "ecs.hpp"
+
+#include <cstddef>
 
 class cevy::ecs::Entity {
   private:
@@ -17,6 +19,8 @@ class cevy::ecs::Entity {
   public:
   friend class ecs::World;
   friend class ecs::Commands;
+  template <typename... T>
+  friend class ecs::Query;
   operator std::size_t &();
   operator std::size_t() const;
 };

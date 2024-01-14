@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** World
 */
@@ -26,7 +26,11 @@ World::EntityWorldRef World::spawn_empty() {
   return ref;
 }
 
-bool World::despawn(Entity const &e) {
+World::EntityWorldRef::operator Entity &() { return entity; };
+
+Entity World::EntityWorldRef::id() { return entity; };
+
+bool World::despawn(const Entity &e) {
   for (auto const &[type, data] : _components_arrays) {
     std::get<1>(data)(*this, e);
   }

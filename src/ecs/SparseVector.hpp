@@ -1,13 +1,12 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** SparseVector
 */
 
 #pragma once
 
-#include <iostream>
 #include <optional>
 #include <vector>
 
@@ -53,6 +52,15 @@ class SparseVector {
   const_iterator cend() const { return _data.cend(); };
   size_type size() const { return _data.size(); };
   void resize(size_type len) { _data.resize(len, std::nullopt); };
+
+  size_type valid_size() const {
+    size_type i = 0;
+    for (auto it : _data) {
+      if (it.has_value())
+        i += 1;
+    }
+    return i;
+  }
 
   reference_type insert_at(size_type pos, Type const &val) {
     if (pos >= _data.size())
