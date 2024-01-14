@@ -26,7 +26,6 @@
 #include "network.hpp"
 
 class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
-  friend NetworkPlugin;
   public:
   class SummonStage : public ecs::Schedule::before<ecs::Schedule::PreUpdate> {};
   class SyncStage : public ecs::Schedule::after<SummonStage> {};

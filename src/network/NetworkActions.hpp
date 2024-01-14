@@ -108,7 +108,7 @@ public:
     void add_action_with(std::function<EActionFailureMode(typename A::Arg, Arg0...)> server, std::function<R1(typename A::Arg, Arg1...)> client_success = [](){}, std::function<R2(typename A::Arg, Arg2...)>  client_fail = [](){}) {
         using server_ftype = std::function<EActionFailureMode(ecs::Commands&, typename A::Arg)>;
         using ftype = std::function<void(ecs::Commands&, typename A::Arg)>;
-            _super_actions[A::value] = std::make_tuple(
+            _super_actions[std::type_index(typeid(A))] = std::make_tuple(
                 std::make_any<server_ftype>([server](ecs::Commands& cmd, typename A::Arg given) mutable {return cmd.system_with(server, given); }),
                 std::make_any<ftype>([client_success](ecs::Commands& cmd, typename A::Arg given) mutable {cmd.system_with(client_success, given); }),
                 std::make_any<ftype>([client_fail](ecs::Commands& cmd, typename A::Arg given) mutable {cmd.system_with(client_fail, given); })
@@ -122,8 +122,8 @@ public:
     void add_action_with(EActionFailureMode (&&server)(typename A::Arg, Arg0...), R1 (&&client_success)(typename A::Arg, Arg1...) = [](){}, R2 (&& client_fail)(typename A::Arg, Arg2...) = [](){}) {
         using server_ftype = std::function<EActionFailureMode(ecs::Commands&, typename A::Arg)>;
         using ftype = std::function<void(ecs::Commands&, typename A::Arg)>;
-            _super_actions[A::value] = std::make_tuple(
-                std::make_any<server_ftype>([server](ecs::Commands& cmd, typename A::Arg given) mutable {cmd.system_with(server, given); }),
+            _super_actions[std::type_index(typeid(A))] = std::make_tuple(
+                std::make_any<server_ftype>([server](ecs::Commands& cmd, typename A::Arg given) mutable {return cmd.system_with(server, given); }),
                 std::make_any<ftype>([client_success](ecs::Commands& cmd, typename A::Arg given) mutable {cmd.system_with(client_success, given); }),
                 std::make_any<ftype>([client_fail](ecs::Commands& cmd, typename A::Arg given) mutable {cmd.system_with(client_fail, given); })
             );
@@ -152,16 +152,16 @@ public:
         if (_mode == Mode::Server) {
             EActionFailureMode ret = std::get<0>(_actions[A::value])(cmd);
             if (ret == ActionFailureMode::Action_Success) {
-                if (A::Presume != Presume::success)
+                if (A::presume != cevy::NetworkActions::Presume::success)
                     _net.sendActionSuccess(A::value, std::vector<uint8_t>({0}));
             } else {
-                if (A::Presume != Presume::fail)
+                if (A::presume != cevy::NetworkActions::Presume::fail)
                     _net.sendActionFailure(A::value, ret);
             }
         } else {
             if (A::presume == Presume::success)
                 std::get<1>(_actions[A::value])(cmd);
-            else if (A::presume == Presume::fail)
+            else if (A::presume == cevy::NetworkActions::Presume::fail)
                 std::get<2>(_actions[A::value])(cmd);
             _net.sendAction(A::value, std::vector<uint8_t>());
         }
@@ -176,17 +176,17 @@ public:
             const auto& func = std::any_cast<std::function<EActionFailureMode(ecs::Commands&, typename A::Arg)>>(server);
             EActionFailureMode ret = func(cmd, given);
             if (ret == ActionFailureMode::Action_Success) {
-                if (A::Presume != Presume::success)
+                if (A::presume != cevy::NetworkActions::Presume::success)
                     _net.sendActionSuccess(A::value, std::vector<uint8_t>({0}));
             } else {
-                if (A::Presume != Presume::fail)
+                if (A::presume != cevy::NetworkActions::Presume::fail)
                     _net.sendActionFailure(A::value, ret);
             }
         } else {
-            if (A::presume == Presume::success) {
+            if (A::presume == cevy::NetworkActions::Presume::success) {
                 const auto& func = std::any_cast<std::function<void(ecs::Commands&, typename A::Arg)>>(client_success);
                 func(cmd, given);
-            } else if (A::presume == Presume::fail) {
+            } else if (A::presume == cevy::NetworkActions::Presume::fail) {
                 const auto& func = std::any_cast<std::function<void(ecs::Commands&, typename A::Arg)>>(client_fail);
                 func(cmd, given);
             }

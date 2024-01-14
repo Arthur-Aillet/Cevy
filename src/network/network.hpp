@@ -29,6 +29,7 @@ inline constexpr std::vector<uint8_t>& serialize(std::vector<uint8_t>& vec, cons
     return vec;
 }
 
+template<typename S, typename A, typename N>
 class NetworkPlugin;
 class Synchroniser;
 class NetworkActions;
