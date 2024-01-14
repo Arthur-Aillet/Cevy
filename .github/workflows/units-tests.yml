@@ -43,7 +43,5 @@ jobs:
       - name: Push changes
         if: env.modified == 'true'
         run: |
-          git config --global user.name
-          git config --global user.email
           git commit -am "Automated formatting"
           git push
