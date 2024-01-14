@@ -20,7 +20,9 @@
 #include "Transform.hpp"
 #include "Velocity.hpp"
 #include "ecs.hpp"
+#ifdef DEBUG
 #include "imgui.h"
+#endif
 
 #include "rendering.hpp"
 #include "rlImGui.h"
@@ -42,13 +44,9 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
     close.send(cevy::ecs::AppExit{});
 }
 
-struct DebugWindow {
-  bool open;
-};
-
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World &w,
 #ifdef DEBUG
-                  cevy::ecs::Resource<DebugWindow> debug,
+                  cevy::ecs::Resource<cevy::engine::DebugWindow> debug,
 #endif
                    cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
   ClearBackground(clearcolor.get());
@@ -59,7 +57,7 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World
     EndMode3D();
     #ifdef DEBUG
     rlImGuiBegin();
-    if(!ImGui::Begin("Test Window", &(debug.get().open))) {
+    if(!ImGui::Begin("Debug Informations", &(debug.get().open))) {
         ImGui::End();
     } else {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
@@ -83,7 +81,7 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PreRenderStage>();
   app.add_stage<PostRenderStage>();
   #ifdef DEBUG
-  app.init_resource<DebugWindow>(DebugWindow{.open=true});
+  app.init_resource<cevy::engine::DebugWindow>(cevy::engine::DebugWindow{.open=true});
   #endif
   app.init_resource<cevy::engine::ClearColor>(cevy::engine::Color(255, 255, 255));
   app.init_component<cevy::engine::Camera>();

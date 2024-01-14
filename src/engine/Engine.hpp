@@ -12,6 +12,13 @@
 #include "ecs.hpp"
 
 namespace cevy::engine {
+
+#ifdef DEBUG
+struct DebugWindow {
+  bool open;
+};
+#endif
+
 class StartupRenderStage : public cevy::ecs::core_stage::after<cevy::ecs::core_stage::PreStartup> {
 };
 class PreStartupRenderStage : public cevy::ecs::core_stage::before<StartupRenderStage> {};
