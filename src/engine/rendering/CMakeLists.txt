@@ -9,6 +9,7 @@ add_library(rendering
   STATIC
   rendering.cpp
   Color.cpp
+  ClearColor.cpp
   )
 
 target_include_directories(rendering PRIVATE ${RAYLIB_FOLDER})

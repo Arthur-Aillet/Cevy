@@ -209,16 +209,14 @@ class cevy::ecs::World {
   };
 
   template <typename Component>
-  std::optional<Component> &add_component(Entity const &to,
-                                                                  const Component &c) {
+  std::optional<Component> &add_component(Entity const &to, const Component &c) {
     auto &array = get_components<Component>();
 
     return array.insert_at(to, c);
   }
 
   template <typename Component, typename... Params>
-  std::optional<Component> &emplace_component(Entity const &to,
-                                                                      Params &&...p) {
+  std::optional<Component> &emplace_component(Entity const &to, Params &&...p) {
 
     auto &array = get_components<Component>();
     return array.emplace_at(to, p...);
@@ -232,7 +230,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays[id]));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   template <class Component>
@@ -243,7 +242,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays.at(id)));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   private:
