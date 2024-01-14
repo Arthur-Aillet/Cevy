@@ -34,9 +34,10 @@ class Synchroniser;
 class NetworkActions;
 class CevyNetwork;
 class NetworkBase;
-using Network = CevyNetwork;
-class NetworkActions;
 class NetworkCommands;
+class ClientHandler;
+class ServerHandler;
+using Network = CevyNetwork;
 } // namespace cevy
 
 template<typename... T>

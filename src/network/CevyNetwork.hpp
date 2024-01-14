@@ -12,16 +12,15 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <list>
 #include <optional>
-#include <tuple>
 #include <unordered_map>
 #include <vector>
+#include <list>
 
 #include "NetworkBase.hpp"
 #include "network.hpp"
 
-class cevy::CevyNetwork : protected cevy::NetworkBase {
+class cevy::CevyNetwork : public cevy::NetworkBase {
   public:
   struct Communication {
   enum ECommunication {
@@ -31,6 +30,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     Action = 4,
     ActionSuccess = 5,
     ActionFailure = 6,
+    HandShake = 7,
   };
   };
 
@@ -63,9 +63,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   };
   };
 
-  CevyNetwork(const std::string &endpoint, size_t port) : NetworkBase(endpoint, port){};
-  CevyNetwork(size_t port) : NetworkBase(port){};
-  CevyNetwork(CevyNetwork &&rhs) : NetworkBase(std::move(rhs)){};
+  CevyNetwork(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
+              size_t client_offset) : NetworkBase(mode, endpoint, udp_port, tcp_port, client_offset){};
+  CevyNetwork(CevyNetwork &&rhs) : NetworkBase(rhs) {};
   ~CevyNetwork(){};
 
   template <typename T>
@@ -76,7 +76,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
     return p[n];
   };
 
-//----------------------------------- State -----------------------------------
+  //----------------------------------- State -----------------------------------
 
   void sendState(uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
@@ -121,7 +121,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 //----------------------------------- Action -----------------------------------
 
   void sendAction(uint16_t id, const std::vector<uint8_t> &block) {
-    std::vector<uint8_t> fullblock = { uint8_t(Communication::Action), byte(id, 0), byte(id, 1) };
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::Action), byte(id, 0), byte(id, 1)};
     fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _events_send.emplace(_actions_send.begin(), fullblock);
     writeUDP(*it, [this, it] { _actions_send.erase(it); });
@@ -226,4 +226,31 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   // the data part contains the name_descriptor/id data, as a prefix of 2 bytes
   data_list _events_recv;
   data_list _events_send;
+};
+
+class cevy::ClientHandler : cevy::CevyNetwork {
+
+  std::string server_ip;
+  float server_ping;
+  // uint16_t session_id;
+
+  public:
+  void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
+    // std::cout << "handshake received" << std::endl;
+  }
+
+  // void sendHandShake(uint16_t id, uint8_t archetype) {
+  //     half h = {.h = id};
+  //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
+  //     writeUDP(_summon_send[id], [](){});
+  // }
+
+  void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
+                   asio::ip::udp::endpoint udp_endpoint) override {
+    if (buffer[0] == (uint8_t)Communication::HandShake) {
+      handleHandShake(bytes, buffer);
+    } else {
+      // cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint); /// TODO: FIX
+    }
+  }
 };
