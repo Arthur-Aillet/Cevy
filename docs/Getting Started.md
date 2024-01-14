@@ -216,6 +216,45 @@ int main() {
 The `add_systems` function adds the system to your App's `Update Shedule`, but we'll cover that more later.
 Now you can run your app again using. You should see `Hello World!` printed once in your terminal.
 
+# Your First Components
+Greeting the whole world is great, but what if we want to greet specific people? In ECS, you would generally model people as entities with a set of components that define them. Let's start simple with a `Person` component.
+
+Create your class `Person`
+
+```cpp
+class Person {
+    private:
+        std::string _name;
+
+    public:
+        Person(std::string name) : _name(name) {}
+        ~Person() {}
+};
+```
+We can then add people to our `World` using a "startup system". Startup systems are just like normal systems, but they run exactly once, before all other systems, right when our app starts. Let's use `Commands` to spawn some entities into our `World`:
+
+```cpp
+void add_people(Commands &cmd) {
+    auto p1 = Person("Elaine Proctor");
+    cmd.spawn(p1);
+}
+```
+Now register the startup system like this:
+
+```cpp
+#include "App.hpp"
+
+int main() {
+    App app;
+    app.init_component<Person>();
+    app.add_systems<core_stage::Startup>(add_people);
+    app.add_systems<core_stage::Update>(hello_world);
+    app.run();
+    return 0,
+}
+```
+
+
 
 [1]: https://github.com/Arthur-Aillet/Cevy "Title"
 [2]: https://github.com/Arthur-Aillet/RType "Title"
