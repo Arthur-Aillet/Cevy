@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - "dev"
+      - "fix/unit-test"
 
 jobs:
   test:
-    # runs-on: [ubuntu-latest, windows-latest]
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout code
@@ -22,7 +22,11 @@ jobs:
         run: cmake -DTESTS=on -S . -B ./build
       - name: Test
         run: make -j --no-print-directory -C build tests-run-cevy
+
   format:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -42,7 +46,7 @@ jobs:
       - name: Push changes
         if: env.modified == 'true'
         run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email '[email protected]'
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Automated formatting"
           git push

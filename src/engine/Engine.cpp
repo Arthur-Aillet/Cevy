@@ -46,7 +46,7 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
 
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World &w,
 #ifdef DEBUG
-                  cevy::ecs::Resource<cevy::engine::DebugWindow> debug,
+                   cevy::ecs::Resource<cevy::engine::DebugWindow> debug,
 #endif
                    cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
   ClearBackground(clearcolor.get());
@@ -55,19 +55,18 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World
     render_models(w);
     render_lines(w);
     EndMode3D();
-    #ifdef DEBUG
+#ifdef DEBUG
     rlImGuiBegin();
-    if(!ImGui::Begin("Debug Informations", &(debug.get().open))) {
-        ImGui::End();
+    if (!ImGui::Begin("Debug Informations", &(debug.get().open))) {
+      ImGui::End();
     } else {
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                    1000.0f / ImGui::GetIO().Framerate,
-                    ImGui::GetIO().Framerate);
-        ImGui::Text("Number of entities: %zu", w.entities().valid_size());
-        ImGui::End();
+      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      ImGui::Text("Number of entities: %zu", w.entities().valid_size());
+      ImGui::End();
     }
     rlImGuiEnd();
-    #endif
+#endif
   }
   EndDrawing();
 }
@@ -80,9 +79,9 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<RenderStage>();
   app.add_stage<PreRenderStage>();
   app.add_stage<PostRenderStage>();
-  #ifdef DEBUG
-  app.init_resource<cevy::engine::DebugWindow>(cevy::engine::DebugWindow{.open=true});
-  #endif
+#ifdef DEBUG
+  app.init_resource<cevy::engine::DebugWindow>(cevy::engine::DebugWindow{.open = true});
+#endif
   app.init_resource<cevy::engine::ClearColor>(cevy::engine::Color(255, 255, 255));
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Velocity>();
