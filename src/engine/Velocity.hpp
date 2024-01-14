@@ -62,7 +62,7 @@ class TransformVelocity : public engine::Transform {
   static void
   system(ecs::Query<engine::Transform, TransformVelocity, option<cevy::engine::PhysicsProps>> q,
          ecs::Resource<cevy::ecs::Time> time) {
-    float delta_t = time.get().delta_seconds() * 60;
+    float delta_t = time.get().delta_seconds();
     for (auto [tm, vel, phys] : q) {
       float decay = 0.995;
       if (phys.has_value())
