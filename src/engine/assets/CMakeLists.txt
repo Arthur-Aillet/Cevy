@@ -13,9 +13,10 @@ add_library(assets
   AssetManager.hpp
   )
 
+target_include_directories(assets PRIVATE ${RAYLIB_FOLDER})
+
 target_include_directories(assets PUBLIC
   ../../ecs
   .
   ..
-  ${RAYLIB_FOLDER}
   )

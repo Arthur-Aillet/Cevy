@@ -11,8 +11,7 @@
 
 #include "ecs.hpp"
 #include "Query.hpp"
-#include "raylib.h"
-#include "raymath.h"
+#include "raylib.hpp"
 #include <any>
 #include <map>
 

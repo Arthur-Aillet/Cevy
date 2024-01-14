@@ -19,7 +19,7 @@ void cevy::ecs::Input<KeyBoard>::update_keys() {
   while (keyval != KeyboardKey::KEY_NULL) {
     just_pressed.insert({raylibToCevyKeyboard(keyval),
                          (KeyBoard){
-                             keyval, // to change to scancode
+                             static_cast<unsigned int>(keyval), // to change to scancode
                              raylibToCevyKeyboard(keyval),
                              ButtonState::JUST_PRESSED,
                          }});

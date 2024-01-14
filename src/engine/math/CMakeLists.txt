@@ -10,8 +10,9 @@ add_library(math
   Vector.cpp
   )
 
+target_include_directories(math PRIVATE ${RAYLIB_FOLDER})
+
 target_include_directories(math PUBLIC
   .
   ..
-  ${RAYLIB_FOLDER}
   )

@@ -1,13 +1,12 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** SparseVector
 */
 
 #pragma once
 
-#include <iostream>
 #include <optional>
 #include <vector>
 

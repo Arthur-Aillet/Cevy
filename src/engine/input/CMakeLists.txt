@@ -12,10 +12,9 @@ add_library(input
   Keyboard.cpp
   Keyboard.hpp
   Mouse.cpp
-  Mouse.cpp
   )
 
 set(RAYLIB_FOLDER ${CMAKE_BINARY_DIR}/_deps/raylib-build/raylib/include)
 target_link_libraries(input raylib)
 
-target_include_directories(input PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
+target_include_directories(input PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../ecs ${CMAKE_CURRENT_SOURCE_DIR}/..)

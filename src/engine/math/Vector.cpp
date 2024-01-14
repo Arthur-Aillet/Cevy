@@ -11,10 +11,11 @@
 #include <complex>
 #include <cstdlib>
 
-#if 1 && (defined(__i386__) || defined(__x86_64__))
+using namespace cevy::engine;
+
+#if 0 && (defined(__i386__) || defined(__x86_64__))
 #include <immintrin.h>
 
-using namespace cevy::engine;
 
 float Vector::eval() const {
   __m128 v = _mm_load_ps(&x);
@@ -75,6 +76,12 @@ Vector Vector::scale(const Vector &rhs) const {
 }
 
 #else
+
+std::ostream &cevy::engine::operator<<(std::ostream &cout, const Vector &vec) {
+  cout << "{ " << vec.x << ", " << vec.y << ", " << vec.z << " }";
+
+  return cout;
+}
 
 float Vector::eval() const { return (x * x + y * y + z * z); }
 
@@ -174,7 +181,20 @@ Vector Vector::operator/(const Vector &rhs) const {
   return v;
 }
 
-Vector Vector::cross(const Vector &rhs) const { return Vector(x * rhs.y, y * rhs.z, z * rhs.x); }
+Vector Vector::cross(const Vector &rhs) const {
+  Vector p;
+  p.x = (y * rhs.z) - (z * rhs.y);
+  p.y = -((x * rhs.z) - (z * rhs.x));
+  p.z = (x * rhs.y) - (y * rhs.x);
+  return p;
+}
+
+void Vector::rotate(const Quaternion &rot) {
+  Vector3 rotated = Vector3RotateByQuaternion(*this, rot);
+  this->x = rotated.x;
+  this->y = rotated.y;
+  this->z = rotated.z;
+}
 
 void Vector::rotate(const Vector &rot) {
   float tmp = y;
