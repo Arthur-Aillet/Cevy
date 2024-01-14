@@ -139,8 +139,8 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<u
 template <>
 inline cevy::engine::Vector cevy::deserialize<cevy::engine::Vector>(std::vector<uint8_t> &vec) {
   engine::Vector t;
+  t.x = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
   t.z = deserialize<float>(vec);
-  t.y = deserialize<float>(vec);
-  t.y = deserialize<float>(vec);
   return t;
 }

@@ -35,7 +35,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Line>(std::vector<uin
 template <>
 inline cevy::engine::Line cevy::deserialize<cevy::engine::Line>(std::vector<uint8_t> &vec) {
   cevy::engine::Line t{engine::Vector(), engine::Vector()};
-  t.end = deserialize<engine::Vector>(vec);
   t.start = deserialize<engine::Vector>(vec);
+  t.end = deserialize<engine::Vector>(vec);
   return t;
 }

@@ -93,8 +93,8 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::TransformVelocity>(st
 template <>
 inline cevy::engine::TransformVelocity cevy::deserialize<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec) {
   cevy::engine::Transform t;
-  t.scale = deserialize<engine::Vector>(vec);
-  t.rotation = deserialize<Quaternion>(vec);
   t.position = deserialize<engine::Vector>(vec);
+  t.rotation = deserialize<Quaternion>(vec);
+  t.scale = deserialize<engine::Vector>(vec);
   return t;
 }

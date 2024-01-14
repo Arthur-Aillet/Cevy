@@ -41,9 +41,9 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Color>(std::vector<ui
 template <>
 inline cevy::engine::Color cevy::deserialize<cevy::engine::Color>(std::vector<uint8_t> &vec) {
   cevy::engine::Color t{0, 0, 0, 0};
-  t.a = deserialize<float>(vec);
-  t.b = deserialize<float>(vec);
-  t.g = deserialize<float>(vec);
   t.r = deserialize<float>(vec);
+  t.g = deserialize<float>(vec);
+  t.b = deserialize<float>(vec);
+  t.a = deserialize<float>(vec);
   return t;
 }

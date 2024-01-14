@@ -193,10 +193,7 @@ class cevy::Synchroniser::SyncBlock {
       std::vector<uint8_t> block;
       (
           [&] {
-            constexpr size_t size = sizeof(Component);
-            std::array<uint8_t, size> vec;
-            std::memcpy(vec.data(), &std::get<Component &>(e), size);
-            block.insert(block.end(), vec.begin(), vec.end());
+            serialize(block, std::get<Component &>(e));
           }(),
           ...);
       _net.sendState(id<Block>(sync_id.id), block);
@@ -213,9 +210,7 @@ class cevy::Synchroniser::SyncBlock {
 
       (
           [&] {
-            constexpr size_t size = sizeof(Component);
-            std::memcpy(&std::get<Component &>(e), block.data(), size);
-            block.erase(block.begin(), block.begin() + size);
+            std::get<Component &>(e) = deserialize<Component>(block);
           }(),
           ...);
     }

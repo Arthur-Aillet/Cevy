@@ -46,7 +46,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::PhysicsProps>(std::ve
 template <>
 inline cevy::engine::PhysicsProps cevy::deserialize<cevy::engine::PhysicsProps>(std::vector<uint8_t> &vec) {
   cevy::engine::PhysicsProps t;
-  t.decay = deserialize<float>(vec);
   t.mass = deserialize<float>(vec);
+  t.decay = deserialize<float>(vec);
   return t;
 }

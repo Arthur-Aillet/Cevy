@@ -61,8 +61,8 @@ inline std::vector<uint8_t> &cevy::serialize<uint8_t>(std::vector<uint8_t> &vec,
 
 template <>
 inline uint8_t cevy::deserialize<uint8_t>(std::vector<uint8_t> &vec) {
-  uint8_t t = vec.back();
-  vec.pop_back();
+  uint8_t t = vec.front();
+  vec.erase(vec.begin());
   return t;
 }
 
@@ -83,8 +83,8 @@ inline uint16_t cevy::deserialize<uint16_t>(std::vector<uint8_t> &vec) {
   uint16_t t;
   auto p = reinterpret_cast<uint8_t *>(&t);
   for (size_t i = serialized_size<uint16_t>::value; i--;) {
-    p[i] = vec.back();
-    vec.pop_back();
+    p[i] = vec.front();
+    vec.erase(vec.begin());
   }
   return t;
 }
@@ -107,8 +107,8 @@ inline int cevy::deserialize<int>(std::vector<uint8_t> &vec) {
   int t;
   auto p = reinterpret_cast<uint8_t *>(&t);
   for (size_t i = serialized_size<int>::value; i--;) {
-    p[i] = vec.back();
-    vec.pop_back();
+    p[i] = vec.front();
+    vec.erase(vec.begin());
   }
   return t;
 }
@@ -131,8 +131,8 @@ inline float cevy::deserialize<float>(std::vector<uint8_t> &vec) {
   float t;
   auto p = reinterpret_cast<uint8_t *>(&t);
   for (size_t i = serialized_size<float>::value; i--;) {
-    p[i] = vec.back();
-    vec.pop_back();
+    p[i] = vec.front();
+    vec.erase(vec.begin());
   }
   return t;
 }
