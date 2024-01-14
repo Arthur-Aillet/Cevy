@@ -42,7 +42,14 @@ void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
     close.send(cevy::ecs::AppExit{});
 }
 
+struct DebugWindow {
+  bool open;
+};
+
 void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World &w,
+#ifdef DEBUG
+                  cevy::ecs::Resource<DebugWindow> debug,
+#endif
                    cevy::ecs::Resource<cevy::engine::ClearColor> clearcolor) {
   ClearBackground(clearcolor.get());
   for (auto [cam] : cams) {
@@ -50,6 +57,19 @@ void update_window(cevy::ecs::Query<cevy::engine::Camera> cams, cevy::ecs::World
     render_models(w);
     render_lines(w);
     EndMode3D();
+    #ifdef DEBUG
+    rlImGuiBegin();
+    if(!ImGui::Begin("Test Window", &(debug.get().open))) {
+        ImGui::End();
+    } else {
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                    1000.0f / ImGui::GetIO().Framerate,
+                    ImGui::GetIO().Framerate);
+        ImGui::Text("Number of entities: %zu", w.entities().valid_size());
+        ImGui::End();
+    }
+    rlImGuiEnd();
+    #endif
   }
   EndDrawing();
 }
@@ -62,6 +82,9 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<RenderStage>();
   app.add_stage<PreRenderStage>();
   app.add_stage<PostRenderStage>();
+  #ifdef DEBUG
+  app.init_resource<DebugWindow>(DebugWindow{.open=true});
+  #endif
   app.init_resource<cevy::engine::ClearColor>(cevy::engine::Color(255, 255, 255));
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Velocity>();
@@ -89,16 +112,6 @@ void cevy::Engine::DebugWindow (void) {
             EnableCursor();
     }
     if(debugMode) {
-        rlImGuiBegin();
-        if(!ImGui::Begin("Test WIndow", &debugMode)) {
-            ImGui::End();
-        } else {
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                        1000.0f / ImGui::GetIO().Framerate,
-                        ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-        rlImGuiEnd();
     } else {
         DisableCursor();
     }
