@@ -43,5 +43,7 @@ jobs:
       - name: Push changes
         if: env.modified == 'true'
         run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Automated formatting"
           git push
