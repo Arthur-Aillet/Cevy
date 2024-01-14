@@ -34,11 +34,11 @@ class cevy::ecs::Factory : virtual public Plugin {
   }
 
   void build(cevy::ecs::App &app) override {
-    for (auto &m : _commands) {
-      std::function<void(Query<T>, cevy::ecs::Commands)> f =
-          std::get<std::function<void(Query<T>, cevy::ecs::Commands)>>(m);
-      app.add_system<Schedule::PreUpdate>(std::move(f));
-    }
+    // for (auto &m : _commands) {
+    //   std::function<void(Query<T>, cevy::ecs::Commands)> f =
+    //       std::get<std::function<void(Query<T>, cevy::ecs::Commands)>>(m);
+    //   app.add_system<Schedule::PreUpdate>(std::move(f));
+    // }
   }
 
   protected:

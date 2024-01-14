@@ -159,7 +159,7 @@ class cevy::ecs::Schedule {
     if (!schedule_defined<S>()) {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
-    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>(0)...); };
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 

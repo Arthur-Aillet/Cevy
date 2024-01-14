@@ -47,7 +47,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   };
 
   template<size_t N, typename... T>
-  class Spawnable {
+  struct Spawnable {
     static const uint16_t value = N;
   };
 

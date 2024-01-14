@@ -111,9 +111,9 @@ class cevy::NetworkActions : public ecs::Plugin {
   void add_action(EActionFailureMode (&&server)(Arg0...), R1 (&&client_success)(Arg1...),
                   R2 (&&client_fail)(Arg2...)) {
     _actions[A::value] = std::make_tuple(
-        [server](ecs::Commands &cmd) mutable { cmd.system(server); },
-        [client_success](ecs::Commands &cmd) mutable { cmd.system(client_success); },
-        [client_fail](ecs::Commands &cmd) mutable { cmd.system(client_fail); });
+        server_system([server](ecs::Commands &cmd) mutable { return cmd.system(server); }),
+        system([client_success](ecs::Commands &cmd) mutable { cmd.system(client_success); }),
+        system([client_fail](ecs::Commands &cmd) mutable { cmd.system(client_fail); }));
   };
 
 
@@ -139,9 +139,9 @@ class cevy::NetworkActions : public ecs::Plugin {
       std::function<R1(Arg1...)> client_success = []() {},
       std::function<R2(Arg2...)> client_fail = []() {}) {
     _actions[A::value] = std::make_tuple(
-        [server](ecs::Commands &cmd) mutable { cmd.system(server); },
-        [client_success](ecs::Commands &cmd) mutable { cmd.system(client_success); },
-        [client_fail](ecs::Commands &cmd) mutable { cmd.system(client_fail); });
+        server_system([server](ecs::Commands &cmd) mutable { cmd.system(server); }),
+        system([client_success](ecs::Commands &cmd) mutable { cmd.system(client_success); }),
+        system([client_fail](ecs::Commands &cmd) mutable { cmd.system(client_fail); }));
   }
 
 
@@ -205,7 +205,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     using ftype = std::function<void(ecs::Commands &, typename A::Arg)>;
     _super_actions[std::type_index(typeid(A))] = std::make_tuple(
         std::make_any<server_ftype>([server](ecs::Commands &cmd, typename A::Arg given) mutable {
-          cmd.system_with(server, given);
+          return cmd.system_with(server, given);
         }),
         std::make_any<ftype>([client_success](ecs::Commands &cmd, typename A::Arg given) mutable {
           cmd.system_with(client_success, given);
@@ -279,14 +279,14 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param cmd a reference to Commands
    */
   template <typename A>
-  void action(ecs::Commands &cmd) const {
+  void action(ecs::Commands &cmd) {
     if (_mode == Mode::Server) {
       EActionFailureMode ret = std::get<0>(_actions[A::value])(cmd);
       if (ret == ActionFailureMode::Action_Success) {
-        if (A::Presume != Presume::success)
+        if (A::presume != Presume::success)
           _net.sendActionSuccess(A::value, std::vector<uint8_t>({0}));
       } else {
-        if (A::Presume != Presume::fail)
+        if (A::presume != Presume::fail)
           _net.sendActionFailure(A::value, ret);
       }
     } else {
@@ -397,8 +397,9 @@ class cevy::NetworkActions : public ecs::Plugin {
   }
 
   protected:
+  using server_system = std::function<EActionFailureMode(ecs::Commands &)>;
   using system = std::function<void(ecs::Commands &)>;
-  std::unordered_map<uint16_t, std::tuple<system, system, system>> _actions;
+  std::unordered_map<uint16_t, std::tuple<server_system, system, system>> _actions;
   std::unordered_map<std::type_index, std::tuple<std::any, std::any, std::any>> _super_actions;
   std::unordered_map<uint16_t, system> _events;
   std::unordered_map<std::type_index, std::any> _super_events;

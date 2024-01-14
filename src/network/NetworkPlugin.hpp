@@ -34,7 +34,7 @@ public:
     // }
 
     void build(cevy::ecs::App& app) {
-        app.init_resource<cevy::NetworkCommands>(cevy::NetworkCommands(*_action, *_sync, app));
+        app.init_resource<cevy::NetworkCommands>(cevy::NetworkCommands(_action, _sync, app));
         _sync.build(app);
         _action.build(app);
     };

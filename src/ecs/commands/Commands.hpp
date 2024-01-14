@@ -10,6 +10,7 @@
 #include "Command.hpp"
 #include "Entity.hpp"
 #include "World.hpp"
+#include <type_traits>
 
 namespace cevy {
 namespace ecs {
@@ -46,24 +47,49 @@ class cevy::ecs::Commands {
 
   EntityCommands entity(const Entity &e);
 
-  template <class R, class... Args>
+  template < class... Args>
+  void system(void (&&func)(Args...)) {
+      _world_access.run_system<Args...>(func);
+  }
+
+  template <class R, class... Args,
+    std::enable_if_t<!std::is_void<R>::value>>
   R system(R (&&func)(Args...)) {
-      return (_world_access.run_system(func));
+      return _world_access.run_system<R, Args...>(func);
   }
 
-    template <class GivenArgs, class R, class... Args>
+
+  template <class GivenArgs, class R, class... Args,
+    std::enable_if_t<!std::is_void<R>::value>>
   R system_with(R (&&func)(GivenArgs, Args...), GivenArgs given) {
-      return (_world_access.run_system_with<GivenArgs>(func, given));
+      return _world_access.run_system_with<GivenArgs, R, Args...>(func, given);
   }
 
-  template <class R, class... Args>
+  template <class GivenArgs, class... Args>
+  void system_with(void (&&func)(GivenArgs, Args...), GivenArgs given) {
+      _world_access.run_system_with<GivenArgs, Args...>(func, given);
+  }
+
+  template <class R, class... Args,
+    std::enable_if_t<!std::is_void<R>::value, bool>>
   R system(std::function<R(Args...)> func) {
-    return (_world_access.run_system<R, Args...>(func));
+    return _world_access.run_system<R, Args...>(func);
   }
 
-  template <class GivenArgs, class R, class... Args>
+  template <class... Args>
+  void system(std::function<void(Args...)> func) {
+    return _world_access.run_system<Args...>(func);
+  }
+
+  template <class GivenArgs, class R, class... Args,
+    std::enable_if_t<!std::is_void<R>::value, bool>>
   R system_with(std::function<R(GivenArgs, Args...)> func, GivenArgs given) {
-    return (_world_access.run_system_with<GivenArgs>(func, given));
+    return _world_access.run_system_with<GivenArgs, R, Args...>(func, given);
+  }
+
+  template <class GivenArgs, class... Args>
+  void system_with(std::function<void(GivenArgs, Args...)> func, GivenArgs given) {
+    _world_access.run_system_with<GivenArgs, Args...>(func, given);
   }
 };
 
