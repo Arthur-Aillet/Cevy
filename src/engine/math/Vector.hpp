@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include "../network/network.hpp"
 #include "raylib.hpp"
+#include <ostream>
 
 namespace cevy::engine {
 /**
@@ -29,6 +31,7 @@ class Vector {
   Vector(float x, float y, float z);
   Vector(const Vector &) = default;
 
+  Vector(const Vector3 &v) : x(v.x), y(v.y), z(v.z){};
   operator Vector3() const { return ((Vector3){(float)x, (float)y, (float)z}); }
 
   Vector &operator=(const Vector &);
@@ -105,6 +108,7 @@ class Vector {
   Vector cross(const Vector &rhs) const;
 
   void rotate(const Vector &rot);
+  void rotate(const Quaternion &rot);
   void rotateR(const Vector &rot);
 
   Vector reflect(const Vector &normal) const;
@@ -114,4 +118,20 @@ class Vector {
   static Vector random(float degree = 1, const Vector &source = Vector(0, 0, 0));
 #endif
 };
+
+std::ostream &operator<<(std::ostream &cout, const Vector &vec);
+
 } // namespace cevy::engine
+
+template <>
+struct cevy::serialized_size<cevy::engine::Vector>
+    : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t> &vec,
+                                                                   const engine::Vector &t) {
+  serialize(vec, t.x);
+  serialize(vec, t.y);
+  serialize(vec, t.z);
+  return vec;
+}

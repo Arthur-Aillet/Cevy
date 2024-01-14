@@ -9,166 +9,305 @@
 
 #include <raylib.h>
 #include <raymath.h>
-#include <string>
-#include <algorithm>
 
 #include "Pointer.hpp"
 #include "Vector.hpp"
-#include "cevy.hpp"
 
 namespace cevy {
 namespace engine {
-class Transform;
-}
-} // namespace cevy
-
-class cevy::engine::Transform {
+class Transform {
   public:
-  Transform() : _m(MatrixIdentity()){};
-  Transform(Matrix &&m) : _m(m){};
-  Transform(const Vector &v) : _m(MatrixTranslate(v.x, v.y, v.z)){};
-  ~Transform(){};
+  Quaternion rotation;
+  Vector position;
+  Vector scale;
 
-  inline operator const Matrix &() const {
+  Transform() : rotation(QuaternionIdentity()), position(0, 0, 0), scale(1, 1, 1) {}
+  Transform(float x, float y, float z)
+      : rotation(QuaternionIdentity()), position(x, y, z), scale(1, 1, 1) {}
+  Transform(const Vector &vec) : rotation(QuaternionIdentity()), position(vec), scale(1, 1, 1) {}
+  Transform(const Quaternion &quat) : rotation(quat), position(0, 0, 0), scale(1, 1, 1) {}
+
+  std::tuple<Vector, Quaternion, Vector> get() const {
     if (!cache_valid()) {
-      if (_parent)
-        _cache = MatrixMultiply(_m, *_parent);
-      else
-        _cache = _m;
+      if (_parent) {
+        auto [p_vec, p_rot, p_scale] = _parent->get();
+        _cache_vector = p_vec;
+        _cache_scale = p_scale;
+        _cache_quaternion = QuaternionMultiply(p_rot, _cache_quaternion);
+        auto v = Vector3RotateByQuaternion(position, _cache_quaternion);
+        _cache_vector += Vector(v);
+      } else {
+        _cache_quaternion = rotation;
+        _cache_vector = Vector3RotateByQuaternion(position, _cache_quaternion);
+        _cache_scale = scale;
+      }
     }
-    return _cache;
+    return {_cache_vector, _cache_quaternion, _cache_scale};
   }
 
   Transform &operator*=(const Transform &other) {
     invalidate();
-    _m = MatrixMultiply(other, _m);
+    auto [vec, rot, sca] = other.get();
+    rotation = QuaternionMultiply(rotation, rot);
+    position += vec;
+    // scale += sca;
     return *this;
   }
 
   Vector operator*(const Vector &v) const {
-    Vector3 w{v.x, v.y, v.z};
-    w = Vector3Transform(w, *this);
-    return Vector(w.x, w.y, w.z);
+    Vector w = v;
+    auto [vec, rot, scale] = get();
+    w = Vector3RotateByQuaternion(w, rot);
+    w += vec;
+    // w *= scale;
+    return w;
   }
 
-  Transform &rotateXYZ(const Vector &v) {
+  Transform &rotateX(float deg) {
     invalidate();
-    *this *= MatrixRotateXYZ(v);
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(deg, 0, 0));
     return *this;
   }
 
-  Transform &rotateAxis(const Vector &v, float angle) {
+  Transform &rotateY(float deg) {
     invalidate();
-    *this *= MatrixRotate(v, angle);
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(0, deg, 0));
     return *this;
   }
 
-  Transform &translateXYZ(const Vector &v) {
+  Transform &rotateZ(float deg) {
     invalidate();
-    *this *= MatrixTranslate(v.x, v.y, v.z);
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(0, 0, deg));
     return *this;
   }
 
-  Transform &translateAxis(Vector v, float distance) {
+  Transform &rotateXYZ(float x, float y, float z) {
     invalidate();
-    v = v.normalize() * distance;
-    *this *= MatrixTranslate(v.x, v.y, v.z);
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(x, y, z));
+    return *this;
+  }
+
+  Transform &rotateXYZ(const Vector &vec) {
+    invalidate();
+    rotation = QuaternionMultiply(rotation, QuaternionFromEuler(vec.x, vec.y, vec.z));
+    return *this;
+  }
+
+  Transform &setRotationX(float deg) {
+    invalidate();
+    rotation = QuaternionFromEuler(deg, 0, 0);
+    return *this;
+  }
+
+  Transform &setRotationY(float deg) {
+    invalidate();
+    rotation = QuaternionFromEuler(0, deg, 0);
+    return *this;
+  }
+
+  Transform &setRotationZ(float deg) {
+    invalidate();
+    rotation = QuaternionFromEuler(0, 0, deg);
+    return *this;
+  }
+
+  Transform &setRotationXYZ(float x, float y, float z) {
+    invalidate();
+    rotation = QuaternionFromEuler(x, y, z);
+    return *this;
+  }
+
+  Transform &setRotationXYZ(const Vector &vec) {
+    invalidate();
+    rotation = QuaternionFromEuler(vec.x, vec.y, vec.z);
+    return *this;
+  }
+
+  Transform &translateX(float x) {
+    invalidate();
+    position.x += x;
+    return *this;
+  }
+
+  Transform &translateY(float y) {
+    invalidate();
+    position.y += y;
+    return *this;
+  }
+
+  Transform &translateZ(float z) {
+    invalidate();
+    position.z += z;
+    return *this;
+  }
+
+  Transform &translateXYZ(float x, float y, float z) {
+    invalidate();
+    position += Vector(x, y, z);
+    return *this;
+  }
+
+  Transform &translateXYZ(const Vector &vec) {
+    invalidate();
+    position += vec;
+    return *this;
+  }
+
+  Transform &setPositionX(float x) {
+    invalidate();
+    position.x = x;
+    return *this;
+  }
+
+  Transform &setPositionY(float y) {
+    invalidate();
+    position.y = y;
+    return *this;
+  }
+
+  Transform &setPositionZ(float z) {
+    invalidate();
+    position.z = z;
+    return *this;
+  }
+
+  Transform &setPositionXYZ(float x, float y, float z) {
+    invalidate();
+    position = Vector(x, y, z);
+    return *this;
+  }
+
+  Transform &setPositionXYZ(const Vector &vec) {
+    invalidate();
+    position = vec;
+    return *this;
+  }
+
+  Transform &scaleX(float deg) {
+    invalidate();
+    scale.x *= deg;
+    return *this;
+  }
+
+  Transform &scaleY(float deg) {
+    invalidate();
+    scale.y *= deg;
+    return *this;
+  }
+
+  Transform &scaleZ(float deg) {
+    invalidate();
+    scale.z *= deg;
+    return *this;
+  }
+
+  Transform &scaleXYZ(float x, float y, float z) {
+    invalidate();
+    scale *= Vector(x, y, z);
+    return *this;
+  }
+
+  Transform &scaleXYZ(const Vector &vec) {
+    invalidate();
+    scale *= vec;
+    return *this;
+  }
+
+  Transform &scaleXYZ(float deg) {
+    invalidate();
+    scale.x *= deg;
+    scale.y *= deg;
+    scale.z *= deg;
+    return *this;
+  }
+
+  Transform &setScaleX(float deg) {
+    invalidate();
+    scale.x = deg;
+    return *this;
+  }
+
+  Transform &setScaleY(float deg) {
+    invalidate();
+    scale.y = deg;
+    return *this;
+  }
+
+  Transform &setScaleZ(float deg) {
+    invalidate();
+    scale.z = deg;
+    return *this;
+  }
+
+  Transform &setScaleXYZ(float x, float y, float z) {
+    invalidate();
+    scale = Vector{x, y, z};
+    return *this;
+  }
+
+  Transform &setScaleXYZ(const Vector &vec) {
+    invalidate();
+    scale = vec;
+    return *this;
+  }
+
+  Transform &setScaleXYZ(float deg) {
+    invalidate();
+    scale.x = deg;
+    scale.y = deg;
+    scale.z = deg;
     return *this;
   }
 
   Vector euler() const {
-    auto q = QuaternionFromMatrix(*this);
-    auto v = QuaternionToEuler(q);
+    auto v = QuaternionToEuler(rotation);
     return {v.x, v.y, v.z};
   }
 
-  Vector xyz() const {
-    const Matrix &m = *this;
-    return { m.m12, m.m13, m.m14 };
-  }
+  Vector xyz() const { return position; }
 
   Vector fwd() const {
     Vector3 v{0, 0, 1};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
+    auto [vec, rot, sc] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
+  }
+
+  Vector up() const {
+    Vector3 v{0, 1, 0};
+    auto [vec, rot, sc] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
+  }
+
+  Vector right() const {
+    Vector3 v{0, 1, 0};
+    auto [vec, rot, _] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
   }
 
   Vector tan() const {
     Vector3 v{1, 0, 0};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
+    auto [vec, rot, _] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
   }
 
   Vector cotan() const {
     Vector3 v{0, 1, 0};
-    v = Vector3Transform(v, *this);
-    return Vector(v.x, v.y, v.z);
+    auto [vec, rot, _] = get();
+    v = Vector3RotateByQuaternion(v, rot);
+    return v;
   }
 
   Transform &parent(const Transform &other) {
+    invalidate();
     _parent = pointer<Transform>(other._lock, other);
     return *this;
   }
 
   protected:
-  template<typename F>
-  Transform &map(F f) {
-    _m.m0  = f(_m.m0);
-    _m.m1  = f(_m.m1);
-    _m.m2  = f(_m.m2);
-    _m.m3  = f(_m.m3);
-    _m.m4  = f(_m.m4);
-    _m.m5  = f(_m.m5);
-    _m.m6  = f(_m.m6);
-    _m.m7  = f(_m.m7);
-    _m.m8  = f(_m.m8);
-    _m.m9  = f(_m.m9);
-    _m.m10 = f(_m.m10);
-    _m.m11 = f(_m.m11);
-    _m.m12 = f(_m.m12);
-    _m.m13 = f(_m.m13);
-    _m.m14 = f(_m.m14);
-    _m.m15 = f(_m.m15);
-    return *this;
-  }
-
-  template<typename F, typename... T>
-  static Transform map(F f, T... t) {
-    Transform ret;
-    ret._m.m0  = f(t._m.m0...);
-    ret._m.m1  = f(t._m.m1...);
-    ret._m.m2  = f(t._m.m2...);
-    ret._m.m3  = f(t._m.m3...);
-    ret._m.m4  = f(t._m.m4...);
-    ret._m.m5  = f(t._m.m5...);
-    ret._m.m6  = f(t._m.m6...);
-    ret._m.m7  = f(t._m.m7...);
-    ret._m.m8  = f(t._m.m8...);
-    ret._m.m9  = f(t._m.m9...);
-    ret._m.m10 = f(t._m.m10...);
-    ret._m.m11 = f(t._m.m11...);
-    ret._m.m12 = f(t._m.m12...);
-    ret._m.m13 = f(t._m.m13...);
-    ret._m.m14 = f(t._m.m14...);
-    ret._m.m15 = f(t._m.m15...);
-    return ret;
-  }
-
-  static Transform lerp(const Transform& a, const Transform& b, float s) {
-    Transform a1 = a;
-    Transform b1 = b;
-
-    a1.map([s](float x) -> float { return x * (1 - s); });
-    b1.map([s](float x) -> float { return x * s; });
-
-    a1 = Transform::map([](auto a, auto b){return a + b;}, a1, b1);
-    return a1;
-  }
-
-  float determinant() const {
-    return MatrixDeterminant(_m);
-  }
-
   inline void invalidate() const { _cache_validity = false; }
 
   inline bool cache_valid() const {
@@ -183,9 +322,10 @@ class cevy::engine::Transform {
 
   pointer<Transform> _parent;
   std::shared_ptr<int> _lock = std::make_shared<int>();
-  Matrix _m;
-  mutable Matrix _cache;
+  mutable Vector _cache_vector;
+  mutable Vector _cache_scale;
+  mutable Quaternion _cache_quaternion;
   mutable bool _cache_validity;
-
-  private:
 };
+} // namespace engine
+} // namespace cevy

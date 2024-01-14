@@ -42,13 +42,28 @@ constexpr bool any() {
   return (... || Args::value);
 };
 
+template <typename... Args>
+constexpr size_t sum(Args... args) {
+  return (0 + ... + args);
+};
+
+template <typename R, typename... Args>
+constexpr std::function<R(Args...)> make_function(R (&&func)(Args...)) {
+  return std::function<R(Args...)>(func);
+};
+
 /// @brief contains all of the engine bits
 namespace cevy {
+
 /// @brief holds the entity components system
 namespace ecs {};
 
 /// @brief hold engine mechanics, depends on ecs
 namespace engine {};
+
+/// @brief hold physics mechanism, depends on ecs
+namespace physics {};
+
 } // namespace cevy
 
 // note: here name-spaces are being forward declared;

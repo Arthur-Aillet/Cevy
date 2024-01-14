@@ -104,6 +104,7 @@ class cevy::ecs::World {
   public:
   /// @brief Id refering to a specific component
   using ComponentId = std::type_index;
+  using Id = std::type_index;
 
   private:
   std::unordered_map<std::type_index, component_data> _components_arrays;
@@ -209,16 +210,14 @@ class cevy::ecs::World {
   };
 
   template <typename Component>
-  std::optional<Component> &add_component(Entity const &to,
-                                                                  const Component &c) {
+  std::optional<Component> &add_component(Entity const &to, const Component &c) {
     auto &array = get_components<Component>();
 
     return array.insert_at(to, c);
   }
 
   template <typename Component, typename... Params>
-  std::optional<Component> &emplace_component(Entity const &to,
-                                                                      Params &&...p) {
+  std::optional<Component> &emplace_component(Entity const &to, Params &&...p) {
 
     auto &array = get_components<Component>();
     return array.emplace_at(to, p...);
@@ -232,7 +231,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays[id]));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   template <class Component>
@@ -243,7 +243,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays.at(id)));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   private:
@@ -340,6 +341,94 @@ class cevy::ecs::World {
 
   template <typename C, typename std::enable_if_t<is_commands<C>::value, bool> = true>
   C get_super(size_t);
+
+  template <class R, class... Args>
+  R run_system(R (&&func)(Args...)) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this]() mutable -> R { return func(get_super<Args>(0)...); };
+    return sys();
+  }
+
+  // template <class... Args>
+  // void run_system(void (&&func)(Args...)) {
+  //   static_assert(
+  //       all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+  //              is_event_reader<Args>, is_event_writer<Args>>()...),
+  //       "type must be reference to query, world, commands, event reader, event writer or
+  //       resource");
+  //   auto sys = [&func, this]() mutable { func(get_super<Args>(0)...); };
+  //   sys();
+  // }
+
+  template <class R, class... Args>
+  R run_system(std::function<R(Args...)> func) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this]() mutable -> R { return func(get_super<Args>(0)...); };
+    return sys();
+  }
+
+  // template <class... Args>
+  // void run_system(std::function<void (Args...)> func) {
+  //   static_assert(
+  //       all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+  //              is_event_reader<Args>, is_event_writer<Args>>()...),
+  //       "type must be reference to query, world, commands, event reader, event writer or
+  //       resource");
+  //   auto sys = [&func, this]() mutable { func(get_super<Args>(0)...); };
+  //   sys();
+  // }
+
+  template <class GivenArgs, class R, class... Args>
+  R run_system_with(R (&&func)(GivenArgs, Args...), GivenArgs given) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this, given]() mutable -> R { return func(given, get_super<Args>(0)...); };
+    return sys();
+  }
+
+  // template <class GivenArgs, class... Args>
+  // void run_system_with(void (&&func)(GivenArgs, Args...), GivenArgs given) {
+  //       static_assert(
+  //       all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+  //              is_event_reader<Args>, is_event_writer<Args>>()...),
+  //       "type must be reference to query, world, commands, event reader, event writer or
+  //       resource");
+  //   auto sys = [&func, this, given]() mutable {
+  //      func(given, get_super<Args>(0)...);
+  //   };
+  //   sys();
+  // }
+
+  template <class GivenArgs, class R, class... Args>
+  R run_system_with(std::function<R(GivenArgs, Args...)> func, GivenArgs given) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this, given]() mutable -> R { return func(given, get_super<Args>(0)...); };
+    return sys();
+  }
+
+  // template <class GivenArgs, class... Args>
+  // void run_system_with(std::function<void(GivenArgs, Args...)> func, GivenArgs given) {
+  //       static_assert(
+  //       all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+  //              is_event_reader<Args>, is_event_writer<Args>>()...),
+  //       "type must be reference to query, world, commands, event reader, event writer or
+  //       resource");
+  //   auto sys = [&func, this, given]() mutable {
+  //     func(given, get_super<Args>(0)...);
+  //   };
+  //   sys();
+  // }
 };
 
 template <typename... Ts>

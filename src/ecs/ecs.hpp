@@ -26,6 +26,9 @@ class Command;
 class EntityCommands;
 class World;
 
+template <typename T>
+class Factory;
+
 template <typename Content>
 class Resource;
 template <class... Containers>

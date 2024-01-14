@@ -8,8 +8,8 @@
 #pragma once
 
 #include <exception>
-#include <string>
 #include <memory>
+#include <string>
 
 namespace cevy {
 namespace engine {
@@ -76,5 +76,5 @@ class pointer {
   std::weak_ptr<void> _weak;
   const T *_value;
 };
-}
-}
+} // namespace engine
+} // namespace cevy

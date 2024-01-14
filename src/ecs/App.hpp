@@ -52,12 +52,25 @@ class cevy::ecs::App : public cevy::ecs::World {
   void add_plugin(const GivenPlugin &plugin) {
     static_assert(std::is_base_of_v<Plugin, GivenPlugin>,
                   "Given plugin does not derive from Cevy Plugin class");
-    auto &p = _plugins.emplace_back(std::make_shared<GivenPlugin>(plugin));
+    static_assert(std::is_move_constructible_v<GivenPlugin>,
+                  "Given plugin must be move constructible");
+    _plugins.push_back(std::make_unique<GivenPlugin>(plugin));
 
-    p->build(*this);
+    _plugins.back()->build(*this);
   }
 
   public:
+  template <typename GivenPlugin, typename... Arg>
+  void emplace_plugin(Arg... arg) {
+    static_assert(std::is_base_of_v<Plugin, GivenPlugin>,
+                  "Given plugin does not derive from Cevy Plugin class");
+    static_assert(std::is_move_constructible_v<GivenPlugin>,
+                  "Given plugin must be move constructible");
+    _plugins.push_back(std::make_unique<GivenPlugin>(arg...));
+
+    _plugins.back()->build(*this);
+  }
+
   /**
    * @brief Adds one or more \link Plugin Plugins\endlink.
    *
@@ -116,6 +129,11 @@ class cevy::ecs::App : public cevy::ecs::World {
   template <class Stage, class... System>
   void add_systems(System &&...system) {
     (_scheduler.add_system<Stage>(system), ...);
+  }
+
+  template <class F, class S, class... Args>
+  void add_class_system(const F &func) {
+    _scheduler.add_class_system<F, S, Args...>(func);
   }
 
   /**

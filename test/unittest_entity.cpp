@@ -1,3 +1,3 @@
 #include <criterion/criterion.h>
 #include <iostream>
-#include "../src/entity.hpp"
+#include "../src/ecs/Entity.hpp"

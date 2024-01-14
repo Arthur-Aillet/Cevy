@@ -11,8 +11,11 @@
 #include <array>
 #include <bitset>
 #include <cstddef>
+#include <iterator>
 #include <optional>
+#include <type_traits>
 
+#include "Entity.hpp"
 #include "SparseVector.hpp"
 #include "cevy.hpp"
 #include "ecs.hpp"
@@ -49,21 +52,23 @@ class Query {
     template <class Container>
     using it_reference_t = typename iterator_t<Container>::reference;
 
+    friend class Entity;
+
     public:
     using value_type = std::tuple<T &...>;
     using reference = value_type;
     using pointer = void;
     using difference_type = size_t;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = std::forward_iterator_tag;
     using iterator_tuple = std::tuple<iterator_t<SparseVector<remove_optional<T>>>...>;
 
     iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0)
-        : current(it_tuple), _max(max), _idx(idx) {
+        : current(it_tuple), _max(max), _idx(idx), _entity(_idx) {
       sync();
     };
 
     public:
-    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx){};
+    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx), _entity(_idx){};
 
     iterator operator++() {
       incr_all();
@@ -117,19 +122,22 @@ class Query {
 
     template <typename Current>
     Current &a_value() {
-      if constexpr (is_optional<Current>::value) {
+      if constexpr (std::is_same<Current, Entity>::value) {
+        return _entity;
+      } else if constexpr (is_optional<Current>::value) {
         return *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
       } else {
         return std::get<iterator_t<SparseVector<Current>>>(current)->value();
       }
     }
 
-    const value_type to_value() { return std::tuple<T &...>{a_value<T>()...}; }
+    const value_type to_value() { return value_type{a_value<T>()...}; }
 
     private:
     iterator_tuple current;
     size_t _max;
     size_t _idx;
+    Entity _entity;
   };
   using iterator_tuple = typename iterator::iterator_tuple;
 
@@ -138,7 +146,7 @@ class Query {
   template <typename Current>
   static void resize_optional(SparseVector<remove_optional<Current>> &c, size_t n) {
     if constexpr (is_optional<Current>::value) {
-      c.resize(std::max(c.size(), n));
+      c.resize(std::max(c.size(), n + 1));
     }
   }
 
@@ -182,13 +190,9 @@ class Query {
   }
 
   public:
-  size_t size() {
-    return _size;
-  }
+  size_t size() { return _size; }
 
-  typename iterator::value_type single() {
-    return *begin();
-  }
+  typename iterator::value_type single() { return *begin(); }
 
   std::optional<typename iterator::value_type> get_single() {
     if (_size <= 0) {
@@ -198,26 +202,26 @@ class Query {
   }
 
   private:
-  template<size_t N>
+  template <size_t N>
   typename iterator::value_type progress_it(iterator &it) {
     auto last = it;
     it++;
     return *last;
   }
 
-  template<size_t N, size_t ...I>
+  template <size_t N, size_t... I>
   std::array<typename iterator::value_type, N> multiple_impl(std::index_sequence<I...>) {
     auto it = begin();
-    return { progress_it<I>(it)... };
+    return {progress_it<I>(it)...};
   }
 
   public:
-  template<size_t N, typename Indicies = std::make_index_sequence<N>>
+  template <size_t N, typename Indicies = std::make_index_sequence<N>>
   std::array<typename iterator::value_type, N> multiple() {
     return multiple_impl<N>(Indicies{});
   }
 
-  template<size_t N>
+  template <size_t N>
   std::optional<std::array<typename iterator::value_type, N>> get_multiple() {
     if (_size < N) {
       return std::nullopt;
