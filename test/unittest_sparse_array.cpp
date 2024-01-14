@@ -55,13 +55,6 @@ Test(SparseVector, get_index) {
     cr_assert(test.get_index(*(test.begin() + 1)).value() == 1);
 }
 
-void print_sparse(SparseVector<int> arr) {
-    for (auto& elm : arr) {
-        std::cout << elm.value_or(-1) << ", ";
-    }
-    std::cout << std::endl;
-}
-
 Test(SparseVector, insert) {
     SparseVector<int> test;
     test.insert_at(2, 3);
