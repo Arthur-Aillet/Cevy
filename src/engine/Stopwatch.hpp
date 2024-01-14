@@ -13,51 +13,52 @@ namespace cevy {
 namespace engine {
 class Stopwatch {
   private:
-  std::chrono::duration<double, std::ratio<1>> _duration;
+  using DurationType = std::chrono::duration<double, std::ratio<1>>;
+  DurationType _duration;
   bool _paused;
 
   public:
   Stopwatch() : _duration(0), _paused(false) {}
   Stopwatch(float secs) : _duration(secs), _paused(false) {}
+  Stopwatch(DurationType secs) : _duration(secs), _paused(false) {}
 
-  std::chrono::duration<double, std::ratio<1>> elapsed() {
-    return _duration;
-  }
+  DurationType elapsed() { return _duration; }
 
-  double elapsed_secs() {
-    return elapsed().count();
-  }
+  double elapsed_secs() { return elapsed().count(); }
 
-  Stopwatch &set_elapsed(const std::chrono::duration<double, std::ratio<1>> &delta) {
+  inline Stopwatch &set_elapsed(const DurationType &delta) {
     _duration = delta;
     return *this;
   }
 
-  Stopwatch &tick(const std::chrono::duration<double, std::ratio<1>> &delta) {
+  inline Stopwatch &set_elapsed(double delta) {
+    _duration = DurationType(delta);
+    return *this;
+  }
+
+  Stopwatch &tick(const DurationType &delta) {
     if (!_paused) {
-        _duration += delta;
+      _duration += delta;
     }
     return *this;
   }
 
-  Stopwatch &pause() {
+  inline Stopwatch &pause() {
     _paused = true;
     return *this;
   }
 
-  Stopwatch &unpause() {
+  inline Stopwatch &unpause() {
     _paused = false;
     return *this;
   }
 
-  bool paused() {
-    return _paused;
-  }
+  inline bool paused() { return _paused; }
 
-  Stopwatch &reset() {
-    _duration = std::chrono::duration<double, std::ratio<1>>(0);
+  inline Stopwatch &reset() {
+    _duration = DurationType(0);
     return *this;
   }
 };
-}
-}
+} // namespace engine
+} // namespace cevy
