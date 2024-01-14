@@ -230,7 +230,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays[id]));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   template <class Component>
@@ -241,7 +242,8 @@ class cevy::ecs::World {
     if (it != _components_arrays.end()) {
       return std::any_cast<SparseVector<Component> &>(std::get<0>(_components_arrays.at(id)));
     }
-    throw(std::runtime_error("Cevy/Ecs: Get unregisted component!"));
+    throw(std::runtime_error(
+        std::string("Cevy/Ecs: Get unregisted component! ID: ").append(typeid(Component).name())));
   }
 
   private:

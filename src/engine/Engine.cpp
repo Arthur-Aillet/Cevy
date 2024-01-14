@@ -15,6 +15,7 @@
 #include "EntityCommands.hpp"
 #include "Event.hpp"
 #include "Line.hpp"
+#include "PhysicsProps.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
 #include "Velocity.hpp"
@@ -64,6 +65,7 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_resource<cevy::engine::ClearColor>(cevy::engine::Color(255, 255, 255));
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Velocity>();
+  app.init_component<cevy::engine::PhysicsProps>();
   app.init_component<cevy::engine::Target>();
   app.init_component<cevy::engine::Line>();
   app.init_component<cevy::engine::Transform>();

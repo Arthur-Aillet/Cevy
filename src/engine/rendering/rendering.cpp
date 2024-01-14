@@ -41,7 +41,8 @@ static void render_model(Model &model, engine::Transform transform, ::Color tint
   Matrix pos = MatrixTranslate(transform.position.x, transform.position.y, transform.position.z);
   Matrix final = MatrixMultiply(rot, pos);
   model.transform = QuaternionToMatrix(transform.rotation);
-  model.transform = MatrixMultiply(model.transform, MatrixScale(transform.scale.x, transform.scale.y, transform.scale.z));
+  model.transform = MatrixMultiply(
+      model.transform, MatrixScale(transform.scale.x, transform.scale.y, transform.scale.z));
   for (int i = 0; i < model.meshCount; ++i) {
     DrawModelEx(model, transform.position, Vector3{0, 0, 0}, 1, Vector3{1, 1, 1}, tint);
   }

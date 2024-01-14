@@ -22,7 +22,8 @@ class Transform {
   Vector scale;
 
   Transform() : rotation(QuaternionIdentity()), position(0, 0, 0), scale(1, 1, 1) {}
-  Transform(float x, float y, float z) : rotation(QuaternionIdentity()), position(x, y, z), scale(1, 1, 1) {}
+  Transform(float x, float y, float z)
+      : rotation(QuaternionIdentity()), position(x, y, z), scale(1, 1, 1) {}
   Transform(const Vector &vec) : rotation(QuaternionIdentity()), position(vec), scale(1, 1, 1) {}
   Transform(const Quaternion &quat) : rotation(quat), position(0, 0, 0), scale(1, 1, 1) {}
 
@@ -49,7 +50,7 @@ class Transform {
     auto [vec, rot, sca] = other.get();
     rotation = QuaternionMultiply(rotation, rot);
     position += vec;
-    //scale += sca;
+    // scale += sca;
     return *this;
   }
 
@@ -58,7 +59,7 @@ class Transform {
     auto [vec, rot, scale] = get();
     w = Vector3RotateByQuaternion(w, rot);
     w += vec;
-    //w *= scale;
+    // w *= scale;
     return w;
   }
 
@@ -240,7 +241,7 @@ class Transform {
 
   Transform &setScaleXYZ(float x, float y, float z) {
     invalidate();
-    scale = Vector {x, y, z};
+    scale = Vector{x, y, z};
     return *this;
   }
 

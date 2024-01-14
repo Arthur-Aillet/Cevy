@@ -10,6 +10,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "PhysicsProps.hpp"
 #include "Query.hpp"
 #include "Resource.hpp"
 #include "Time.hpp"
@@ -37,7 +38,7 @@ class Velocity : public Vector {
 
 class TransformVelocity : public engine::Transform {
   public:
-  TransformVelocity(){};
+  TransformVelocity() : engine::Transform(){};
   TransformVelocity(const Transform &tm) : engine::Transform(tm){};
   ~TransformVelocity(){};
 
@@ -58,11 +59,14 @@ class TransformVelocity : public engine::Transform {
     return ret;
   }
 
-  static void system(ecs::Query<engine::Transform, TransformVelocity> q,
-                     ecs::Resource<cevy::ecs::Time> time) {
+  static void
+  system(ecs::Query<engine::Transform, TransformVelocity, option<cevy::engine::PhysicsProps>> q,
+         ecs::Resource<cevy::ecs::Time> time) {
     float delta_t = time.get().delta_seconds() * 60;
-    float decay = 0.995;
-    for (auto [tm, vel] : q) {
+    for (auto [tm, vel, phys] : q) {
+      float decay = 0.995;
+      if (phys.has_value())
+        decay = 1 - phys.value().decay;
       tm *= vel * delta_t;
       vel *= powf(decay, delta_t);
     }

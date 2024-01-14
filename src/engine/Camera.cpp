@@ -33,19 +33,15 @@ void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::T
                                     option<cevy::engine::Transform>>
                        cams) {
   for (auto [cam, opt_target, opt_transform] : cams) {
-    // if (opt_pos && !opt_transform) {
-    //   cam.camera.position = opt_pos.value();
-    // }
-    //
-    // if (opt_target) {
-    //  cam.camera.target = opt_target.value();
-    //}
-
     if (opt_transform) {
       auto &tm = opt_transform.value();
       cam.camera.up = Vector3RotateByQuaternion(Vector3{0, 1, 0}, tm.rotation);
-      Vector3 vc = Vector3RotateByQuaternion(Vector3{0, 0, 1}, tm.rotation);
-      cam.camera.target = Vector3Add(tm.position, vc);
+      if (opt_target) {
+        cam.camera.target = opt_target.value();
+      } else {
+        Vector3 vc = Vector3RotateByQuaternion(Vector3{0, 0, 1}, tm.rotation);
+        cam.camera.target = Vector3Add(tm.position, vc);
+      }
       cam.camera.position = tm.position;
     }
   }
