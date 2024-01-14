@@ -8,6 +8,7 @@
 include_directories(".")
 
 add_subdirectory(ecs)
+add_subdirectory(network)
 add_subdirectory(engine)
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../public/*")
