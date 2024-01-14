@@ -69,9 +69,7 @@ public:
         using Arg = Data;
     };
 
-    virtual void build(cevy::ecs::App& app) {
-
-    };
+    virtual void build(cevy::ecs::App&) {}
 
     // template <typename A, typename F>
     // void add_action(F function) {

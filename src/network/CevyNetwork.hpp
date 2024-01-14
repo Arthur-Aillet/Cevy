@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -157,7 +158,6 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
 //----------------------------------- Summon -----------------------------------
 
   void sendSummon(uint16_t id, uint8_t archetype) {
-    half h = {.h = id};
     std::vector<uint8_t> fullblock = {byte(id, 0), byte(id, 1), archetype};
     sendEvent(Event::Summon, fullblock);
   }
@@ -195,8 +195,12 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
   }
 
   protected:
-  void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer) override {
-    if (bytes < 0)
+  void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer, asio::ip::udp::endpoint&) override {
+    if (error) {
+      std::cerr << "(ERROR)udp_rcv:" << error << std::endl;
+      return;
+    }
+    if (bytes <= 0)
       return;
     if (buffer[0] == (uint8_t)Communication::State) {
       return handle_state(bytes, buffer);
@@ -228,29 +232,28 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
   data_list _events_send;
 };
 
-class cevy::ClientHandler : cevy::CevyNetwork {
+// class cevy::ClientHandler : cevy::CevyNetwork {
 
-  std::string server_ip;
-  float server_ping;
-  // uint16_t session_id;
+//   std::string server_ip;
+//   float server_ping;
+//   // uint16_t session_id;
 
-  public:
-  void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
-    // std::cout << "handshake received" << std::endl;
-  }
+//   public:
+//   void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
+//     // std::cout << "handshake received" << std::endl;
+//   }
 
-  // void sendHandShake(uint16_t id, uint8_t archetype) {
-  //     half h = {.h = id};
-  //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
-  //     writeUDP(_summon_send[id], [](){});
-  // }
+//   // void sendHandShake(uint16_t id, uint8_t archetype) {
+//   //     half h = {.h = id};
+//   //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
+//   //     writeUDP(_summon_send[id], [](){});
+//   // }
 
-  void udp_receive(std::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
-                   asio::ip::udp::endpoint udp_endpoint) override {
-    if (buffer[0] == (uint8_t)Communication::HandShake) {
-      handleHandShake(bytes, buffer);
-    } else {
-      // cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint); /// TODO: FIX
-    }
-  }
-};
+//   void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) override {
+//     if (co.buffer[0] == (uint8_t)Communication::HandShake) {
+//       handleHandShake(bytes, co.buffer);
+//     } else {
+//       cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint); /// TODO: FIX
+//     }
+//   }
+// };

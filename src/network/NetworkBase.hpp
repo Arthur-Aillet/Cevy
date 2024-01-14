@@ -72,26 +72,6 @@ class cevy::NetworkBase {
 
        {};
 
-
-  private:
-  template <typename Component>
-  std::stringstream serialization(SparseVector<Component> components) {
-    std::stringstream ss;
-    ss << typeid(Component).name() << ' ' << components;
-    return ss;
-  }
-
-  template <typename Component>
-  std::tuple<std::string, Component> unserialization(std::istringstream iss) {
-    std::string typeIdName;
-    Component component;
-    iss >> typeIdName >> component;
-    if (typeIdName != typeid(component).name()) {
-      std::cerr << "Error: Invalide component type: " << typeIdName << std::endl;
-    }
-    return {typeIdName, component};
-  }
-
   public:
   union half {
     uint16_t h;
@@ -145,6 +125,10 @@ class cevy::NetworkBase {
     _temp_tcp_co = TcpConnexion(_io_context);
 
     _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this](asio::error_code error) {
+      if (error) {
+        std::cerr << "(ERROR)async_accept:" << error << std::endl;
+        return;
+      }
       std::cout << "new tcp connexion accepted to the server" << std::endl;
       _tcp_connexions.push_back(std::move(_temp_tcp_co));
       read_one_TCP(_tcp_connexions.back());
@@ -210,27 +194,6 @@ class cevy::NetworkBase {
     _tcp_socket.open(asio::ip::tcp::v4());
   }
 
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << std::hex << _udp_recv[i];
-      }
-      std::cout << std::endl << std::endl;
-      readUDP();
-    }
-  }
-
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
-                           udp::endpoint udp_endpoint) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << std::hex << _udp_recv[i];
-      }
-      std::cout << std::endl << std::endl;
-    }
-  }
 
   void readUDP() {
     _udp_socket.async_receive_from(
@@ -241,10 +204,16 @@ class cevy::NetworkBase {
   }
 
   protected:
+  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer, udp::endpoint &udp_endpoint) = 0;
+  virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) = 0;
+
   template <typename Function>
   void writeUDP(const std::vector<uint8_t> &data, Function &&func) {
     _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint,
-                              [this, &func](asio::error_code error, size_t bytes) { func(); });
+                              [this, &func](asio::error_code error, size_t) {
+                                if (error)
+                                  std::cerr << "(ERROR)async_send:" << error << std::endl;
+                                func(); });
   }
 
   void read_one_TCP(TcpConnexion &co) {
@@ -272,13 +241,4 @@ class cevy::NetworkBase {
                          [this, &func](asio::error_code error, size_t bytes) { func(); });
   }
 
-  virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << co.buffer[i];
-      }
-      std::cout << std::endl;
-    }
-  }
 };
