@@ -44,11 +44,16 @@ constexpr bool any() {
 
 /// @brief contains all of the engine bits
 namespace cevy {
+
 /// @brief holds the entity components system
 namespace ecs {};
 
 /// @brief hold engine mechanics, depends on ecs
 namespace engine {};
+
+/// @brief hold physics mechanism, depends on ecs
+namespace physics {};
+
 } // namespace cevy
 
 // note: here name-spaces are being forward declared;
