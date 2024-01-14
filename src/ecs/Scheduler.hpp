@@ -15,7 +15,6 @@
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
-#include <iostream>
 
 #include "Event.hpp"
 #include "Stage.hpp"

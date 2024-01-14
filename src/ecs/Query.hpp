@@ -68,7 +68,7 @@ class Query {
     };
 
     public:
-    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx), _entity(_idx) {};
+    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx), _entity(_idx){};
 
     iterator operator++() {
       incr_all();

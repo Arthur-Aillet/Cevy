@@ -90,7 +90,6 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   virtual void build(cevy::ecs::App &) override {}
 
-
   /**
    * @brief add an action with regular functions
    *
@@ -102,10 +101,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param client_success system triggered on action success
    * @param client_fail system triggered on action failure
    */
-  template <typename A,
-            typename... Arg0,
-            typename... Arg1,
-            typename... Arg2>
+  template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action(EActionFailureMode (&&server)(Arg0...), bool (&&client_success)(Arg1...),
                   bool (&&client_fail)(Arg2...)) {
     _actions[A::value] = std::make_tuple(
@@ -114,8 +110,7 @@ class cevy::NetworkActions : public ecs::Plugin {
         system([client_fail](ecs::Commands &cmd) mutable { return cmd.system(client_fail); }));
   };
 
-
-    /**
+  /**
    * @brief add an action with std::function
    *
    * @tparam A Action to map to
@@ -126,10 +121,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param client_success system triggered on action success
    * @param client_fail system triggered on action failure
    */
-  template <typename A,
-            typename... Arg0,
-            typename... Arg1,
-            typename... Arg2>
+  template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action(
       std::function<EActionFailureMode(Arg0...)> server,
       std::function<bool(Arg1...)> client_success = []() {},
@@ -139,8 +131,6 @@ class cevy::NetworkActions : public ecs::Plugin {
         system([client_success](ecs::Commands &cmd) mutable { return cmd.system(client_success); }),
         system([client_fail](ecs::Commands &cmd) mutable { return cmd.system(client_fail); }));
   }
-
-
 
   /**
    * @brief add an action with std::functions, taking an extra parameter
@@ -154,10 +144,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param client_success system triggered on action success
    * @param client_fail system triggered on action failure
    */
-  template <typename A,
-            typename... Arg0,
-            typename... Arg1,
-            typename... Arg2>
+  template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action_with(
       std::function<EActionFailureMode(typename A::Arg, Arg0...)> server,
       std::function<bool(typename A::Arg, Arg1...)> client_success = []() {},
@@ -176,7 +163,6 @@ class cevy::NetworkActions : public ecs::Plugin {
         }));
   }
 
-
   /**
    * @brief add an action with regular functions, taking an extra parameter
    *
@@ -189,10 +175,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param client_success system triggered on action success
    * @param client_fail system triggered on action failure
    */
-  template <typename A,
-            typename... Arg0,
-            typename... Arg1,
-            typename... Arg2>
+  template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action_with(
       EActionFailureMode (&&server)(typename A::Arg, Arg0...),
       bool (&&client_success)(typename A::Arg, Arg1...) = []() {},
@@ -222,7 +205,6 @@ class cevy::NetworkActions : public ecs::Plugin {
   void add_event(bool (&&func)(Args...)) {
     _events[E::value] = [func](ecs::Commands &cmd) { cmd.system(func); };
   };
-
 
   /**
    * @brief add an event with a regular function, taking an extra parameter
@@ -257,7 +239,6 @@ class cevy::NetworkActions : public ecs::Plugin {
     _super_events[std::type_index(typeid(E))] =
         std::make_any<std::function<bool(ecs::Commands &, typename E::Arg)>>(lambda);
   };
-
 
   /**
    * @brief Call an action
@@ -345,7 +326,6 @@ class cevy::NetworkActions : public ecs::Plugin {
     }
   }
 
-
   /**
    * @brief send an event
    *
@@ -360,7 +340,6 @@ class cevy::NetworkActions : public ecs::Plugin {
     std::vector<uint8_t> vec(E::serialized_size, 0);
     _net.sendEvent(E::value, vec);
   }
-
 
   /**
    * @brief Send an event with a given argument

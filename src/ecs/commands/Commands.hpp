@@ -70,7 +70,7 @@ class cevy::ecs::Commands {
   // }
 
   template <class R, class... Args>
-    R system(std::function<R(Args...)> func) {
+  R system(std::function<R(Args...)> func) {
     return _world_access.run_system<R, Args...>(func);
   }
 

@@ -46,14 +46,14 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     Client,
   };
 
-  template<size_t N, typename... T>
+  template <size_t N, typename... T>
   struct Spawnable {
     static const uint16_t value = N;
   };
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(CevyNetwork& net) : _net(net) {};
+  Synchroniser(CevyNetwork &net) : _net(net){};
 
   Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
 
@@ -77,8 +77,8 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     _spawnCommands[S::value] = [args...](ecs::EntityCommands e) { e.insert(T(args)...); };
   }
 
-  template<typename T>
-  void summon(cevy::ecs::Commands& command) {
+  template <typename T>
+  void summon(cevy::ecs::Commands &command) {
     auto e = command.spawn_empty();
     _spawnCommands[T::value](e);
     auto id = first_free();
@@ -87,15 +87,16 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     _net.sendSummon(id, T::value);
   }
 
-  void dismiss(cevy::ecs::Commands& command, SyncId syncId) {
+  void dismiss(cevy::ecs::Commands &command, SyncId syncId) {
     auto target = syncId.id;
-    std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor = [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
-      for (auto [id, e] : q) {
-        if (id.id == target) {
-          command.entity(e).despawn();
-        }
-      }
-    };
+    std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor =
+        [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
+          for (auto [id, e] : q) {
+            if (id.id == target) {
+              command.entity(e).despawn();
+            }
+          }
+        };
     command.system(deletor);
     _occupancy[target] = false;
     _net.sendDismiss(target);
@@ -118,13 +119,14 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
       if (!x)
         break;
       auto target = x.value();
-      std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor = [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
-        for (auto [id, e] : q) {
-          if (id.id == target) {
-            command.entity(e).despawn();
-          }
-        }
-      };
+      std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor =
+          [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {
+            for (auto [id, e] : q) {
+              if (id.id == target) {
+                command.entity(e).despawn();
+              }
+            }
+          };
       command.system(deletor);
       _occupancy[target] = false;
     };
@@ -139,7 +141,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     throw std::out_of_range("Trying to create more than 1023 synced entities");
   }
 
-  CevyNetwork& _net;
+  CevyNetwork &_net;
   std::unordered_map<BlockType, uint8_t> _blocks;
   uint8_t _blockCount;
   std::unordered_map<uint8_t, std::function<void(ecs::EntityCommands)>> _spawnCommands;
@@ -151,8 +153,11 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   void build(cevy::ecs::App &app) override {
     app.add_stage<SummonStage>();
     app.add_stage<SyncStage>();
-    std::function<void(ecs::Commands)> func = [this](cevy::ecs::Commands cmd){ this->system_summon(cmd);};
-    app.add_class_system<std::function<void(ecs::Commands)>, SummonStage, cevy::ecs::Commands>(func);
+    std::function<void(ecs::Commands)> func = [this](cevy::ecs::Commands cmd) {
+      this->system_summon(cmd);
+    };
+    app.add_class_system<std::function<void(ecs::Commands)>, SummonStage, cevy::ecs::Commands>(
+        func);
     build_custom(app);
   }
 };

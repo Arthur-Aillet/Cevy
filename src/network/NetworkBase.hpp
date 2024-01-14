@@ -50,27 +50,22 @@ class cevy::NetworkBase {
     TcpConnexion(asio::io_context &socket) : socket(socket) {}
   };
 
-  NetworkBase(const NetworkBase& rhs) = delete;
+  NetworkBase(const NetworkBase &rhs) = delete;
 
-  NetworkBase(NetworkBase &rhs) :
-      quit(rhs.quit),
-      _nw_thread(std::move(rhs._nw_thread)),
+  NetworkBase(NetworkBase &rhs)
+      : quit(rhs.quit), _nw_thread(std::move(rhs._nw_thread)),
 
-      _dest_ip(std::move(rhs._dest_ip)),
-      _dest_tcp_port(std::move(rhs._dest_tcp_port)),
-      _dest_udp_port(std::move(rhs._dest_udp_port)),
+        _dest_ip(std::move(rhs._dest_ip)), _dest_tcp_port(std::move(rhs._dest_tcp_port)),
+        _dest_udp_port(std::move(rhs._dest_udp_port)),
 
-      _udp_endpoint(std::move(rhs._udp_endpoint)),
-      _tcp_endpoint(std::move(rhs._tcp_endpoint)),
+        _udp_endpoint(std::move(rhs._udp_endpoint)), _tcp_endpoint(std::move(rhs._tcp_endpoint)),
 
-      _udp_socket(std::move(rhs._udp_socket)),
-      _tcp_socket(std::move(rhs._tcp_socket)),
-      _tcp_connexions(std::move(rhs._tcp_connexions)),
-      _tcp_acceptor(std::move(rhs._tcp_acceptor)),
-      _temp_tcp_co(std::move(rhs._temp_tcp_co)),
-      _udp_recv(std::move(rhs._udp_recv))
+        _udp_socket(std::move(rhs._udp_socket)), _tcp_socket(std::move(rhs._tcp_socket)),
+        _tcp_connexions(std::move(rhs._tcp_connexions)),
+        _tcp_acceptor(std::move(rhs._tcp_acceptor)), _temp_tcp_co(std::move(rhs._temp_tcp_co)),
+        _udp_recv(std::move(rhs._udp_recv))
 
-       {};
+            {};
 
   public:
   union half {
@@ -194,7 +189,6 @@ class cevy::NetworkBase {
     _tcp_socket.open(asio::ip::tcp::v4());
   }
 
-
   void readUDP() {
     _udp_socket.async_receive_from(
         asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes) {
@@ -204,7 +198,8 @@ class cevy::NetworkBase {
   }
 
   protected:
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer, udp::endpoint &udp_endpoint) = 0;
+  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
+                           udp::endpoint &udp_endpoint) = 0;
   virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) = 0;
 
   template <typename Function>
@@ -213,7 +208,8 @@ class cevy::NetworkBase {
                               [this, &func](asio::error_code error, size_t) {
                                 if (error)
                                   std::cerr << "(ERROR)async_send:" << error << std::endl;
-                                func(); });
+                                func();
+                              });
   }
 
   void read_one_TCP(TcpConnexion &co) {
@@ -240,5 +236,4 @@ class cevy::NetworkBase {
     co.socket.async_send(asio::buffer(data),
                          [this, &func](asio::error_code error, size_t bytes) { func(); });
   }
-
 };

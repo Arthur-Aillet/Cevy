@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "ecs.hpp"
-#include "network.hpp"
 #include "NetworkActions.hpp"
 #include "Synchroniser.hpp"
+#include "ecs.hpp"
+#include "network.hpp"
 
 /**
  * @brief Commands helper for facilitating network related actions
@@ -22,9 +22,9 @@
  */
 class cevy::NetworkCommands : protected ecs::Commands {
   public:
-  NetworkCommands(NetworkActions& actions, Synchroniser& sync, ecs::World& world)
-    : Commands(world), _actions(actions), _sync(sync) {};
-  ~NetworkCommands() {};
+  NetworkCommands(NetworkActions &actions, Synchroniser &sync, ecs::World &world)
+      : Commands(world), _actions(actions), _sync(sync){};
+  ~NetworkCommands(){};
 
   /**
    * @brief Call an action
@@ -37,7 +37,7 @@ class cevy::NetworkCommands : protected ecs::Commands {
    *
    * @tparam A Action to call
    */
-  template<typename A>
+  template <typename A>
   void action() {
     _actions.action<A>(*this);
   };
@@ -60,11 +60,10 @@ class cevy::NetworkCommands : protected ecs::Commands {
    * @tparam A::Arg Argument required
    * @param given argument to give
    */
-  template<typename A>
+  template <typename A>
   void action_with(typename A::Arg given) {
     _actions.event_with<A>(*this, given);
   };
-
 
   /**
    * @brief send an event
@@ -73,7 +72,7 @@ class cevy::NetworkCommands : protected ecs::Commands {
    *
    * @tparam E Event to send
    */
-  template<typename E>
+  template <typename E>
   void event() {
     _actions.event<E>(*this);
   };
@@ -92,22 +91,21 @@ class cevy::NetworkCommands : protected ecs::Commands {
    * @tparam E::Arg Argument required
    * @param given argument to give
    */
-  template<typename E>
+  template <typename E>
   void event_with(typename E::Arg given) {
     _actions.event_with<E>(*this, given);
   };
 
-  template<typename T>
+  template <typename T>
   void summon() {
     _sync.summon<T>(*this);
   };
 
-  void dismiss(Synchroniser::SyncId id) {
-    _sync.dismiss(*this, id);
-  }
+  void dismiss(Synchroniser::SyncId id) { _sync.dismiss(*this, id); }
 
   protected:
-  NetworkActions& _actions;
-  Synchroniser& _sync;
+  NetworkActions &_actions;
+  Synchroniser &_sync;
+
   private:
 };

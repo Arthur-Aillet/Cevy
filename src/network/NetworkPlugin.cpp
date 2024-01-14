@@ -9,5 +9,3 @@
 #include "network/network.hpp"
 
 using cevy::NetworkPlugin;
-
-
