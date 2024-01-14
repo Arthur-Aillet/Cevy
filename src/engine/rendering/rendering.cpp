@@ -37,9 +37,6 @@ void render_lines(cevy::ecs::World &w) {
 }
 
 static void render_model(Model &model, engine::Transform transform, ::Color tint) {
-  Matrix rot = QuaternionToMatrix(transform.rotation);
-  Matrix pos = MatrixTranslate(transform.position.x, transform.position.y, transform.position.z);
-  Matrix final = MatrixMultiply(rot, pos);
   model.transform = QuaternionToMatrix(transform.rotation);
   model.transform = MatrixMultiply(
       model.transform, MatrixScale(transform.scale.x, transform.scale.y, transform.scale.z));
