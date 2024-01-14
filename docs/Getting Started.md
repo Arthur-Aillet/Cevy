@@ -382,6 +382,65 @@ int main() {
 ```
 Try running the app again. It should do exactly what it did before. In the next section, we'll fix the "hello" spam using Resources.
 
+
+# Resources
+`Entities` and `Components` are great for representing complex, query-able groups of data. But most Apps will also require "globally unique" data of some kind. In Cevy ECS, we represent globally unique data using `Resources`.
+
+Here are some examples of data that could be encoded as `Resources`:
+    - Elapsed Time
+    - Asset Collections (sounds, textures, meshes)
+    - Renderers
+
+## Tracking Time with Resources
+Let's solve our App's "hello spam" problem by only printing "hello" once every two seconds. We'll do this by using the Time resource, which is automatically added to our App via add_plugins(DefaultPlugins).
+
+For simplicity, remove the hello_world system from your App. This way we only need to adapt the greet_people system.
+
+Resources are accessed in much the same way that we access components. You can access the Time resource in your system like this:
+```cpp
+void greet_people(Ressource<Time> time, Query<Name> persons) {
+    for p : persons {
+        std::cout << "hello " << p.getName() << std::endl;
+    }
+}
+```
+The `delta` field on `Time` gives us the time that has passed since the last update. But in order to run our system once every two seconds, we must track the amount of time that has passed over a series of updates.
+```cpp
+
+class GreetTime {
+    private:
+    Time _time;
+
+    public:
+    GreetTime(Time time) : _time(time) {}
+    ~GreetTime() {}
+
+    Time getTime() { return _time }
+}
+
+void greet_people(Ressource<GreetTimer> time, Query<Name> persons) {
+    if (time.getTime().get().delta_seconds() >= 2) {
+        for p : persons {
+            std::cout << "hello " << p.getName() << std::endl;
+        }
+    }
+}
+```
+Now all that's left is adding a `GreetTimer` Resource to our `HelloPlugin`.
+```cpp
+class HelloPlugin : public Plugin {
+    public:
+    void build(App &app) {
+        app.init_component<Name>();
+        app.init_component<Person>();
+        app.insert_resource(GreetTimer(Time()));
+        app.add_systems<core_stage::Startup>(add_people);
+        app.add_systems<core_stage::Update>(hello_world, greet_people);
+    }
+};
+```
+
+
 [1]: https://github.com/Arthur-Aillet/Cevy "Title"
 [2]: https://github.com/Arthur-Aillet/RType "Title"
 [3]: https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16 "Title"
