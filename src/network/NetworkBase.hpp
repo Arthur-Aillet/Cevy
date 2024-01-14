@@ -50,24 +50,27 @@ class cevy::NetworkBase {
     TcpConnexion(asio::io_context &socket) : socket(socket) {}
   };
 
-  private:
-  template <typename Component>
-  std::stringstream serialization(SparseVector<Component> components) {
-    std::stringstream ss;
-    ss << typeid(Component).name() << ' ' << components;
-    return ss;
-  }
+  NetworkBase(const NetworkBase& rhs) = delete;
 
-  template <typename Component>
-  std::tuple<std::string, Component> unserialization(std::istringstream iss) {
-    std::string typeIdName;
-    Component component;
-    iss >> typeIdName >> component;
-    if (typeIdName != typeid(component).name()) {
-      std::cerr << "Error: Invalide component type: " << typeIdName << std::endl;
-    }
-    return {typeIdName, component};
-  }
+  NetworkBase(NetworkBase &rhs) :
+      quit(rhs.quit),
+      _nw_thread(std::move(rhs._nw_thread)),
+
+      _dest_ip(std::move(rhs._dest_ip)),
+      _dest_tcp_port(std::move(rhs._dest_tcp_port)),
+      _dest_udp_port(std::move(rhs._dest_udp_port)),
+
+      _udp_endpoint(std::move(rhs._udp_endpoint)),
+      _tcp_endpoint(std::move(rhs._tcp_endpoint)),
+
+      _udp_socket(std::move(rhs._udp_socket)),
+      _tcp_socket(std::move(rhs._tcp_socket)),
+      _tcp_connexions(std::move(rhs._tcp_connexions)),
+      _tcp_acceptor(std::move(rhs._tcp_acceptor)),
+      _temp_tcp_co(std::move(rhs._temp_tcp_co)),
+      _udp_recv(std::move(rhs._udp_recv))
+
+       {};
 
   public:
   union half {
@@ -112,7 +115,7 @@ class cevy::NetworkBase {
       _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
           ->socket.connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321));
       std::cout << "tcp connexion successful :)" << std::endl;
-    } catch (asio::system_error e) {
+    } catch (asio::system_error &e) {
       std::cout << "tcp connexion fail :(" << std::endl
                 << e.code() << " bonjour" << e.what() << std::endl;
     }
@@ -122,6 +125,10 @@ class cevy::NetworkBase {
     _temp_tcp_co = TcpConnexion(_io_context);
 
     _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this](asio::error_code error) {
+      if (error) {
+        std::cerr << "(ERROR)async_accept:" << error << std::endl;
+        return;
+      }
       std::cout << "new tcp connexion accepted to the server" << std::endl;
       _tcp_connexions.push_back(std::move(_temp_tcp_co));
       read_one_TCP(_tcp_connexions.back());
@@ -187,27 +194,6 @@ class cevy::NetworkBase {
     _tcp_socket.open(asio::ip::tcp::v4());
   }
 
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << std::hex << _udp_recv[i];
-      }
-      std::cout << std::endl << std::endl;
-      readUDP();
-    }
-  }
-
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
-                           udp::endpoint udp_endpoint) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << std::hex << _udp_recv[i];
-      }
-      std::cout << std::endl << std::endl;
-    }
-  }
 
   void readUDP() {
     _udp_socket.async_receive_from(
@@ -218,10 +204,16 @@ class cevy::NetworkBase {
   }
 
   protected:
+  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer, udp::endpoint &udp_endpoint) = 0;
+  virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) = 0;
+
   template <typename Function>
   void writeUDP(const std::vector<uint8_t> &data, Function &&func) {
     _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint,
-                              [this, &func](asio::error_code error, size_t bytes) { func(); });
+                              [this, &func](asio::error_code error, size_t) {
+                                if (error)
+                                  std::cerr << "(ERROR)async_send:" << error << std::endl;
+                                func(); });
   }
 
   void read_one_TCP(TcpConnexion &co) {
@@ -249,13 +241,4 @@ class cevy::NetworkBase {
                          [this, &func](asio::error_code error, size_t bytes) { func(); });
   }
 
-  virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) {
-    if (!error) {
-      std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      for (size_t i = 0; i < bytes; ++i) {
-        std::cout << co.buffer[i];
-      }
-      std::cout << std::endl;
-    }
-  }
 };

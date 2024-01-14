@@ -325,6 +325,19 @@ class cevy::ecs::World {
     R ret = sys();
     return std::forward<R>(ret);
   }
+
+  template <class GivenArgs, class R, class... Args>
+  R run_system_with(R (&&func)(GivenArgs, Args...), GivenArgs given) {
+        static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this, given]() mutable -> R {
+      return func(given, get_super<Args>(0)...);
+    };
+    R ret = sys();
+    return std::forward<R>(ret);
+  }
 };
 
 template <typename... Ts>

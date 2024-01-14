@@ -18,7 +18,7 @@ class EntityCommands;
 } // namespace cevy
 
 class cevy::ecs::Commands {
-  private:
+  protected:
   friend class cevy::ecs::World;
 
   cevy::ecs::World &_world_access;
@@ -48,7 +48,22 @@ class cevy::ecs::Commands {
 
   template <class R, class... Args>
   R system(R (&&func)(Args...)) {
-    return std::forward<R>(_world_access.run_system(func));
+      return (_world_access.run_system(func));
+  }
+
+    template <class GivenArgs, class R, class... Args>
+  R system_with(R (&&func)(GivenArgs, Args...), GivenArgs given) {
+      return (_world_access.run_system_with<GivenArgs>(func, given));
+  }
+
+  template <class R, class... Args>
+  R system(std::function<R(Args...)> func) {
+    return (_world_access.run_system(func));
+  }
+
+  template <class GivenArgs, class R, class... Args>
+  R system_with(std::function<R(GivenArgs, Args...)> func, GivenArgs given) {
+    return (_world_access.run_system_with<GivenArgs>(func, given));
   }
 };
 

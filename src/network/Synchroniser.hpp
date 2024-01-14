@@ -26,6 +26,7 @@
 #include "network.hpp"
 
 class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
+  friend NetworkPlugin;
   public:
   class SummonStage : public ecs::Schedule::before<ecs::Schedule::PreUpdate> {};
   class SyncStage : public ecs::Schedule::after<SummonStage> {};
@@ -45,10 +46,12 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(std::move(rhs._net)) {}
+  Synchroniser(CevyNetwork& net) : _net(net) {};
 
-  Synchroniser(Mode mode, const std::string &host = std::string(""))
-      : mode(mode), _net(host, 4995){};
+  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
+
+  // Synchroniser(Mode mode, const std::string &host = std::string(""))
+  //     : mode(mode), _net(host, 4995){};
   ~Synchroniser(){};
 
   template <typename Block, typename... Component>
@@ -67,21 +70,21 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     _spawnCommands[i] = [args...](ecs::EntityCommands e) { e.insert(T(args)...); };
   }
 
-  void system_summon(cevy::ecs::Commands command, cevy::ecs::Query<SyncId> q) {
-    auto x = _net.recvSummon();
-    for (auto it : x) {
-      auto e = command.spawn_empty();
-      _spawnCommands[it.second](e);
-      e.insert(SyncId{it.first, it.second});
-      _occupancy[it.first] = true;
-    }
-    for (auto e : q) {
-      if (std::get<SyncId &>(e).id == SyncId::unset) {
-        std::get<SyncId &>(e).id = first_free();
-        _net.sendSummon(std::get<SyncId &>(e).id, std::get<SyncId &>(e).type);
-      }
-    }
-  }
+  // void system_summon(cevy::ecs::Commands command, cevy::ecs::Query<SyncId> q) {
+  //   auto x = _net.recvSummon();
+  //   for (auto it : x) {
+  //     auto e = command.spawn_empty();
+  //     _spawnCommands[it.second](e);
+  //     e.insert(SyncId{it.first, it.second});
+  //     _occupancy[it.first] = true;
+  //   }
+  //   for (auto e : q) {
+  //     if (std::get<SyncId &>(e).id == SyncId::unset) {
+  //       std::get<SyncId &>(e).id = first_free();
+  //       _net.sendSummon(std::get<SyncId &>(e).id, std::get<SyncId &>(e).type);
+  //     }
+  //   }
+  // }
 
   protected:
   uint16_t first_free() {
@@ -94,7 +97,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     throw std::out_of_range("Trying to create more than 1023 synced entities");
   }
 
-  CevyNetwork _net;
+  CevyNetwork& _net;
   std::unordered_map<BlockType, uint8_t> _blocks;
   uint8_t _blockCount;
   std::unordered_map<uint8_t, std::function<void(ecs::EntityCommands)>> _spawnCommands;
@@ -104,16 +107,16 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   protected:
   void build(cevy::ecs::App &app) override {
-    struct SyncSubSystem {
-      Synchroniser &_sync;
-      void operator()(cevy::ecs::Commands cmd, cevy::ecs::Query<SyncId> q) const {
-        _sync.system_summon(cmd, q);
-      };
-    };
-    SyncSubSystem sys{*this};
+    // struct SyncSubSystem {
+    //   Synchroniser &_sync;
+    //   void operator()(cevy::ecs::Commands cmd, cevy::ecs::Query<SyncId> q) const {
+    //     // _sync.system_summon(cmd, q);
+    //   };
+    // };
+    // SyncSubSystem sys{*this};
     // app.add_class_system<SyncSubSystem, SummonStage>(std::move(sys));
-    app.add_class_system<SyncSubSystem, SummonStage, cevy::ecs::Commands, cevy::ecs::Query<SyncId>>(
-        std::move(sys));
+    // app.add_class_system<SyncSubSystem, SummonStage, cevy::ecs::Commands, cevy::ecs::Query<SyncId>>(
+        // std::move(sys));
     build_custom(app);
   }
 };
