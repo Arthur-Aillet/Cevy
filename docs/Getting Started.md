@@ -161,12 +161,60 @@ FetchContent_Declare(
 FetchContent_Populate(cevy)
 ```
 ## Build Cevy
-Now you can run your program with these lign
+Now you can run your program with these line.
 
 ```bash
 cmake -S . -B ./build
 make --no-print-directory -C build
 ```
+
+# Apps
+Cevy programs are referred to as `App`s. The simplest Cevy app look like this:
+
+```cpp
+#include "App.hpp"
+
+int main() {
+    App app;
+    app.run();
+    return 0,
+}
+```
+
+Nice and simple righ? Copy the code above into your `main.cpp` file and run it.
+You will notice that nothing happens? This is because we haven't told our app to do anything yet! Apps are just empty shells capable of running our application logic. Let's add some logic to our App using Cevy ECS.
+
+
+# ECS
+
+All app logic in Cevy uses the Entity Component System paradigm, which is often shortened to ECS. ECS is a software pattern that involves breaking your program up into **Entities**, **Components**, and **Systems**. **Entities** are unique "things" that are assigned groups of **Components**, which are then processed using **Systems**.
+
+For example, one entity might have a `Position` and `Velocity` component, whereas another entity might have a `Position` and `UI` component. Systems are logic that runs on a specific set of component types. You might have a `movement` system that runs on all entities with a `Position` and `Velocity` component.
+
+The ECS pattern encourages clean, decoupled designs by forcing you to break up your app data and logic into its core components. It also helps make your code faster by optimizing memory access patterns and making parallelism easier.
+
+# Your First System
+
+Past the following function into your `main.cpp` file:
+```cpp
+void hello_world() {
+    std::cout << "Hello World!" << std::endl;
+}
+```
+This will be our fisrt system. The only remaining step is to add it to our `App`!
+
+```cpp
+#include "App.hpp"
+
+int main() {
+    App app;
+    app.add_systems<core_stage::Update>(hello_world);
+    app.run();
+    return 0,
+}
+```
+The `add_systems` function adds the system to your App's `Update Shedule`, but we'll cover that more later.
+Now you can run your app again using. You should see `Hello World!` printed once in your terminal.
 
 
 [1]: https://github.com/Arthur-Aillet/Cevy "Title"
