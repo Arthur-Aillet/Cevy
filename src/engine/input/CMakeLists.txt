@@ -7,11 +7,11 @@
 
 add_library(input
   STATIC
-  Input.cpp
   Input.hpp
   Keyboard.cpp
   Keyboard.hpp
   Mouse.cpp
+  Mouse.hpp
   )
 
 set(RAYLIB_FOLDER ${CMAKE_BINARY_DIR}/_deps/raylib-build/raylib/include)

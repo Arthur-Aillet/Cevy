@@ -7,32 +7,37 @@
 
 #pragma once
 
-#pragma GCC system_header
+#include "Input.hpp"
+#include <unordered_map>
 
-#include "ecs.hpp"
-#include "Query.hpp"
-#include "raylib.hpp"
-#include <any>
-#include <map>
-
-void update_all_inputs(cevy::ecs::Query<cevy::ecs::Input<std::any>> inputs);
-
-enum ButtonState {
-  JUST_PRESSED = 0,
-  PRESSED = 1,
-  JUST_RELEASED = 2,
-};
+namespace cevy {
+namespace engine {
 
 template <typename InputType>
-class cevy::ecs::Input {
+class Input {
   public:
   void update_keys() {};
   void clear_keys() {
-    just_pressed.clear();
-    pressed.clear();
-    just_released.clear();
+    _just_pressed.clear();
+    _pressed.clear();
+    _just_released.clear();
   };
-  std::map<int, InputType> just_pressed;
-  std::map<int, InputType> pressed;
-  std::map<int, InputType> just_released;
+
+  bool pressed(int enum_val) {
+    return _pressed.count(enum_val);
+  }
+
+  bool just_pressed(int enum_val) {
+    return _just_pressed.count(enum_val);
+  }
+
+  bool just_released(int enum_val) {
+    return _just_released.count(enum_val);
+  }
+
+  std::unordered_map<int, typename InputType::Info> _just_pressed;
+  std::unordered_map<int, typename InputType::Info> _pressed;
+  std::unordered_map<int, typename InputType::Info> _just_released;
 };
+}
+}

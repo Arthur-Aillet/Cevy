@@ -8,6 +8,11 @@
 #pragma once
 
 #include "Input.hpp"
+#include "Resource.hpp"
+#include "raylib.hpp"
+
+namespace cevy {
+namespace engine {
 
 enum MouseInput {
   Mouse_LEFT = 0,
@@ -17,11 +22,6 @@ enum MouseInput {
   Mouse_EXTRA = 4,
   Mouse_FORWARD = 5,
   Mouse_BACK = 6,
-};
-
-struct Mouse {
-  MouseInput button;
-  ButtonState state;
 };
 
 struct MousePosition {
@@ -34,13 +34,24 @@ struct MouseWheel {
   double horisontal;
 };
 
+struct Mouse {
+  MouseInput button;
+  //ButtonState state;
+};
+
 template<>
-class cevy::ecs::Input<Mouse> {
+class Input<Mouse> {
   public:
   void update_keys();
-  std::map<int, Mouse> just_pressed;
-  std::map<int, Mouse> pressed;
-  std::map<int, Mouse> just_released;
+  //std::map<int, Mouse> _just_pressed;
+  //std::map<int, Mouse> _pressed;
+  //std::map<int, Mouse> _just_released;
   MousePosition position;
   MouseWheel wheel;
 };
+
+
+void update_mouse(cevy::ecs::Resource<cevy::engine::Input<Mouse>> inputs);
+
+}
+}

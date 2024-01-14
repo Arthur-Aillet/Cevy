@@ -6,25 +6,30 @@
 */
 
 #include "Mouse.hpp"
-
-void cevy::ecs::Input<Mouse>::update_keys() {
+void cevy::engine::Input<cevy::engine::Mouse>::update_keys() {
+/*
   Vector2 wheelMove = GetMouseWheelMoveV();
   wheel.horisontal = wheelMove.x;
   wheel.vectical = wheelMove.y;
   position.delta = GetMouseDelta();
   position.position = GetMousePosition();
-  pressed.clear();
-  just_pressed.clear();
-  just_released.clear();
+  _pressed.clear();
+  _just_pressed.clear();
+  _just_released.clear();
   for (int i = 0; i <= 6; i++) {
     if (IsMouseButtonPressed(i)) {
-      just_pressed.insert({i, (Mouse){(MouseInput)i, ButtonState::JUST_PRESSED}});
+      _just_pressed.insert({i, (Mouse){(MouseInput)i, ButtonState::JUST_PRESSED}});
     }
     if (IsMouseButtonDown(i)) {
-      pressed.insert({i, (Mouse){(MouseInput)i, ButtonState::PRESSED}});
+      _pressed.insert({i, (Mouse){(MouseInput)i, ButtonState::PRESSED}});
     }
     if (IsMouseButtonReleased(i)) {
-      just_released.insert({i, (Mouse){(MouseInput)i, ButtonState::JUST_RELEASED}});
+      _just_released.insert({i, (Mouse){(MouseInput)i, ButtonState::JUST_RELEASED}});
     }
   }
+*/
+}
+
+void cevy::engine::update_mouse(cevy::ecs::Resource<cevy::engine::Input<cevy::engine::Mouse>> inputs) {
+  inputs.get().update_keys();
 }

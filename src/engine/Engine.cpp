@@ -14,7 +14,9 @@
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
 #include "Event.hpp"
+#include "Keyboard.hpp"
 #include "Line.hpp"
+#include "Mouse.hpp"
 #include "PhysicsProps.hpp"
 #include "Target.hpp"
 #include "Transform.hpp"
@@ -72,6 +74,10 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.init_component<cevy::engine::TransformVelocity>();
   app.init_component<cevy::engine::Color>();
   app.init_component<cevy::engine::ClearColor>();
+  app.insert_resource(cevy::engine::Input<Keyboard>());
+  app.insert_resource(cevy::engine::Input<Mouse>());
+  app.add_systems<ecs::core_stage::PreUpdate>(cevy::engine::update_mouse);
+  app.add_systems<ecs::core_stage::PreUpdate>(cevy::engine::update_keyboard);
   app.add_plugins(cevy::engine::AssetManagerPlugin());
   app.add_systems<cevy::engine::PreStartupRenderStage>(init_window);
   app.add_systems<cevy::engine::PreRenderStage>(close_game);

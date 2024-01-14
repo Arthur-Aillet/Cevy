@@ -22,7 +22,7 @@ add_subdirectory(input)
 add_subdirectory(rendering)
 
 target_link_libraries(engine PUBLIC raylib imgui rlImGui) #PRIVATE
-target_link_libraries(engine PUBLIC ecs math assets rendering)
+target_link_libraries(engine PUBLIC ecs math assets rendering input)
 
 target_include_directories(engine PUBLIC
   ../ecs

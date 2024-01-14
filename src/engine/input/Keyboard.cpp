@@ -6,31 +6,41 @@
 */
 
 #include "Keyboard.hpp"
+#include "raylib.hpp"
+#include <iostream>
+#include <ostream>
+
+using namespace cevy;
+using namespace engine;
 
 template<>
-void cevy::ecs::Input<KeyBoard>::update_keys() {
-  int keyval = GetKeyPressed();
-  for (auto const &[key, val] : just_pressed) {
-    if (pressed.find(key) != pressed.end()) {
-      pressed.insert({key, val});
+void cevy::engine::Input<Keyboard>::update_keys() {
+  for (auto const &[key, val] : _just_pressed) {
+    if (_pressed.find(key) != _pressed.end()) {
+      _pressed.insert({key, val});
     }
   }
-  just_pressed.clear();
+  _just_pressed.clear();
+
+  int keyval = GetKeyPressed();
   while (keyval != KeyboardKey::KEY_NULL) {
-    just_pressed.insert({raylibToCevyKeyboard(keyval),
-                         (KeyBoard){
-                             static_cast<unsigned int>(keyval), // to change to scancode
-                             raylibToCevyKeyboard(keyval),
-                             ButtonState::JUST_PRESSED,
-                         }});
+    _just_pressed.insert({keyval,
+                             Keyboard::State::JUST_PRESSED,
+                         });
     keyval = GetKeyPressed();
   }
-  just_released.clear();
+
+  _just_released.clear();
   keyval = GetKeyPressed();
-  for (auto input : pressed) {
-    if (IsKeyUp(input.second.scancode)) {
-      pressed.erase(input.second.keycode);
-      just_released.insert(input);
+  for (auto input : _pressed) {
+    if (IsKeyUp(input.second)) {
+      _pressed.erase(input.second);
+      _just_released.insert(input);
     }
   }
 };
+
+void cevy::engine::update_keyboard(cevy::ecs::Resource<cevy::engine::Input<Keyboard>> inputs) {
+  inputs.get().update_keys();
+  std::cout << inputs.get()._pressed.size() << std::endl;
+}
