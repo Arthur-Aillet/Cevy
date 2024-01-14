@@ -25,13 +25,10 @@
 #include <vector>
 
 #include "../ecs/SparseVector.hpp"
-#include "asio/completion_condition.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
-#include "asio/read.hpp"
 #include "asio/system_error.hpp"
-#include "asio/write.hpp"
 #include "network.hpp"
 
 class cevy::NetworkBase {
@@ -172,9 +169,6 @@ class cevy::NetworkBase {
       server.write_one_TCP(server._tcp_connexions.back());
     }
     server._nw_thread.join();
-    // while (true) {
-    //   server._io_context.run();
-    // }
   }
 
   static void start_client(const std::string &host) {
@@ -242,15 +236,6 @@ class cevy::NetworkBase {
     });
   }
 
-  // NetworkBase(NetworkBase &&rhs)
-  //     : _nw_thread(std::move(rhs._nw_thread)), _udp_endpoint(std::move(rhs._udp_endpoint)),
-  //       _tcp_endpoint(std::move(rhs._tcp_endpoint)), _udp_socket(std::move(rhs._udp_socket)),
-  //       _tcp_socket(std::move(rhs._tcp_socket)), _udp_recv(std::move(rhs._udp_recv)),
-  //       _tcp_recv(std::move(rhs._tcp_recv)), _tcp_acceptor(std::move(rhs._tcp_acceptor)){};
-
-  // NetworkBase(asio::ip::udp::socket &&udp_socket, asio::ip::tcp::socket &&tcp_socket)
-  //     : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
-
   NetworkBase(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
               size_t client_offset)
       : _udp_endpoint(asio::ip::udp::v4(),
@@ -261,36 +246,7 @@ class cevy::NetworkBase {
         _tcp_acceptor(_io_context, _tcp_endpoint), _temp_tcp_co(_io_context) {
     _udp_socket.open(asio::ip::udp::v4());
     _tcp_socket.open(asio::ip::tcp::v4());
-
-    // _nw_thread = std::thread([this]() {
-    //   while (!this->quit)
-    //     this->_io_context.run();
-    // });
   }
-
-  // NetworkBase(size_t port)
-  //     : _udp_endpoint(asio::ip::udp::v4(), port), _tcp_endpoint(asio::ip::tcp::v4(), port),
-  //       _udp_socket(_io_context), _tcp_socket(_io_context),
-  //       _tcp_acceptor(_io_context, _tcp_endpoint) {
-  //   _udp_socket.open(asio::ip::udp::v4());
-  //   _tcp_socket.open(asio::ip::tcp::v4());
-
-  //   _nw_thread = std::thread([this]() {
-  //     while (!this->quit)
-  //       this->_io_context.run();
-  //   });
-  // }
-
-  // NetworkBase(NetworkMode mode, size_t port)
-  //     : _udp_endpoint(udp::v4(), port), _tcp_endpoint(tcp::v4(), port), _udp_socket(_io_context),
-  //       _tcp_socket(_io_context), _tcp_acceptor(_io_context, _tcp_endpoint) {
-  //   _udp_socket.open(udp::v4());
-  //   _tcp_socket.open(tcp::v4());
-
-  //   if (mode == NetworkMode::Server) {
-  //     tcp_accept_new_connexion();
-  //   }
-  // }
 
   protected:
   template <typename Function>
@@ -321,18 +277,6 @@ class cevy::NetworkBase {
   }
 
   void read_one_TCP(TcpConnexion &co) {
-    // asio::async_read(co.socket, asio::buffer(co.buffer), asio::transfer_at_least(20),
-    //                  [this, &co](asio::error_code error, size_t bytes) {
-    //                    std::cout << "error is : " << error << std::endl;
-    //                    tcp_receive(error, bytes, co);
-    //                    read_one_TCP(co);
-    //                  });
-    if (co.socket.is_open()) {
-      std::cout << "OPEN" << std::endl;
-    } else {
-      std::cout << "CLOSED :(" << std::endl;
-      abort();
-    }
     co.socket.async_read_some(asio::buffer(co.buffer),
                               [this, &co](asio::error_code error, size_t bytes) {
                                 std::cout << "error is : " << error << std::endl;
@@ -341,7 +285,7 @@ class cevy::NetworkBase {
                               });
   }
 
-  void readTCP() { // REVIEW - useful ?
+  void read_all_TCP() {
     for (auto &co : _tcp_connexions) {
       read_one_TCP(co);
     }
@@ -374,13 +318,3 @@ class cevy::NetworkBase {
     }
   }
 };
-
-// class TcpClient : cevy::NetworkBase {
-//   const std::string server_ip;
-//   const int server_port;
-//   tcp::socket socket;
-
-//   TcpClient(std::string server_ip, int server_port) : cevy::NetworkBase(), server_ip(server_ip),
-//   server_port(server_port), socket(_io_context) {};
-
-// };
