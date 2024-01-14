@@ -52,6 +52,11 @@ constexpr std::function<R(Args...)> make_function(R (&&func)(Args...)) {
   return std::function<R(Args...)>(func);
 };
 
+template <typename R, typename... Args, typename F>
+constexpr std::function<R(Args...)> make_function(F func) {
+  return std::function<R(Args...)>(func);
+};
+
 /// @brief contains all of the engine bits
 namespace cevy {
 /// @brief holds the entity components system

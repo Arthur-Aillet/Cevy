@@ -35,7 +35,7 @@ class cevy::ecs::App : public cevy::ecs::World {
    * Allows plugins to hold values, this let plugin.build() to not be a dynamic function and for
    * plugin to take parameters
    */
-  std::vector<std::shared_ptr<Plugin>> _plugins;
+  std::vector<std::unique_ptr<Plugin>> _plugins;
 
   private:
   /**
@@ -54,7 +54,7 @@ class cevy::ecs::App : public cevy::ecs::World {
                   "Given plugin does not derive from Cevy Plugin class");
     static_assert(std::is_move_constructible_v<GivenPlugin>,
                   "Given plugin must be move constructible");
-    _plugins.push_back(std::make_unique<GivenPlugin>(plugin));
+    _plugins.push_back(std::move(std::make_unique<GivenPlugin>(plugin)));
 
     _plugins.back()->build(*this);
   }
@@ -66,7 +66,7 @@ class cevy::ecs::App : public cevy::ecs::World {
                   "Given plugin does not derive from Cevy Plugin class");
     static_assert(std::is_move_constructible_v<GivenPlugin>,
                   "Given plugin must be move constructible");
-    _plugins.push_back(std::make_unique<GivenPlugin>(arg...));
+    _plugins.emplace_back<std::unique_ptr<Plugin>>(std::move(std::make_unique<GivenPlugin>(arg...)));
 
     _plugins.back()->build(*this);
   }

@@ -17,11 +17,18 @@
 #include "network/network.hpp"
 
 template <typename S, typename A, typename N = cevy::CevyNetwork>
-class cevy::NetworkPlugin : ecs::Plugin {
+class cevy::NetworkPlugin : public ecs::Plugin {
   public:
   ~NetworkPlugin(){};
 
+  NetworkPlugin(CevyNetwork::NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
+              size_t client_offset)
+      : _net(mode, endpoint, udp_port, tcp_port, client_offset), _sync(_net), _action(_net){};
+
   NetworkPlugin(N &&net) : _net(std::move(net)), _sync(_net), _action(_net){};
+
+  NetworkPlugin(NetworkPlugin &&rhs) : _net(std::move(rhs._net)), _sync(std::move(rhs._sync)), _action(std::move(rhs._net)) {};
+
 
   // template<typename S, typename A>
   // NetworkPlugin(S&& s, A&& a) {
