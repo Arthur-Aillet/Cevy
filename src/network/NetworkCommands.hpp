@@ -23,13 +23,18 @@ class cevy::NetworkCommands : protected ecs::Commands {
   };
 
   template<typename A>
-  void event() {
-    _actions.event<A>(*this);
+  void action_with(typename A::Arg given) {
+    _actions.event_with<A>(*this, given);
   };
 
-  template<typename A, typename GivenArgs>
-  void event_with(GivenArgs given) {
-    _actions.event_with<A>(*this, given);
+  template<typename E>
+  void event() {
+    _actions.event<E>(*this);
+  };
+
+  template<typename E>
+  void event_with(typename E::Arg given) {
+    _actions.event_with<E>(*this, given);
   };
 
   protected:

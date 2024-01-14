@@ -10,6 +10,7 @@
 #include "../cevy.hpp"
 #include <cstdint>
 #include <exception>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 #include <bit>
@@ -22,6 +23,12 @@ struct serialized_size : public std::integral_constant<size_t, 0> {};
 template<typename T>
 constexpr std::vector<uint8_t>& serialize(std::vector<uint8_t>&, const T&);
 
+template<template<typename...> typename T, typename... Ts>
+inline constexpr std::vector<uint8_t>& serialize(std::vector<uint8_t>& vec, const T<Ts...>& t) {
+    (vec.push_back(std::get<Ts>(t)), ...);
+    return vec;
+}
+
 class NetworkPlugin;
 class Synchroniser;
 class NetworkActions;
@@ -32,6 +39,8 @@ class NetworkActions;
 class NetworkCommands;
 } // namespace cevy
 
+template<typename... T>
+struct cevy::serialized_size<std::tuple<T...>> : public std::integral_constant<size_t, sum(serialized_size<T>::value...)> {};
 
 template<>
 struct cevy::serialized_size<int> : public std::integral_constant<size_t, 4> {};

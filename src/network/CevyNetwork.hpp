@@ -41,8 +41,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   };
   };
 
-  struct ActionFailureValue {
-  enum EActionFailureValue {
+  struct ActionFailureMode {
+  enum EActionFailureMode {
+    Action_Success = 0,
     Action_Unavailable = 1,
     Action_Disabled = 2,
     Action_Error = 3,
@@ -122,6 +123,20 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
   void sendAction(uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = { uint8_t(Communication::Action), byte(id, 0), byte(id, 1) };
     fullblock.insert(fullblock.end(), block.begin(), block.end());
+    auto it = _events_send.emplace(_actions_send.begin(), fullblock);
+    writeUDP(*it, [this, it] { _actions_send.erase(it); });
+  }
+
+  void sendActionSuccess(uint16_t id, const std::vector<uint8_t> &block) {
+    std::vector<uint8_t> fullblock = { uint8_t(Communication::ActionSuccess), byte(id, 0), byte(id, 1) };
+    fullblock.insert(fullblock.end(), block.begin(), block.end());
+    auto it = _events_send.emplace(_actions_send.begin(), fullblock);
+    writeUDP(*it, [this, it] { _actions_send.erase(it); });
+  }
+
+  void sendActionFailure(uint16_t id, ActionFailureMode::EActionFailureMode mode) {
+    std::vector<uint8_t> fullblock = { uint8_t(Communication::ActionFailure), byte(id, 0), byte(id, 1) };
+    fullblock.push_back(mode);
     auto it = _events_send.emplace(_actions_send.begin(), fullblock);
     writeUDP(*it, [this, it] { _actions_send.erase(it); });
   }
