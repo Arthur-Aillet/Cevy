@@ -5,6 +5,8 @@
 ## ecs-cmake
 ##
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_library(SparseVector
   STATIC
   SparseVector.cpp
@@ -13,9 +15,12 @@ add_library(SparseVector
 add_library(entity
   STATIC
   Entity.cpp
+  Entity.hpp
   )
 
 target_link_libraries(entity SparseVector)
+
+include_directories(PUBLIC . ./commands ../)
 
 add_subdirectory(commands)
 
@@ -27,8 +32,9 @@ add_library(world
 
 add_library(schedule
   STATIC
-  Schedule.cpp
-  Schedule.hpp
+  Scheduler.cpp
+  Scheduler.hpp
+  Stage.hpp
   )
 
 add_library(default_plugin
@@ -53,6 +59,4 @@ add_library(app
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
 add_library(ecs SHARED ${CEVY_HEADERS})
 target_link_libraries(ecs SparseVector world commands app entity schedule default_plugin time)
-target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
-target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/commands)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)

@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Asset Manager
 */
@@ -20,7 +20,7 @@ void init_asset_manager(cevy::ecs::World &w) {
 }
 
 void cevy::engine::AssetManagerPlugin::build(ecs::App &app) {
-  app.add_system<PostStartupRenderStage>(init_asset_manager);
+  app.add_systems<PostStartupRenderStage>(init_asset_manager);
   app.init_component<Handle<cevy::engine::Mesh>>();
   app.init_component<Handle<cevy::engine::Diffuse>>();
 }

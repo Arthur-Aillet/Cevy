@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Engine
 */
@@ -10,16 +10,18 @@
 #include "AssetManager.hpp"
 #include "Camera.hpp"
 #include "Color.hpp"
-#include "Commands.hpp"
 #include "DefaultPlugin.hpp"
 #include "EntityCommands.hpp"
+#include "Line.hpp"
 #include "Position.hpp"
-#include "Resource.hpp"
-#include "Rotation.hpp"
-#include "World.hpp"
+#include "Target.hpp"
+#include "Transform.hpp"
+#include "Velocity.hpp"
+#include "Event.hpp"
+#include "Position.hpp"
 #include "ecs.hpp"
 #include "imgui.h"
-#include "raylib.h"
+
 #include "rendering.hpp"
 #include "rlImGui.h"
 
@@ -35,39 +37,29 @@ void init_window() {
   rlImGuiSetup(true);
 }
 
-void close_game(cevy::ecs::Resource<struct cevy::ecs::Control> control) {
+void close_game(cevy::ecs::EventWriter<cevy::ecs::AppExit> close) {
   if (WindowShouldClose())
-    control.get().abort = true;
+    close.send(cevy::ecs::AppExit{});
 }
 
-void update_window(
-    cevy::ecs::Query<cevy::engine::Camera, cevy::engine::Position, cevy::engine::Rotation> cams,
-    cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Rotation>,
-                     cevy::engine::Handle<cevy::engine::Mesh>,
-                     option<cevy::engine::Handle<cevy::engine::Diffuse>>,
-                     option<cevy::engine::Color>>
-        models) {
-  Vector3 fowards = {0, 0, 0};
-  for (auto cam : cams) {
-    fowards = std::get<2>(cam).fowards();
-    std::get<0>(cam).camera.position = std::get<1>(cam);
-  }
-  DrawGrid(100, 1.0f);
-
+void update_window(cevy::ecs::Query<cevy::engine::Camera> cams,
+                   cevy::ecs::Query<option<cevy::engine::Position>, cevy::engine::Line,
+                                    option<cevy::engine::Color>>
+                       lines,
+                   cevy::ecs::Query<option<cevy::engine::Position>, option<cevy::engine::Transform>,
+                                    cevy::engine::Handle<cevy::engine::Mesh>,
+                                    option<cevy::engine::Handle<cevy::engine::Diffuse>>,
+                                    option<cevy::engine::Color>>
+                       models) {
   ClearBackground(WHITE);
-  for (auto cam : cams) {
-    BeginMode3D(std::get<0>(cam));
+  for (auto [cam] : cams) {
+    BeginMode3D(cam);
     DrawGrid(100, 1.0f);
     render_models(models);
+    render_lines(lines);
     EndMode3D();
   }
   EndDrawing();
-}
-
-void list_pos(cevy::ecs::Query<cevy::engine::Position> pos) {
-  for (auto po : pos) {
-    std::cout << std::get<0>(po).x << std::endl;
-  }
 }
 
 void cevy::engine::Engine::build(cevy::ecs::App &app) {
@@ -80,14 +72,18 @@ void cevy::engine::Engine::build(cevy::ecs::App &app) {
   app.add_stage<PostRenderStage>();
   app.init_component<cevy::engine::Camera>();
   app.init_component<cevy::engine::Position>();
-  app.init_component<cevy::engine::Rotation>();
+  app.init_component<cevy::engine::Velocity>();
+  app.init_component<cevy::engine::Target>();
+  app.init_component<cevy::engine::Line>();
+  app.init_component<cevy::engine::Transform>();
+  app.init_component<cevy::engine::TransformVelocity>();
   app.init_component<cevy::engine::Color>();
   app.add_plugins(cevy::engine::AssetManagerPlugin());
-  app.add_system<cevy::engine::PreStartupRenderStage>(init_window);
-  app.add_system<cevy::engine::PreRenderStage>(close_game);
-  app.add_system<cevy::engine::RenderStage>(update_window);
-  app.spawn(cevy::engine::Camera(), cevy::engine::Position(10.0, 10.0, 10.0),
-            cevy::engine::Rotation(0.0, 0.6, 1.0));
+  app.add_systems<cevy::engine::PreStartupRenderStage>(init_window);
+  app.add_systems<cevy::engine::PreRenderStage>(close_game);
+  app.add_systems<cevy::engine::PreRenderStage>(update_camera);
+  app.add_systems<cevy::engine::RenderStage>(update_window);
+  app.add_systems<ecs::core_stage::Update>(TransformVelocity::system);
 }
 
 /*
@@ -127,27 +123,5 @@ void cevy::Engine::Fullscreen (void) {
         return;
     SetWindowSize(this->screenWidth, this->screenWidth);
         ToggleFullscreen();
-}
-
-void cevy::Engine::update(void) {
-    const char* text = "Your first window!";
-    Vector2 text_size;
-
-    while (!WindowShouldClose()) {
-        Fullscreen();
-        text_size = MeasureTextEx(GetFontDefault(), text, 20, 1);
-
-        BeginDrawing();
-
-        ClearBackground(DARKGRAY);
-        DrawText(text, this->screenWidth / 2 - text_size.x / 2,
-this->screenHeight / 2 - text_size.y / 2, 20, RAYWHITE); BeginMode3D(camera);
-
-        DrawGrid(100, 1.0f);
-
-        EndMode3D();
-        DebugWindow();
-        EndDrawing();
-    }
 }
 */

@@ -1,13 +1,13 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Diffuse
 */
 
 #pragma once
 
-#include "raylib.h"
+#include "raylib.hpp"
 
 namespace cevy::engine {
 class Diffuse {

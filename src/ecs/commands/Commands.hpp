@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Commands
 */
@@ -40,11 +40,13 @@ class cevy::ecs::Commands {
 
   cevy::ecs::EntityCommands spawn_empty();
 
+  void despawn(Entity e);
+
   template <typename... Ts>
   cevy::ecs::EntityCommands spawn(Ts... a);
 };
 
 template <typename C, typename std::enable_if_t<is_commands<C>::value, bool>>
-C cevy::ecs::World::get_super() {
+C cevy::ecs::World::get_super(size_t _last_id) {
   return cevy::ecs::Commands(*this);
 }

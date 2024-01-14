@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Queries
 */
@@ -8,12 +8,16 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <bitset>
 #include <cstddef>
 #include <optional>
 
 #include "SparseVector.hpp"
+#include "cevy.hpp"
 #include "ecs.hpp"
+
+namespace cevy::ecs {
 
 template <class T>
 struct is_query : public std::false_type {};
@@ -34,7 +38,7 @@ template <typename Type>
 using remove_optional = eval_cond_t<is_optional<Type>::value, inner_optional, Type, Type>;
 
 template <class... T>
-class cevy::ecs::Query {
+class Query {
   using Containers = std::tuple<SparseVector<remove_optional<T>>...>;
 
   public:
@@ -65,7 +69,7 @@ class cevy::ecs::Query {
       incr_all();
       return *this;
     };
-    iterator &operator++(int) {
+    iterator operator++(int) {
       auto old = *this;
       incr_all();
       return old;
@@ -176,9 +180,54 @@ class cevy::ecs::Query {
     (resize_optional<T>(containers, current_size), ...);
     return current_size;
   }
-  private:
+
   public:
+  size_t size() {
+    return _size;
+  }
+
+  typename iterator::value_type single() {
+    return *begin();
+  }
+
+  std::optional<typename iterator::value_type> get_single() {
+    if (_size <= 0) {
+      return std::nullopt;
+    }
+    return single();
+  }
+
+  private:
+  template<size_t N>
+  typename iterator::value_type progress_it(iterator &it) {
+    auto last = it;
+    it++;
+    return *last;
+  }
+
+  template<size_t N, size_t ...I>
+  std::array<typename iterator::value_type, N> multiple_impl(std::index_sequence<I...>) {
+    auto it = begin();
+    return { progress_it<I>(it)... };
+  }
+
+  public:
+  template<size_t N, typename Indicies = std::make_index_sequence<N>>
+  std::array<typename iterator::value_type, N> multiple() {
+    return multiple_impl<N>(Indicies{});
+  }
+
+  template<size_t N>
+  std::optional<std::array<typename iterator::value_type, N>> get_multiple() {
+    if (_size < N) {
+      return std::nullopt;
+    }
+    return multiple<N>();
+  }
+
+  private:
   size_t _size;
   iterator _begin;
   iterator _end;
 };
+} // namespace cevy::ecs

@@ -1,6 +1,6 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Default Plugin
 */
@@ -8,26 +8,24 @@
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
 #include "Time.hpp"
-#include "ecs.hpp"
 
 void init_default_schedules(cevy::ecs::App &app) {
-  using cevy::ecs::Schedule;
+  using namespace cevy::ecs::core_stage;
 
-  app.add_stage<Schedule::Startup>();
-  app.add_stage<Schedule::PreStartup>();
-  app.add_stage<Schedule::PostStartup>();
+  app.add_stage<Startup>();
+  app.add_stage<PreStartup>();
+  app.add_stage<PostStartup>();
 
-  app.add_stage<Schedule::First>();
-  app.add_stage<Schedule::Update>();
-  app.add_stage<Schedule::PreUpdate>();
-  app.add_stage<Schedule::PostUpdate>();
-  app.add_stage<Schedule::Last>();
+  app.add_stage<First>();
+  app.add_stage<Update>();
+  app.add_stage<PreUpdate>();
+  app.add_stage<PostUpdate>();
+  app.add_stage<Last>();
 }
-
-void init_timer(cevy::ecs::World &w) { w.insert_resource<cevy::ecs::Time>(cevy::ecs::Time()); }
 
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {
   init_default_schedules(app);
-  app.insert_resource(cevy::ecs::Control{.abort = false});
-  app.add_system<cevy::ecs::Schedule::PostStartup>(init_timer);
+  app.add_event<AppExit>();
+  app.add_systems<cevy::ecs::core_stage::PostStartup>(init_timer);
+  app.add_systems<cevy::ecs::core_stage::First>(update_timer);
 }

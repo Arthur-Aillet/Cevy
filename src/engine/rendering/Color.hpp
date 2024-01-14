@@ -1,13 +1,13 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Color
 */
 
 #pragma once
 
-#include "raylib.h"
+#include "raylib.hpp"
 
 namespace cevy::engine {
 class Color {
@@ -19,5 +19,6 @@ class Color {
 
   Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
   operator ::Color();
+  operator const ::Color() const;
 };
 } // namespace cevy::engine

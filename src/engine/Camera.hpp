@@ -1,18 +1,21 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
 ** Camera
 */
 
 #pragma once
 
-#include "raylib.h"
+#include "Position.hpp"
+#include "Query.hpp"
+#include "Target.hpp"
+#include "cevy.hpp"
+#include "raylib.hpp"
+#include <optional>
 
 namespace cevy::engine {
 class Camera {
-  private:
-  /* data */
   public:
   Camera3D camera;
   operator Camera3D &();
@@ -22,3 +25,7 @@ class Camera {
   ~Camera();
 };
 } // namespace cevy::engine
+
+void update_camera(cevy::ecs::Query<cevy::engine::Camera, option<cevy::engine::Position>,
+                                    option<cevy::engine::Target>>
+                       cams);

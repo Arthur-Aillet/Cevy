@@ -13,5 +13,3 @@ add_library(commands
   EntityCommands.hpp
   EntityCommands.cpp
   )
-
-target_include_directories(commands PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
