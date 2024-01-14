@@ -24,6 +24,9 @@ jobs:
         run: make -j --no-print-directory -C build tests-run-cevy
 
   format:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
