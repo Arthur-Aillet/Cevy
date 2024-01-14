@@ -13,12 +13,15 @@
 #include <asio/ip/udp.hpp>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <stdint.h>
+#include <string>
 #include <sys/types.h>
 #include <thread>
 #include <typeinfo>
+#include <unistd.h>
 #include <vector>
 
 #include "../ecs/SparseVector.hpp"
@@ -44,7 +47,7 @@ class cevy::NetworkBase {
   class TcpConnexion {
     public:
     tcp::socket socket;
-    std::string buffer;
+    std::vector<uint8_t> buffer = std::vector<uint8_t>(1024, 0);
 
     TcpConnexion(asio::io_context &socket) : socket(socket) {}
     // ~TcpConnexion() {};
@@ -97,39 +100,49 @@ class cevy::NetworkBase {
   void tcp_client_connect() {
     std::cout << "async tcp connect" << std::endl;
     _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
-        ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321), // FIXME - ip from the server
-          [this](asio::error_code error) {
-          std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
-          on_client_tcp_connect();
-          // read_one_TCP(_tcp_connexions.back()); // FIXME - reactivate
-        });
+        ->socket.async_connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"),
+                                             54321), // FIXME - ip from the server
+                               [this](asio::error_code error) {
+                                 std::cout
+                                     << "triggered here, maybe with error : " << error.message()
+                                     << std::endl;
+                                 on_client_tcp_connect();
+                                 write_one_TCP(_tcp_connexions.back());
+                                 read_one_TCP(_tcp_connexions.back()); // FIXME - reactivate
+                               });
     std::cout << "set async connect" << std::endl;
   }
 
   void tcp_client_connect_sync() {
     try {
       _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
-        ->socket.connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321));
+          ->socket.connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321));
       std::cout << "tcp connexion successful :)" << std::endl;
     } catch (asio::system_error e) {
-      std::cout << "tcp connexion fail :(" << std::endl << e.code() << " bonjour" << e.what() <<
-      std::endl;
+      std::cout << "tcp connexion fail :(" << std::endl
+                << e.code() << " bonjour" << e.what() << std::endl;
     }
   }
 
   void tcp_accept_new_connexion() {
     _temp_tcp_co = TcpConnexion(_io_context);
     // tcp::acceptor tcp_acceptor(_io_context, _tcp_endpoint);
-    std::cout<<"log avant" << std::endl;
-    _tcp_acceptor.async_accept(_temp_tcp_co.socket,
-                               [this](asio::error_code error) {
-                                 std::cout << "new tcp connexion accepted to the server"
-                                           << std::endl; // REVIEW - debug message
-                                 _tcp_connexions.push_back(std::move(_temp_tcp_co));
-                                 read_one_TCP(_tcp_connexions.back());
-                                 tcp_accept_new_connexion();
-                               });
-  std::cout<<"log apres" << std::endl;
+    std::cout << "log avant" << std::endl;
+    if (!_tcp_acceptor.is_open()) {
+      std::cout << "PORINT heRE" << std::endl;
+      abort();
+    } else {
+      std::cout << "correct" << std::endl;
+    }
+    _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this](asio::error_code error) {
+      std::cout << "new tcp connexion accepted to the server"
+                << std::endl; // REVIEW - debug message
+      _tcp_connexions.push_back(std::move(_temp_tcp_co));
+      write_one_TCP(_tcp_connexions.back());
+      read_one_TCP(_tcp_connexions.back());
+      tcp_accept_new_connexion();
+    });
+    std::cout << "log apres" << std::endl;
   }
 
   void close_all_tcp() {
@@ -141,8 +154,8 @@ class cevy::NetworkBase {
   }
 
   static void start_server() {
-    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context from
-                                 // the class instead
+    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context
+    // from the class instead
 
     // udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 12345));
 
@@ -153,6 +166,11 @@ class cevy::NetworkBase {
     // server.readUDP();
     server.start_thread();
     std::cout << "running" << std::endl;
+    while (std::cin.good()) {
+      std::string test;
+      std::getline(std::cin, test);
+      server.write_one_TCP(server._tcp_connexions.back());
+    }
     server._nw_thread.join();
     // while (true) {
     //   server._io_context.run();
@@ -160,7 +178,8 @@ class cevy::NetworkBase {
   }
 
   static void start_client(const std::string &host) {
-    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context from
+    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context
+    // from
     //                              // the class instead
     // udp::resolver resolver(io_context);
     // udp::endpoint receiver_endpoint = *resolver.resolve(udp::v4(), host, "daytime").begin();
@@ -183,6 +202,11 @@ class cevy::NetworkBase {
     NetworkBase client = NetworkBase(NetworkMode::Client, "127.0.0.1", 12345, 54321, 1);
     client.tcp_client_connect();
     client.start_thread();
+    while (std::cin.good()) {
+      std::string test;
+      std::getline(std::cin, test);
+      client.write_one_TCP(client._tcp_connexions.back());
+    }
     client._nw_thread.join();
     // while (1) { // std::cin.good()
     //   // std::string line;
@@ -227,9 +251,12 @@ class cevy::NetworkBase {
   // NetworkBase(asio::ip::udp::socket &&udp_socket, asio::ip::tcp::socket &&tcp_socket)
   //     : _udp_socket(std::move(udp_socket)), _tcp_socket(std::move(tcp_socket)) {}
 
-  NetworkBase(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port, size_t client_offset)
-      : _udp_endpoint(asio::ip::udp::v4(), udp_port + (client_offset * (mode == NetworkMode::Client))),
-        _tcp_endpoint(asio::ip::tcp::v4(), tcp_port * (mode == NetworkMode::Client)), // FIXME - tcp port
+  NetworkBase(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
+              size_t client_offset)
+      : _udp_endpoint(asio::ip::udp::v4(),
+                      udp_port + (client_offset * (mode == NetworkMode::Client))),
+        _tcp_endpoint(asio::ip::tcp::v4(),
+                      tcp_port + (client_offset * mode == NetworkMode::Client)), // FIXME - tcp port
         _udp_socket(_io_context), _tcp_socket(_io_context),
         _tcp_acceptor(_io_context, _tcp_endpoint), _temp_tcp_co(_io_context) {
     _udp_socket.open(asio::ip::udp::v4());
@@ -300,12 +327,18 @@ class cevy::NetworkBase {
     //                    tcp_receive(error, bytes, co);
     //                    read_one_TCP(co);
     //                  });
-    co.socket.async_receive(asio::buffer(co.buffer),
-                     [this, &co](asio::error_code error, size_t bytes) {
-                       std::cout << "error is : " << error << std::endl;
-                       tcp_receive(error, bytes, co);
-                       read_one_TCP(co);
-                     });
+    if (co.socket.is_open()) {
+      std::cout << "OPEN" << std::endl;
+    } else {
+      std::cout << "CLOSED :(" << std::endl;
+      abort();
+    }
+    co.socket.async_read_some(asio::buffer(co.buffer),
+                              [this, &co](asio::error_code error, size_t bytes) {
+                                std::cout << "error is : " << error << std::endl;
+                                tcp_receive(error, bytes, co);
+                                read_one_TCP(co);
+                              });
   }
 
   void readTCP() { // REVIEW - useful ?
@@ -314,14 +347,16 @@ class cevy::NetworkBase {
     }
   }
 
-  // void write_one_TCP(TcpConnexion &co) {
-  //   asio::async_write()
-  // }
+  void write_one_TCP(TcpConnexion &co) {
+    co.socket.async_send(asio::buffer("hello world"), [](asio::error_code error, size_t bytes) {
+      std::cout << "lambda from the write : " << error << std::endl;
+    });
+  }
 
   virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) {
     if (!error) {
       std::cout << "revieved " << bytes << " bytes:" << std::endl;
-      std::cout << co.buffer << std::endl;
+      // std::cout << co.buffer << std::endl;
       // for (size_t i = 0; i < bytes; ++i) {
       //     std:: cout << std::hex << _udp_recv[i];
       // }
