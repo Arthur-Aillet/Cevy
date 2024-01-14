@@ -21,3 +21,21 @@ class Target : public cevy::engine::Vector {
   }
 };
 } // namespace cevy::engine
+
+template <>
+struct cevy::serialized_size<cevy::engine::Target>
+    : public std::integral_constant<size_t, serialized_size<engine::Vector>::value> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Target>(std::vector<uint8_t> &vec,
+                                                                   const cevy::engine::Target &t) {
+  serialize(vec, engine::Vector(t));
+  return vec;
+}
+
+template <>
+inline cevy::engine::Target cevy::deserialize<cevy::engine::Target>(std::vector<uint8_t> &vec) {
+  cevy::engine::Target t;
+  t = deserialize<engine::Vector>(vec);;
+  return t;
+}

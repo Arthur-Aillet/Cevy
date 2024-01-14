@@ -19,3 +19,23 @@ class Line {
   operator Ray() { return Ray{.position = start, .direction = end}; }
 };
 } // namespace cevy::engine
+
+template <>
+struct cevy::serialized_size<cevy::engine::Line>
+    : public std::integral_constant<size_t, serialized_size<float>::value * 4> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Line>(std::vector<uint8_t> &vec,
+                                                                   const cevy::engine::Line &t) {
+  serialize(vec, t.start);
+  serialize(vec, t.end);
+  return vec;
+}
+
+template <>
+inline cevy::engine::Line cevy::deserialize<cevy::engine::Line>(std::vector<uint8_t> &vec) {
+  cevy::engine::Line t{engine::Vector(), engine::Vector()};
+  t.end = deserialize<engine::Vector>(vec);
+  t.start = deserialize<engine::Vector>(vec);
+  return t;
+}

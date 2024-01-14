@@ -8,6 +8,7 @@
 #pragma once
 
 #include "raylib.hpp"
+#include "network/network.hpp"
 
 namespace cevy::engine {
 class Color {
@@ -22,3 +23,27 @@ class Color {
   operator const ::Color() const;
 };
 } // namespace cevy::engine
+
+template <>
+struct cevy::serialized_size<cevy::engine::Color>
+    : public std::integral_constant<size_t, serialized_size<float>::value * 4> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Color>(std::vector<uint8_t> &vec,
+                                                                   const cevy::engine::Color &t) {
+  serialize(vec, t.r);
+  serialize(vec, t.g);
+  serialize(vec, t.b);
+  serialize(vec, t.a);
+  return vec;
+}
+
+template <>
+inline cevy::engine::Color cevy::deserialize<cevy::engine::Color>(std::vector<uint8_t> &vec) {
+  cevy::engine::Color t{0, 0, 0, 0};
+  t.a = deserialize<float>(vec);
+  t.b = deserialize<float>(vec);
+  t.g = deserialize<float>(vec);
+  t.r = deserialize<float>(vec);
+  return t;
+}
