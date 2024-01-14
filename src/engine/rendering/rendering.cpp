@@ -16,7 +16,9 @@
 #include "World.hpp"
 #include "cevy.hpp"
 #include "ecs.hpp"
+#include "raylib.h"
 #include "raylib.hpp"
+#include "raymath.h"
 
 using namespace cevy::engine;
 using namespace cevy;
@@ -34,12 +36,13 @@ void render_lines(cevy::ecs::World &w) {
   }
 }
 
-static void render_model(const Model &model, engine::Transform transform) {
+static void render_model(Model &model, engine::Transform transform, ::Color tint) {
   Matrix rot = QuaternionToMatrix(transform.rotation);
   Matrix pos = MatrixTranslate(transform.position.x, transform.position.y, transform.position.z);
   Matrix final = MatrixMultiply(rot, pos);
   for (int i = 0; i < model.meshCount; ++i) {
-    DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], final);
+    model.transform = QuaternionToMatrix(transform.rotation);
+    DrawModelEx(model, transform.position, Vector3{0, 0, 0}, 1, Vector3{1, 1, 1}, tint);
   }
 }
 
@@ -59,7 +62,7 @@ void render_models(cevy::ecs::World &w) {
       SetMaterialTexture(handle->mesh.materials, MATERIAL_MAP_DIFFUSE,
                          opt_diffuse.value().get()->texture);
     }
-    render_model(handle->mesh, tm);
+    render_model(handle->mesh, tm, ray_color);
     if (opt_diffuse) {
       handle->mesh.materialCount = 1;
       handle->mesh.materials = (Material *)RL_CALLOC(handle->mesh.materialCount, sizeof(Material));
