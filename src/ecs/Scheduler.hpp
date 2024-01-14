@@ -9,12 +9,12 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <optional>
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
-#include <iostream>
 
 #include "Event.hpp"
 #include "Stage.hpp"

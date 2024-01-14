@@ -14,7 +14,7 @@
 namespace cevy::physics {
 using namespace cevy::ecs;
 class PhysicsPlugin : public Plugin {
-   public:
-   void build(App &app);
+  public:
+  void build(App &app);
 };
-}
+} // namespace cevy::physics

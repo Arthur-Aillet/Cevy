@@ -10,9 +10,9 @@
 #include <algorithm>
 #include <memory>
 
-#include "SparseVector.hpp"
 #include "Position.hpp"
 #include "Rotation.hpp"
+#include "SparseVector.hpp"
 #include "World.hpp"
 
 #include "Shape.hpp"
@@ -24,39 +24,37 @@
 namespace cevy::physics {
 
 enum CELL_SIZE {
-    X = 50,
-    Y = 50,
-    Z = 50,
+  X = 50,
+  Y = 50,
+  Z = 50,
 };
 class Collider {
-    private:
-        std::unique_ptr<Shape> _shape;
+  private:
+  std::unique_ptr<Shape> _shape;
 
-    public:
+  public:
+  template <typename GivenShape>
+  Collider(std::unique_ptr<GivenShape> shape) : _shape(std::move(shape)) {
+    static_assert(std::is_base_of<Shape, GivenShape>::value, "GivenShape must derive from Shape");
+  }
+  ~Collider() = default;
 
-    template<typename GivenShape>
-    Collider(std::unique_ptr<GivenShape> shape) : _shape(std::move(shape)) {
-        static_assert(std::is_base_of<Shape, GivenShape>::value, "GivenShape must derive from Shape");
-    }
-    ~Collider() = default;
-
-    Shape& getShape() const { return *_shape; }
+  Shape &getShape() const { return *_shape; }
 };
 
-using entity = std::tuple<const Collider&, const cevy::engine::Position&, const cevy::engine::Rotation&>;
+using entity =
+    std::tuple<const Collider &, const cevy::engine::Position &, const cevy::engine::Rotation &>;
 class Grid {
-    private:
-    SparseVector<SparseVector<SparseVector<std::vector<entity>>>> _cells;
+  private:
+  SparseVector<SparseVector<SparseVector<std::vector<entity>>>> _cells;
 
-    public:
-    Grid() {};
-    ~Grid() {};
+  public:
+  Grid(){};
+  ~Grid(){};
 
-    SparseVector<SparseVector<SparseVector<std::vector<entity>>>> getCells() const { return _cells; };
-    void addEntity(const size_t x, const size_t y, const size_t z, const entity& value);
-    void setGrid(cevy::ecs::World& world);
-    void collisionWithNeighboringEntities(const entity& entity1);
-
-
+  SparseVector<SparseVector<SparseVector<std::vector<entity>>>> getCells() const { return _cells; };
+  void addEntity(const size_t x, const size_t y, const size_t z, const entity &value);
+  void setGrid(cevy::ecs::World &world);
+  void collisionWithNeighboringEntities(const entity &entity1);
 };
-}
+} // namespace cevy::physics
