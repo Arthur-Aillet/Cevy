@@ -121,7 +121,7 @@ Connect systems
 fn main() {
   app::new()
     .add_plugin(CameraPlugin)
-    .add_system(First, spawn_player)
+    .add_systems(First, spawn_player)
     .init_resource(clock::new())
     .run();
 }
@@ -134,7 +134,7 @@ int main()
 {
     App app;
     app.add_plugin<CameraPlugin>();
-    app.add_system(STAGE::First, spawn_player);
+    app.add_systems(STAGE::First, spawn_player);
     app.init_resource<Clock>(/* initializer-list */); // for emplace-ctor
     app.init_resource(Clock());
     app.run();
@@ -232,9 +232,9 @@ Create an abstraction layer
 
 impl Plugin for HelloPlugin {
   fn build(&self, app: &mut App) {
-    app.add_system(Start, spawn_camera)
-      .add_system(Update, move_camera)
-      .add_system(PostUpdate, destroy_camera)
+    app.add_systems(Start, spawn_camera)
+      .add_systems(Update, move_camera)
+      .add_systems(PostUpdate, destroy_camera)
       .add_event<CameraDestroyed>::new()
   }
 }
@@ -251,9 +251,9 @@ app.add_plugins<HelloPlugin, GoodbyePlugin>();
 class HelloPlugin : public Plugin {
     void build(App& app) override
     {
-        app.add_system(STAGE::start, spawn_camera);
-        app.add_system(STAGE::update, move_camera);
-        app.add_system(STAGE::postUpdate, destroy_camera);
+        app.add_systems(STAGE::start, spawn_camera);
+        app.add_systems(STAGE::update, move_camera);
+        app.add_systems(STAGE::postUpdate, destroy_camera);
         app.add_event(CameraDestroyed());
     }
 }
@@ -313,6 +313,9 @@ void event_listener(EvenReader<MyEvent>& events)
     auto it = events.read();
 
     for (auto my_event: events) {
+        std::cerr << my_event.message << std::endl;
+    }
+    for (const auto &my_event: events) {
         std::cerr << my_event.message << std::endl;
     }
 }

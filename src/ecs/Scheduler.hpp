@@ -1,65 +1,38 @@
 /*
 ** Agartha-Software, 2023
-** Cevy
+** C++evy
 ** File description:
-** Schedule
+** Scheduler
 */
 
 #pragma once
+
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <optional>
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
 
+#include "Event.hpp"
+#include "Stage.hpp"
 #include "World.hpp"
 #include "ecs.hpp"
 
-class cevy::ecs::Schedule {
-  public:
-  struct IsStage {};
+namespace cevy::ecs {
 
-  template <typename Before = std::nullopt_t, typename After = std::nullopt_t,
-            typename Repeat = std::true_type>
-  class Stage : public IsStage {
-    public:
-    using is_repeat = Repeat;
-    using previous = Before;
-    using next = After;
+typedef struct AppExit {
+} AppExit;
 
-    template <typename T>
-    using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
-
-    template <typename T>
-    using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
-  };
-  template <typename T>
-  using before = Stage<>::before<T>;
-  template <typename T>
-  using after = Stage<>::after<T>;
-
-  using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
-
-  class Startup : public at_start {};
-  class PreStartup : public before<Startup> {};
-  class PostStartup : public after<Startup> {};
-
-  class First : public Stage<> {};
-
-  class Update : public after<First> {};
-  class PreUpdate : public before<Update> {};
-  class PostUpdate : public after<Update> {};
-
-  class StateTransition : public before<Update> {};
-  class RunFixedUpdateLoop : public before<Update> {};
-
-  class Last : public after<PostUpdate> {};
+class Scheduler {
+  using SystemId = size_t;
 
   private:
   std::list<std::type_index> _schedule;
   std::list<std::type_index> _at_start_schedule;
+  SystemId last_id = 0;
 
   public:
   template <typename S, typename std::enable_if_t<
@@ -120,19 +93,11 @@ class cevy::ecs::Schedule {
   using system_function = std::function<void(World &)>;
   using system = std::tuple<system_function, std::type_index>;
   std::vector<system> _systems;
-  Schedule() : _stage(_at_start_schedule.begin()){};
-  ~Schedule() = default;
+  Scheduler() : _stage(_at_start_schedule.begin()){};
+  ~Scheduler() = default;
 
-  void quit() const;
-  void abort();
-
-  template <class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
-    add_system<Update>(func);
-  }
-
-  template <class S, class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  template <class F, class S, class... Args>
+  void add_class_system(const F &func) {
     static_assert(
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
         "type must be reference to query, world, commands or resource");
@@ -141,13 +106,48 @@ class cevy::ecs::Schedule {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
 
-    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>()...); };
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>(0)...); };
+    _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+  }
+
+  template <class R, class... Args>
+  void add_system(R (&&func)(Args...)) {
+    add_system<core_stage::Update>(func);
+  }
+
+  template <class S, class R, class... Args>
+  void add_system(const std::function<R(Args...)> &func) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>>()...),
+        "type must be reference to query, world, commands or resource");
+    if (!schedule_defined<S>()) {
+      std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+    }
+    system_function sys = [&func](World &reg) mutable { func(reg.get_super<Args>(0)...); };
+    _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
+  }
+
+  template <class S, class R, class... Args>
+  void add_system(R (&&func)(Args...)) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+#ifdef DEBUG
+    if (!schedule_defined<S>()) {
+      std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
+    }
+#endif
+
+    system_function sys = [id = last_id, &func](World &reg) mutable {
+      func(reg.get_super<Args>(id)...);
+    };
+    last_id += 1;
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 
   protected:
   mutable bool _stop = false;
-  mutable bool _abort = false;
   std::list<std::type_index>::iterator _stage;
 
   void runStartStages(World &world);
@@ -159,3 +159,4 @@ class cevy::ecs::Schedule {
   public:
   void run(World &world);
 };
+} // namespace cevy::ecs

@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 
-#include "../src/ecs/SparseVector.hpp"
+#include "SparseVector.hpp"
 
 Test(SparseVector, constructors) {
     SparseVector<int> test = SparseVector<int>();
@@ -17,6 +17,8 @@ Test(SparseVector, size) {
     cr_assert(test.size() == 0);
     test.resize(4);
     cr_assert(test.size() == 4);
+    test.resize(3);
+    cr_assert(test.size() == 3);
 }
 
 Test(SparseVector, insert_at) {
@@ -30,6 +32,7 @@ Test(SparseVector, insert_at) {
     cr_assert(test[0] == std::nullopt);
     int initial = 8;
     test.insert_at(5, initial);
+    cr_assert(test[5] == 8);
     test[5] = 7;
     cr_assert(test[5] == 7);
     cr_assert(initial == 8);
@@ -50,13 +53,6 @@ Test(SparseVector, get_index) {
     cr_assert(test[2] == 3);
     cr_assert(test.get_index(var).has_value() == false);
     cr_assert(test.get_index(*(test.begin() + 1)).value() == 1);
-}
-
-void print_sparse(SparseVector<int> arr) {
-    for (auto& elm : arr) {
-        std::cout << elm.value_or(-1) << ", ";
-    }
-    std::cout << std::endl;
 }
 
 Test(SparseVector, insert) {
@@ -85,23 +81,20 @@ Test(SparseVector, assignation_op) {
     cr_assert(test2[2] == 3);
 }
 
-/*
-Test(SparseVector, get) {
+Test(SparseVector, iterator_operations) {
     SparseVector<int> test;
-    test[1] = 3;
-    cr_assert(test[1] == 3);
-}
+    test.insert_at(0, 1);
+    test.insert_at(2, 3);
+    test.insert_at(4, 5);
 
-Test(SparseVector, begin) {
-    SparseVector<int> test;
-    test.begin();
-    test.cbegin();
+    auto it = test.begin();
+    cr_assert(it == test.begin());
+    cr_assert(*it == 1);
+    ++it;
+    cr_assert(*it == std::nullopt);
+    it += 3;
+    cr_assert(*it == 5);
+    auto it2 = it - 4;
+    cr_assert(it2 == test.begin());
+    cr_assert(it > it2);
 }
-
-Test(SparseVector, end) {
-    SparseVector<int> test;
-    test.end();
-    test.cend();
-}
-
-*/
