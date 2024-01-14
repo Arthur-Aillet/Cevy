@@ -48,7 +48,6 @@ class cevy::NetworkBase {
     std::vector<uint8_t> buffer = std::vector<uint8_t>(1024, 0);
 
     TcpConnexion(asio::io_context &socket) : socket(socket) {}
-    // ~TcpConnexion() {};
   };
 
   private:
@@ -126,7 +125,6 @@ class cevy::NetworkBase {
       std::cout << "new tcp connexion accepted to the server"
                 << std::endl; // REVIEW - debug message
       _tcp_connexions.push_back(std::move(_temp_tcp_co));
-      // write_one_TCP(_tcp_connexions.back());
       read_one_TCP(_tcp_connexions.back());
       tcp_accept_new_connexion();
     });
@@ -152,67 +150,7 @@ class cevy::NetworkBase {
     _tcp_connexions.erase(to_erase, _tcp_connexions.end());
   }
 
-  static void start_server() {
-    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context
-    // from the class instead
-
-    // udp::socket udp_socket(io_context, udp::endpoint(udp::v4(), 12345));
-
-    NetworkBase server = NetworkBase(NetworkMode::Server, "127.0.0.1", 12345, 54321, 1);
-    std::cout << "setting up acceptor;" << std::endl;
-    server.tcp_accept_new_connexion();
-    std::cout << "setting up udp read;" << std::endl;
-    // server.readUDP();
-    server.start_thread();
-    std::cout << "running" << std::endl;
-    while (std::cin.good()) {
-      std::string test;
-      std::getline(std::cin, test);
-      // server.write_one_TCP(server._tcp_connexions.back());
-    }
-    server._nw_thread.join();
-  }
-
-  static void start_client(const std::string &host) {
-    // asio::io_context io_context; // FIXME - recreation only for test purposes, use _io_context
-    // from
-    //                              // the class instead
-    // udp::resolver resolver(io_context);
-    // udp::endpoint receiver_endpoint = *resolver.resolve(udp::v4(), host, "daytime").begin();
-
-    // udp::socket udp_socket(io_context);
-    // udp_socket.open(udp::v4());
-    // tcp::endpoint tcp_endpoint(asio::ip::address::from_string("127.0.0.1"),
-    //                           54322); // REVIEW - ip to change
-    // tcp::socket tcp_socket(io_context, tcp_endpoint);
-    // try {
-    //   tcp_socket.connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321)); //
-    // //  REVIEW - actually sync, easier to test
-    //   std::cout << "tcp connexion successful :)" << std::endl;
-    // } catch (asio::system_error e) {
-    //   std::cout << "tcp connexion fail :(" << std::endl << e.code() << " bonjour" << e.what() <<
-    //   std::endl;
-    // }
-    // client._udp_endpoint = receiver_endpoint;
-    // client._tcp_endpoint = tcp_endpoint;
-    NetworkBase client = NetworkBase(NetworkMode::Client, "127.0.0.1", 12345, 54321, 1);
-    client.tcp_client_connect();
-    client.start_thread();
-    while (std::cin.good()) {
-      std::string test;
-      std::getline(std::cin, test);
-      // client.write_one_TCP(client._tcp_connexions.back());
-    }
-    client._nw_thread.join();
-    // while (1) { // std::cin.good()
-    //   // std::string line;
-    //   // std::cin >> line;
-    //   // client.writeUDP(std::vector<uint8_t>(line.begin(), line.end()), []() {});
-    //   client._io_context.run();
-    // }
-  }
-
-  public: // FIXME - public to facilitate tests
+  private:
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
@@ -234,10 +172,8 @@ class cevy::NetworkBase {
 
   public:
   void start_thread() {
-    std::cout << "starting thread" << std::endl;
     _nw_thread = std::thread([this]() {
-      // while (!this->quit) // REVIEW - check if needed
-      this->_io_context.run();
+    this->_io_context.run();
     });
   }
 
@@ -294,11 +230,8 @@ class cevy::NetworkBase {
   void read_one_TCP(TcpConnexion &co) {
     co.socket.async_read_some(asio::buffer(co.buffer),
                               [this, &co](asio::error_code error, size_t bytes) {
-                                std::cout << "error is : " << error << std::endl;
                                 if (error.value() == 2) { // end of co
-                                  std::cout << "closing ended socket" << std::endl;
                                   co.socket.close();
-                                  std::cout << "closed ended socket" << std::endl;
                                   close_dead_tcp();
                                   return;
                                 }
