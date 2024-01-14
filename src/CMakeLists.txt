@@ -8,6 +8,7 @@
 include_directories(".")
 
 add_subdirectory(ecs)
+add_subdirectory(network)
 add_subdirectory(engine)
 
 ## IN DEVELOPPEMENT:

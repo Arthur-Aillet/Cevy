@@ -13,7 +13,9 @@
 #include <cstddef>
 #include <iterator>
 #include <optional>
+#include <type_traits>
 
+#include "Entity.hpp"
 #include "SparseVector.hpp"
 #include "cevy.hpp"
 #include "ecs.hpp"
@@ -50,6 +52,8 @@ class Query {
     template <class Container>
     using it_reference_t = typename iterator_t<Container>::reference;
 
+    friend class Entity;
+
     public:
     using value_type = std::tuple<T &...>;
     using reference = value_type;
@@ -59,12 +63,12 @@ class Query {
     using iterator_tuple = std::tuple<iterator_t<SparseVector<remove_optional<T>>>...>;
 
     iterator(iterator_tuple const &it_tuple, size_t max, size_t idx = 0)
-        : current(it_tuple), _max(max), _idx(idx) {
+        : current(it_tuple), _max(max), _idx(idx), _entity(_idx) {
       sync();
     };
 
     public:
-    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx){};
+    iterator(iterator const &z) : current(z.current), _max(z._max), _idx(z._idx), _entity(_idx){};
 
     iterator operator++() {
       incr_all();
@@ -118,19 +122,22 @@ class Query {
 
     template <typename Current>
     Current &a_value() {
-      if constexpr (is_optional<Current>::value) {
+      if constexpr (std::is_same<Current, Entity>::value) {
+        return _entity;
+      } else if constexpr (is_optional<Current>::value) {
         return *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
       } else {
         return std::get<iterator_t<SparseVector<Current>>>(current)->value();
       }
     }
 
-    const value_type to_value() { return std::tuple<T &...>{a_value<T>()...}; }
+    const value_type to_value() { return value_type{a_value<T>()...}; }
 
     private:
     iterator_tuple current;
     size_t _max;
     size_t _idx;
+    Entity _entity;
   };
   using iterator_tuple = typename iterator::iterator_tuple;
 
