@@ -35,7 +35,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   struct SyncId {
     size_t id = unset;
     size_t type = 0;
-    static const size_t unset = -1;
+    inline static const size_t unset = -1;
   };
   template <typename Block, typename... Component>
   class SyncBlock;

@@ -19,7 +19,7 @@
 template<typename S, typename A, typename N = cevy::CevyNetwork>
 class cevy::NetworkPlugin : ecs::Plugin {
 public:
-    ~NetworkPlugin();
+    ~NetworkPlugin() {};
 
 
     NetworkPlugin(N&& net)
