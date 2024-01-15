@@ -417,6 +417,35 @@ class cevy::ecs::World {
     return sys();
   }
 
+  // template<typename T, typename... As, typename... Bs, template<typename> typename GetterA, template<typename> typename GetterB, typename... ArgsA, typename... ArgsB>
+  // T get(GetterA<T> getA, GetterB<T> getB, std::tuple<ArgsA...> argsA, std::tuple<ArgsB...> argsB) {
+  //   static_assert(Or<std::is_same<T, As>..., std::is_same<T, Bs>...>::value, "T must be in either a or b");
+  //   if constexpr (Or<std::is_same<T, As>...>::value) {
+  //     return getA(std::get<ArgsA...>(argsA));
+  //   } else if constexpr (Or<std::is_same<T, Bs>...>::value) {
+  //     return getB(std::get<ArgsA...>(argsA));
+  //   }
+  // };
+
+  template<typename T, template<typename...> typename U, typename... Us>
+  T get_uber(U<Us...>& tuple, size_t = 0) {
+    if constexpr (Or<std::is_same<T, Us>...>::value)
+      return std::get<T>(tuple);
+    else
+      return get_super<T>(0);
+  }
+
+
+  template <class R, class... Args, class... GivenArgs>
+  R run_system_with_tuple(std::function<R(Args...)> func, std::tuple<GivenArgs...> given) {
+    static_assert(
+        all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
+               is_event_reader<Args>, is_event_writer<Args>, Or<std::is_same<Args, GivenArgs>>...>()...),
+        "type must be reference to query, world, commands, event reader, event writer or resource");
+    auto sys = [&func, this, given]() mutable -> R { return func(get_uber<Args>(given, 0)...); };
+    return sys();
+  }
+
   // template <class GivenArgs, class... Args>
   // void run_system_with(std::function<void(GivenArgs, Args...)> func, GivenArgs given) {
   //       static_assert(

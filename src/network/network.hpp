@@ -119,7 +119,7 @@ struct cevy::serialized_size<size_t> : public std::integral_constant<size_t, siz
 template <>
 inline std::vector<uint8_t> &cevy::serialize<size_t>(std::vector<uint8_t> &vec, const size_t &t) {
   auto p = reinterpret_cast<const uint8_t *>(&t);
-  for (size_t i = serialized_size<size_t>::value; ++i;) {
+  for (size_t i = 0; i < serialized_size<size_t>::value; ++i) {
     vec.push_back(p[i]);
   }
   return vec;

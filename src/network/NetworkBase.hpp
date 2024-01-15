@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "../ecs/SparseVector.hpp"
+#include "Plugin.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
@@ -65,9 +66,9 @@ class cevy::NetworkBase {
         _udp_endpoint(std::move(rhs._udp_endpoint)), _tcp_endpoint(std::move(rhs._tcp_endpoint)),
 
         _udp_socket(std::move(rhs._udp_socket)), _tcp_socket(std::move(rhs._tcp_socket)),
-        _connections(std::move(rhs._connections)),
         _tcp_acceptor(std::move(rhs._tcp_acceptor)), _temp_tcp_co(std::move(rhs._temp_tcp_co)),
-        _udp_recv(std::move(rhs._udp_recv))
+        _udp_recv(std::move(rhs._udp_recv)),
+        _connections(std::move(rhs._connections))
 
             {};
 
@@ -163,6 +164,7 @@ class cevy::NetworkBase {
   }
 
   private:
+  NetworkMode _mode;
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
@@ -184,13 +186,18 @@ class cevy::NetworkBase {
   std::unordered_map<ConnectionDescriptor, Connection> _connections;
 
   public:
+
   void start_thread() {
+    if (_mode == NetworkMode::Server) {
+      tcp_accept_new_connexion();
+    }
+    readUDP();
     _nw_thread = std::thread([this]() { this->_io_context.run(); });
   }
 
   NetworkBase(NetworkMode mode, size_t udp_port, size_t tcp_port,
               size_t client_offset)
-      : _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
+      : _mode(mode), _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
         _udp_endpoint(asio::ip::udp::v4(),
                       udp_port + (client_offset * (mode == NetworkMode::Client))),
         _tcp_endpoint(asio::ip::tcp::v4(),

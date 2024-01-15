@@ -102,6 +102,11 @@ class cevy::NetworkCommands : protected ecs::Commands {
     _sync.summon<T>(*this);
   };
 
+  template <typename T, typename U>
+  void summon(CevyNetwork::ConnectionDescriptor cd) {
+    _sync.summon<T, U>(*this, cd);
+  };
+
   void dismiss(Synchroniser::SyncId id) { _sync.dismiss(*this, id); }
 
   void connect(const std::string& str) {

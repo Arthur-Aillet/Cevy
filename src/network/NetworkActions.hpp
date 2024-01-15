@@ -13,6 +13,7 @@
 #include <exception>
 #include <functional>
 #include <list>
+#include <tuple>
 #include <type_traits>
 #include <typeindex>
 #include <unordered_map>
@@ -30,7 +31,7 @@
  * @brief A handler for network activity
  *
  * Stores and exposes systems mapped to events and actions
- * Controlled through \link cevy::NetworkCommands NetworkCommands \endlink
+ * Controlled through \link cevy::ecs::Commands ecs::Commands \endlink
  *
  */
 class cevy::NetworkActions : public ecs::Plugin {
@@ -90,6 +91,65 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   using ClientJoin = Event<CevyNetwork::Event::ClientJoin, CevyNetwork::ConnectionDescriptor>;
 
+
+  void actions_system(ecs::Resource<ecs::Commands> cmd) {
+    while (true) {
+      auto event = _net.recvEvent();
+      if (!event)
+        break;
+      auto& [id, vec] = event.value();
+      vec.resize(_remote_event_arg_size[id]);
+      event_remote(cmd, id, vec);
+    }
+    while (true) {
+      auto action = _net.recvAction();
+      if (!action)
+        break;
+      auto& [state, id, vec] = action.value();
+      EActionFailureMode fail = EActionFailureMode(state);
+      vec.resize(_remote_act_arg_size[id]);
+      if (fail == EActionFailureMode::Action_Success) {
+        actionSuccess_remote(cmd, id, vec);
+      } else {
+        actionFailure_remote(cmd, fail, id, vec);
+      }
+    }
+  }
+
+  protected:
+  void event_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
+    if (_events.find(id) != _events.end()) {
+      _events.find(id)->second(cmd);
+    } else if (_remote_events.find(id) != _remote_events.end()) {
+      _remote_events.find(id)->second(cmd, vec);
+    } else {
+      std::cerr << "(WARNING)event_remote: unmapped" << std::endl;
+    }
+  }
+
+  void actionSuccess_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
+    if (_actions.find(id) != _actions.end()) {
+      std::get<1>(_actions.find(id)->second)(cmd);
+    } else if (_remote_actions.find(id) != _remote_actions.end()) {
+      std::get<1>(_remote_actions.find(id)->second)(cmd, vec);
+    } else {
+      std::cerr << "(WARNING)actionSuccess_remote: unmapped" << std::endl;
+    }
+  }
+
+  void actionFailure_remote(ecs::Commands& cmd, EActionFailureMode fail, uint16_t id, std::vector<uint8_t> &vec) {
+    if (_actions.find(id) != _actions.end()) {
+      std::get<2>(_actions.find(id)->second)(cmd, fail);
+    } else if (_remote_actions.find(id) != _remote_actions.end()) {
+      std::get<2>(_remote_actions.find(id)->second)(cmd, fail, vec);
+    } else {
+      std::cerr << "(WARNING)actionFailure_remote: unmapped" << std::endl;
+    }
+  }
+
+
+  public:
+
   virtual void build(cevy::ecs::App &) override {}
 
   /**
@@ -105,11 +165,11 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action(EActionFailureMode (&&server)(Arg0...), bool (&&client_success)(Arg1...),
-                  bool (&&client_fail)(Arg2...)) {
+                  bool (&&client_fail)(EActionFailureMode, Arg2...)) {
     _actions[A::value] = std::make_tuple(
-        server_system([server](ecs::Commands &cmd) mutable { return cmd.system(server); }),
-        system([client_success](ecs::Commands &cmd) mutable { return cmd.system(client_success); }),
-        system([client_fail](ecs::Commands &cmd) mutable { return cmd.system(client_fail); }));
+        server_system([server](ecs::Commands &cmd) { return cmd.system(server); }),
+        system_success([client_success](ecs::Commands &cmd) { return cmd.system(client_success); }),
+        system_fail([client_fail](ecs::Commands &cmd, EActionFailureMode fail) { return cmd.system_with(client_fail, fail); }));
   };
 
   /**
@@ -125,14 +185,19 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action(
-      std::function<EActionFailureMode(Arg0...)> server,
-      std::function<bool(Arg1...)> client_success = []() {},
-      std::function<bool(Arg2...)> client_fail = []() {}) {
+      std::function<EActionFailureMode(Arg0...)> server = server_default,
+      std::function<bool(Arg1...)> client_success = success_default,
+      std::function<bool(EActionFailureMode, Arg2...)> client_fail = failure_default) {
     _actions[A::value] = std::make_tuple(
-        server_system([server](ecs::Commands &cmd) mutable { return cmd.system(server); }),
-        system([client_success](ecs::Commands &cmd) mutable { return cmd.system(client_success); }),
-        system([client_fail](ecs::Commands &cmd) mutable { return cmd.system(client_fail); }));
+        server_system([server](ecs::Commands &cmd) { return cmd.system(server); }),
+        system_success([client_success](ecs::Commands &cmd) { return cmd.system(client_success); }),
+        system_fail([client_fail](ecs::Commands &cmd, EActionFailureMode fail) { return cmd.system_with(client_fail, fail); }));
   }
+
+  template<typename T, typename... Ts>
+  struct head {
+    using value_type = T;
+  };
 
   /**
    * @brief add an action with std::functions, taking an extra parameter
@@ -149,20 +214,33 @@ class cevy::NetworkActions : public ecs::Plugin {
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action_with(
       std::function<EActionFailureMode(typename A::Arg, Arg0...)> server,
-      std::function<bool(typename A::Arg, Arg1...)> client_success = []() {},
-      std::function<bool(typename A::Arg, Arg2...)> client_fail = []() {}) {
-    using server_ftype = std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>;
-    using ftype = std::function<void(ecs::Commands &, typename A::Arg)>;
-    _super_actions[std::type_index(typeid(A))] = std::make_tuple(
-        std::make_any<server_ftype>([server](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(server, given);
-        }),
-        std::make_any<ftype>([client_success](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(client_success, given);
-        }),
-        std::make_any<ftype>([client_fail](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(client_fail, given);
-        }));
+      std::function<bool(typename A::Arg, Arg1...)> client_success,
+      std::function<bool(Arg2...)> client_fail) {
+
+    static_assert(std::is_same<typename head<Arg2...>::value_type, EActionFailureMode>::value, "first arg of fail function must be `EActionFailure`");
+    // static_assert(std::is_same<Arg2...[0], EActionFailureMode>::value, "");
+    // , typename A::Arg, , );
+    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, typename A::Arg given) {
+      return cmd.system_with(server, given);
+    };
+    super_system_success<typename A::Arg> success_lambda = [client_success](ecs::Commands &cmd, typename A::Arg given) {
+      return cmd.system_with(client_success, given);
+    };
+    super_system_fail<typename A::Arg> fail_lambda = [client_fail](ecs::Commands &cmd, std::tuple<EActionFailureMode, typename A::Arg> pair) {
+      return cmd.system_with_tuple(client_fail, pair);
+    };
+
+    _super_actions[A::value] = std::make_tuple(
+      std::make_any<super_server_system<typename A::Arg>>(server_lambda),
+      std::make_any<super_system_success<typename A::Arg>>(success_lambda),
+      std::make_any<super_system_fail<typename A::Arg>>(fail_lambda)
+    );
+
+    _remote_actions[A::value] = std::make_tuple(
+      [server_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, std::move(arg));},
+      [success_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return success_lambda(cmd, std::move(arg));},
+      [fail_lambda](ecs::Commands &cmd, EActionFailureMode fail, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return fail_lambda(cmd, std::make_pair(fail, std::move(arg)));}
+    );
   }
 
   /**
@@ -181,19 +259,29 @@ class cevy::NetworkActions : public ecs::Plugin {
   void add_action_with(
       EActionFailureMode (&&server)(typename A::Arg, Arg0...),
       bool (&&client_success)(typename A::Arg, Arg1...) = []() {},
-      bool (&&client_fail)(typename A::Arg, Arg2...) = []() {}) {
-    using server_ftype = std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>;
-    using ftype = std::function<void(ecs::Commands &, typename A::Arg)>;
-    _super_actions[std::type_index(typeid(A))] = std::make_tuple(
-        std::make_any<server_ftype>([server](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(server, given);
-        }),
-        std::make_any<ftype>([client_success](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(client_success, given);
-        }),
-        std::make_any<ftype>([client_fail](ecs::Commands &cmd, typename A::Arg given) mutable {
-          return cmd.system_with(client_fail, given);
-        }));
+      bool (&&client_fail)(EActionFailureMode, typename A::Arg, Arg2...) = []() {}) {
+    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, typename A::Arg given) {
+      return cmd.system_with(server, given);
+    };
+    super_system_success<typename A::Arg> success_lambda = [client_success](ecs::Commands &cmd, typename A::Arg given) {
+      return cmd.system_with(client_success, given);
+    };
+
+    super_system_fail<typename A::Arg> fail_lambda = [client_fail](ecs::Commands &cmd, std::tuple<EActionFailureMode, typename A::Arg> pair) {
+      return cmd.system_with_tuple(client_fail, pair);
+    };
+
+    _super_actions[A::value] = std::make_tuple(
+      std::make_any<super_server_system<typename A::Arg>>(server_lambda),
+      std::make_any<super_system_success<typename A::Arg>>(success_lambda),
+      std::make_any<super_system_fail<typename A::Arg>>(fail_lambda)
+    );
+
+    _remote_actions[A::value] = std::make_tuple(
+      [server_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, std::move(arg));},
+      [success_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return success_lambda(cmd, std::move(arg));},
+      [fail_lambda](ecs::Commands &cmd, EActionFailureMode fail, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return fail_lambda(cmd, std::make_pair(fail, std::move(arg)));}
+    );
   }
 
   /**
@@ -229,11 +317,13 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename E, typename... Args>
   void add_event_with(bool (&&func)(typename E::Arg, Args...)) {
-    auto lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
+    super_system_success<typename E::Arg> lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
       return cmd.system_with<typename E::Arg>(func, given);
     };
-    _super_events[std::type_index(typeid(E))] =
-        std::make_any<std::function<void(ecs::Commands &, typename E::Arg)>>(lambda);
+    _super_events[E::value] =
+      std::make_any<super_system_success<typename E::Arg>>(lambda);
+
+    _remote_events[E::value] = [lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename E::Arg arg = deserialize<typename E::Arg>(vec); return lambda(cmd, arg); };
   };
 
   /**
@@ -246,11 +336,13 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename E, typename... Args>
   void add_event_with(std::function<bool(typename E::Arg, Args...)> func) {
-    auto lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
+    super_system_success<typename E::Arg> lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
       return cmd.system_with<typename E::Arg>(func, given);
     };
-    _super_events[std::type_index(typeid(E))] =
-        std::make_any<std::function<bool(ecs::Commands &, typename E::Arg)>>(lambda);
+    _super_events[E::value] =
+      std::make_any<super_system_success<typename E::Arg>>(lambda);
+
+    _remote_events[E::value] = [lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename E::Arg arg = deserialize<typename E::Arg>(vec); return lambda(cmd, arg); };
   };
 
   /**
@@ -308,9 +400,9 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A>
   void action_with(ecs::Commands &cmd, typename A::Arg given, CevyNetwork::ConnectionDescriptor cd = -1) {
-    auto &server = std::get<0>(_super_actions[std::type_index(typeid(A))]);
-    auto &client_success = std::get<1>(_super_actions[std::type_index(typeid(A))]);
-    auto &client_fail = std::get<2>(_super_actions[std::type_index(typeid(A))]);
+    auto &server = std::get<0>(_super_actions[A::value]);
+    auto &client_success = std::get<1>(_super_actions[A::value]);
+    auto &client_fail = std::get<2>(_super_actions[A::value]);
     if (_mode == Mode::Server) {
       const auto &func =
           std::any_cast<std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>>(
@@ -376,7 +468,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   template <typename E>
   void event_with(ecs::Commands &cmd, typename E::Arg given) {
     const auto &func = std::any_cast<std::function<bool(ecs::Commands &, typename E::Arg)>>(
-        _super_events[std::type_index(typeid(E))]);
+        _super_events[E::value]);
     func(cmd, given);
     std::vector<uint8_t> vec;
     serialize(vec, given);
@@ -385,13 +477,55 @@ class cevy::NetworkActions : public ecs::Plugin {
     _net.sendEvent(E::value, vec);
   }
 
+  public:
+  template<typename Arg = std::tuple<>, typename... Args>
+  using server_function = EActionFailureMode(Arg, Args...);
+
+  template<typename Arg = std::tuple<>, typename... Args>
+  using success_function = bool(Arg, Args...);
+
+  template<typename Arg = std::tuple<>, typename... Args>
+  using failure_function = bool(EActionFailureMode, Arg, Args...);
+
+  template<typename Arg = std::tuple<>, typename... Args>
+  using server_stdfunction = std::function<EActionFailureMode(Arg, Args...)>;
+
+  template<typename Arg = std::tuple<>, typename... Args>
+  using success_stdfunction = std::function<bool(Arg, Args...)>;
+
+  template<typename Arg = std::tuple<>, typename... Args>
+  using failure_stdfunction = std::function<bool(EActionFailureMode, Arg, Args...)>;
+
+  // static server_stdfunction<> server_default;
+
+  inline static std::function<server_function<>> server_default = [](auto){ return CevyNetwork::ActionFailureMode::Action_Success; };
+  inline static std::function<success_function<>> success_default = [](auto){ return true; };
+  inline static std::function<failure_function<>> failure_default = [](auto, auto){ return true; };
+
   protected:
   using server_system = std::function<EActionFailureMode(ecs::Commands &)>;
-  using system = std::function<bool(ecs::Commands &)>;
-  std::unordered_map<uint16_t, std::tuple<server_system, system, system>> _actions;
-  std::unordered_map<std::type_index, std::tuple<std::any, std::any, std::any>> _super_actions;
-  std::unordered_map<uint16_t, system> _events;
-  std::unordered_map<std::type_index, std::any> _super_events;
+  using system_success = std::function<bool(ecs::Commands &)>;
+  using system_fail = std::function<bool(ecs::Commands &, EActionFailureMode)>;
+
+  template<typename Arg>
+  using super_server_system = std::function<EActionFailureMode(ecs::Commands &, Arg)>;
+  template<typename Arg>
+  using super_system_success = std::function<bool(ecs::Commands &, Arg)>;
+  template<typename Arg>
+  using super_system_fail = std::function<bool(ecs::Commands &, std::tuple<EActionFailureMode, Arg>)>;
+
+  using remote_server_system = std::function<EActionFailureMode(ecs::Commands &, std::vector<uint8_t>&)>;
+  using remote_system_sucess = std::function<bool(ecs::Commands &, std::vector<uint8_t>&)>;
+  using remote_system_fail = std::function<bool(ecs::Commands &, EActionFailureMode, std::vector<uint8_t>&)>;
+
+  std::unordered_map<uint16_t, std::tuple<server_system, system_success, system_fail>> _actions;
+  std::unordered_map<uint16_t, std::tuple<std::any, std::any, std::any>> _super_actions;
+  std::unordered_map<uint16_t, std::tuple<remote_server_system, remote_system_sucess, remote_system_fail>> _remote_actions;
+  std::unordered_map<uint16_t, system_success> _events;
+  std::unordered_map<uint16_t, std::any> _super_events;
+  std::unordered_map<uint16_t, remote_system_sucess> _remote_events;
+  std::unordered_map<uint16_t, size_t> _remote_event_arg_size;
+  std::unordered_map<uint16_t, size_t> _remote_act_arg_size;
   Mode _mode;
   cevy::CevyNetwork &_net;
 };

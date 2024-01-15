@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "cevy.hpp"
+
 namespace cevy {
 /**
  * @brief Holds the entity components system

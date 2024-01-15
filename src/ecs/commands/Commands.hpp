@@ -64,6 +64,11 @@ class cevy::ecs::Commands {
     return _world_access.run_system_with<GivenArgs, R, Args...>(func, given);
   }
 
+  template <typename GivenArgs, class R, class... Args>
+  R system_with(std::function<R(GivenArgs, Args...)> func, GivenArgs given) {
+    return _world_access.run_system_with<GivenArgs, R, Args...>(func, given);
+  }
+
   // template <class GivenArgs, class... Args>
   // void system_with(void (&&func)(GivenArgs, Args...), GivenArgs given) {
   //   _world_access.run_system_with<GivenArgs, Args...>(func, given);
@@ -79,10 +84,11 @@ class cevy::ecs::Commands {
   //   _world_access.run_system<Args...>(func);
   // }
 
-  template <class GivenArgs, class R, class... Args>
-  R system_with(std::function<R(GivenArgs, Args...)> func, GivenArgs given) {
-    return _world_access.run_system_with<GivenArgs, R, Args...>(func, given);
+  template <class R, class... Args, typename... GivenArgs>
+  R system_with_tuple(std::function<R(Args...)> func, std::tuple<GivenArgs...> given) {
+    return _world_access.run_system_with_tuple<R, Args...>(func, given);
   }
+
 
   // template <class GivenArgs, class... Args>
   // void system_with(std::function<void(GivenArgs, Args...)> func, GivenArgs given) {

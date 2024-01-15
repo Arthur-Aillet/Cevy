@@ -79,6 +79,8 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   template <typename T>
   void summon(cevy::ecs::Commands &command) {
+    if (mode == Mode::Client)
+      return;
     auto e = command.spawn_empty();
     _spawnCommands[T::value](e);
     auto id = first_free();
@@ -87,7 +89,22 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     _net.sendSummon(id, T::value);
   }
 
+  template <typename T, typename U>
+  void summon(cevy::ecs::Commands &command, CevyNetwork::ConnectionDescriptor cd) {
+    if (mode == Mode::Client)
+      return;
+    auto e = command.spawn_empty();
+    _spawnCommands[T::value](e);
+    auto id = first_free();
+    _occupancy[id] = true;
+    e.insert(SyncId({id, T::value}));
+    auto& handler = dynamic_cast<ServerHandler&>(_net);
+    handler.sendSummon(cd, id, T::value, U::value);
+  }
+
   void dismiss(cevy::ecs::Commands &command, SyncId syncId) {
+    if (mode == Mode::Client)
+      return;
     auto target = syncId.id;
     std::function<void(ecs::Query<SyncId, ecs::Entity>)> deletor =
         [target, command](ecs::Query<SyncId, ecs::Entity> q) mutable {

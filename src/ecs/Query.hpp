@@ -122,9 +122,7 @@ class Query {
 
     template <typename Current>
     Current &a_value() {
-      if constexpr (std::is_same<Current, Entity>::value) {
-        return _entity;
-      } else if constexpr (is_optional<Current>::value) {
+      if constexpr (is_optional<Current>::value) {
         return *std::get<iterator_t<SparseVector<typename Current::value_type>>>(current);
       } else {
         return std::get<iterator_t<SparseVector<Current>>>(current)->value();

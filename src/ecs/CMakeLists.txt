@@ -22,13 +22,13 @@ target_link_libraries(entity SparseVector)
 
 include_directories(PUBLIC . ./commands ../)
 
-add_subdirectory(commands)
-
 add_library(world
   STATIC
   World.cpp
   World.hpp
   )
+
+add_subdirectory(commands)
 
 add_library(schedule
   STATIC
