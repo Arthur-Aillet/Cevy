@@ -40,6 +40,7 @@ class cevy::NetworkBase {
   enum NetworkMode {
     Server,
     Client,
+    undefined,
   };
 
   class Connection {

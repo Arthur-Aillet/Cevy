@@ -11,6 +11,7 @@
 #include "Synchroniser.hpp"
 #include "ecs.hpp"
 #include "network.hpp"
+#include <type_traits>
 
 /**
  * @brief Commands helper for facilitating network related actions
@@ -22,8 +23,8 @@
  */
 class cevy::NetworkCommands : protected ecs::Commands {
   public:
-  NetworkCommands(NetworkActions &actions, Synchroniser &sync, ecs::World &world)
-      : Commands(world), _actions(actions), _sync(sync){};
+  NetworkCommands(CevyNetwork& net, NetworkActions &actions, Synchroniser &sync, ecs::World &world)
+      : Commands(world), _net(net), _actions(actions), _sync(sync){};
   ~NetworkCommands(){};
 
   /**
@@ -103,7 +104,13 @@ class cevy::NetworkCommands : protected ecs::Commands {
 
   void dismiss(Synchroniser::SyncId id) { _sync.dismiss(*this, id); }
 
+  void connect(const std::string& str) {
+    auto& handler = dynamic_cast<ClientHandler&>(_net);
+    handler.connect(*this, str);
+  }
+
   protected:
+  CevyNetwork &_net;
   NetworkActions &_actions;
   Synchroniser &_sync;
 

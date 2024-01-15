@@ -26,10 +26,9 @@
 
 class cevy::CevyNetwork : protected cevy::NetworkBase {
   public:
-
   using NetworkBase::ConnectionDescriptor;
-
   using NetworkBase::NetworkMode;
+  inline static const NetworkMode mode = NetworkMode::undefined;
 
   struct Communication {
     enum ECommunication {
@@ -333,7 +332,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase {
 
 class cevy::ServerHandler : public cevy::CevyNetwork {
   public:
-
+    inline static const NetworkMode mode = NetworkMode::Server;
     ServerHandler(const std::string &endpoint, size_t udp_port, size_t tcp_port,
               size_t client_offset)
       : CevyNetwork(CevyNetwork::NetworkMode::Server, endpoint, udp_port, tcp_port, client_offset){};
@@ -407,10 +406,10 @@ class cevy::ServerHandler : public cevy::CevyNetwork {
 
 class cevy::ClientHandler : public cevy::CevyNetwork {
   public:
-
-    ClientHandler(const std::string &endpoint, size_t udp_port, size_t tcp_port,
-              size_t client_offset)
-      : CevyNetwork(CevyNetwork::NetworkMode::Client, endpoint, udp_port, tcp_port, client_offset){};
+  inline static const NetworkMode mode = NetworkMode::Client;
+  ClientHandler(const std::string &endpoint, size_t udp_port, size_t tcp_port,
+            size_t client_offset)
+    : CevyNetwork(CevyNetwork::NetworkMode::Client, endpoint, udp_port, tcp_port, client_offset){};
 
   protected:
   ConnectionDescriptor _server = -1;
