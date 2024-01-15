@@ -27,6 +27,10 @@ class cevy::NetworkPlugin : public ecs::Plugin {
 
   NetworkPlugin(N &&net) : _net(std::move(net)), _sync(_net), _action(_net){};
 
+  template<typename... Args>
+  NetworkPlugin(Args... args) : _net(args...), _sync(_net), _action(_net){};
+
+
   NetworkPlugin(NetworkPlugin &&rhs) : _net(std::move(rhs._net)), _sync(std::move(rhs._sync)), _action(std::move(rhs._net)) {};
 
 

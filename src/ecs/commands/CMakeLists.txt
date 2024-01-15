@@ -13,3 +13,6 @@ add_library(commands
   EntityCommands.hpp
   EntityCommands.cpp
   )
+
+
+target_link_libraries(commands world)

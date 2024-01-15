@@ -88,6 +88,8 @@ class cevy::NetworkActions : public ecs::Plugin {
     using Arg = Data;
   };
 
+  using ClientJoin = Event<CevyNetwork::Event::ClientJoin, CevyNetwork::ConnectionDescriptor>;
+
   virtual void build(cevy::ecs::App &) override {}
 
   /**
@@ -195,6 +197,17 @@ class cevy::NetworkActions : public ecs::Plugin {
   }
 
   /**
+   * @brief specify the event join function
+   *
+   * @param func system to trigger
+   */
+  template <typename F>
+  void on_client_join(F &&func) {
+    add_event_with<ClientJoin>(func);
+  };
+
+
+  /**
    * @brief add an event with a regular function
    *
    * @tparam E Event to map to
@@ -253,15 +266,17 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param cmd a reference to Commands
    */
   template <typename A>
-  void action(ecs::Commands &cmd) {
+  void action(ecs::Commands &cmd, CevyNetwork::ConnectionDescriptor cd = -1) {
     if (_mode == Mode::Server) {
       EActionFailureMode ret = std::get<0>(_actions[A::value])(cmd);
+      if (cd == -1)
+        return;
       if (ret == ActionFailureMode::Action_Success) {
         if (A::presume != Presume::success)
-          _net.sendActionSuccess(A::value, std::vector<uint8_t>({0}));
+          _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
       } else {
         if (A::presume != Presume::fail)
-          _net.sendActionFailure(A::value, ret);
+          _net.sendActionFailure(cd, A::value, ret);
       }
     } else {
       if (A::presume == Presume::success)
@@ -292,7 +307,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param given argument to give
    */
   template <typename A>
-  void action_with(ecs::Commands &cmd, typename A::Arg given) {
+  void action_with(ecs::Commands &cmd, typename A::Arg given, CevyNetwork::ConnectionDescriptor cd = -1) {
     auto &server = std::get<0>(_super_actions[std::type_index(typeid(A))]);
     auto &client_success = std::get<1>(_super_actions[std::type_index(typeid(A))]);
     auto &client_fail = std::get<2>(_super_actions[std::type_index(typeid(A))]);
@@ -301,12 +316,14 @@ class cevy::NetworkActions : public ecs::Plugin {
           std::any_cast<std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>>(
               server);
       EActionFailureMode ret = func(cmd, given);
+      if (cd == -1)
+        return;
       if (ret == ActionFailureMode::Action_Success) {
         if (A::Presume != Presume::success)
-          _net.sendActionSuccess(A::value, std::vector<uint8_t>({0}));
+          _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
       } else {
         if (A::Presume != Presume::fail)
-          _net.sendActionFailure(A::value, ret);
+          _net.sendActionFailure(cd, A::value, ret);
       }
     } else {
       if (A::presume == Presume::success) {

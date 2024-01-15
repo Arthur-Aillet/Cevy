@@ -42,13 +42,16 @@ class cevy::NetworkBase {
     Client,
   };
 
-  class TcpConnexion {
+  class Connection {
     public:
     tcp::socket socket;
+    udp::endpoint udp_endpoint;
     std::array<uint8_t, 512> buffer;
 
-    TcpConnexion(asio::io_context &socket) : socket(socket) {}
+    Connection(asio::io_context &socket) : socket(socket) {}
   };
+
+  using ConnectionDescriptor = size_t;
 
   NetworkBase(const NetworkBase &rhs) = delete;
 
@@ -61,7 +64,7 @@ class cevy::NetworkBase {
         _udp_endpoint(std::move(rhs._udp_endpoint)), _tcp_endpoint(std::move(rhs._tcp_endpoint)),
 
         _udp_socket(std::move(rhs._udp_socket)), _tcp_socket(std::move(rhs._tcp_socket)),
-        _tcp_connexions(std::move(rhs._tcp_connexions)),
+        _connections(std::move(rhs._connections)),
         _tcp_acceptor(std::move(rhs._tcp_acceptor)), _temp_tcp_co(std::move(rhs._temp_tcp_co)),
         _udp_recv(std::move(rhs._udp_recv))
 
@@ -90,43 +93,33 @@ class cevy::NetworkBase {
     } b;
   };
 
-  virtual void on_client_tcp_connect() { std::cout << "client: tcp connected :D" << std::endl; }
-
   void tcp_client_connect() {
     std::cout << "async tcp connect" << std::endl;
-    _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
-        ->socket.async_connect(
+    ConnectionDescriptor idx = connection_count;
+    _connections.emplace(idx, _io_context);
+    _connections.at(idx)
+        .socket.async_connect(
             tcp::endpoint(asio::ip::address::from_string(_dest_ip), _dest_tcp_port),
-            [this](asio::error_code error) {
+            [this, idx](asio::error_code error) {
               std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
-              on_client_tcp_connect();
-              read_one_TCP(_tcp_connexions.back());
+              read_one_TCP(idx);
             });
     std::cout << "set async connect" << std::endl;
   }
 
-  void tcp_client_connect_sync() {
-    try {
-      _tcp_connexions.emplace(_tcp_connexions.end(), _io_context)
-          ->socket.connect(tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 54321));
-      std::cout << "tcp connexion successful :)" << std::endl;
-    } catch (asio::system_error &e) {
-      std::cout << "tcp connexion fail :(" << std::endl
-                << e.code() << " bonjour" << e.what() << std::endl;
-    }
-  }
-
   void tcp_accept_new_connexion() {
-    _temp_tcp_co = TcpConnexion(_io_context);
+    _temp_tcp_co = Connection(_io_context);
+    ConnectionDescriptor idx = connection_count;
 
-    _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this](asio::error_code error) {
+    _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this, idx](asio::error_code error) {
       if (error) {
         std::cerr << "(ERROR)async_accept:" << error << std::endl;
         return;
       }
       std::cout << "new tcp connexion accepted to the server" << std::endl;
-      _tcp_connexions.push_back(std::move(_temp_tcp_co));
-      read_one_TCP(_tcp_connexions.back());
+      _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
+      tcp_accept(error, idx);
+      read_one_TCP(idx);
       tcp_accept_new_connexion();
     });
     std::cout << "log apres" << std::endl;
@@ -134,21 +127,22 @@ class cevy::NetworkBase {
 
   void close_all_tcp() {
     std::cout << "closing tcp connexions" << std::endl;
-    for (auto &i : _tcp_connexions) {
-      i.socket.close();
+    for (auto& [idx, co] : _connections) {
+      co.socket.close();
     }
-    _tcp_connexions.clear();
+    _connections.clear();
   }
 
   void close_dead_tcp() {
     std::cout << "closing dead tcp connexions" << std::endl;
-    auto to_erase =
-        std::remove_if(_tcp_connexions.begin(), _tcp_connexions.end(), [](TcpConnexion &co) {
-          if (!co.socket.is_open())
-            std::cout << "will erase closed socket" << std::endl;
-          return !co.socket.is_open();
-        });
-    _tcp_connexions.erase(to_erase, _tcp_connexions.end());
+    std::vector<std::unordered_map<ConnectionDescriptor, Connection>::iterator> to_erase;
+    for (auto it = _connections.begin(); it != _connections.end(); ++it) {
+      if (!it->second.socket.is_open())
+        to_erase.push_back(it);
+    }
+    for (auto erase : to_erase) {
+      _connections.erase(erase);
+    }
   }
 
   private:
@@ -165,11 +159,13 @@ class cevy::NetworkBase {
 
   udp::socket _udp_socket;
   tcp::socket _tcp_socket;
-  std::vector<TcpConnexion> _tcp_connexions;
+  size_t connection_count = 0;
   tcp::acceptor _tcp_acceptor;
-  TcpConnexion _temp_tcp_co;
+  Connection _temp_tcp_co;
 
   std::array<uint8_t, 512> _udp_recv;
+  protected:
+  std::unordered_map<ConnectionDescriptor, Connection> _connections;
 
   public:
   void start_thread() {
@@ -191,20 +187,31 @@ class cevy::NetworkBase {
 
   void readUDP() {
     _udp_socket.async_receive_from(
-        asio::buffer(_udp_recv), _udp_endpoint, [this](asio::error_code error, size_t bytes) {
-          this->udp_receive(error, bytes, this->_udp_recv, _udp_endpoint);
+        asio::buffer(_udp_recv), _udp_endpoint,
+        [this](asio::error_code error, size_t bytes) {
+          this->udp_receive(error, bytes, this->_udp_recv, std::find_if(_connections.begin(), _connections.end(),
+            [this](auto &pair){return pair.second.udp_endpoint == _udp_endpoint;}
+          )->first);
           readUDP();
         });
   }
 
   protected:
   virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
-                           udp::endpoint &udp_endpoint) = 0;
-  virtual void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) = 0;
+                           ConnectionDescriptor cd) = 0;
+  virtual void tcp_receive(asio::error_code error, size_t bytes, ConnectionDescriptor cd) = 0;
+
+  virtual void tcp_accept(asio::error_code error, size_t idx) = 0;
 
   template <typename Function>
-  void writeUDP(const std::vector<uint8_t> &data, Function &&func) {
-    _udp_socket.async_send_to(asio::buffer(data), _udp_endpoint,
+  void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    _connections.at(cd).socket.async_send(asio::buffer(data),
+                         [this, &func](asio::error_code error, size_t bytes) { func(); });
+  }
+
+  template <typename Function>
+  void writeUDP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    _udp_socket.async_send_to(asio::buffer(data), _connections.at(cd).udp_endpoint,
                               [this, &func](asio::error_code error, size_t) {
                                 if (error)
                                   std::cerr << "(ERROR)async_send:" << error << std::endl;
@@ -212,28 +219,24 @@ class cevy::NetworkBase {
                               });
   }
 
-  void read_one_TCP(TcpConnexion &co) {
+  void read_one_TCP(ConnectionDescriptor cd) {
+    auto& co = _connections.at(cd);
     co.socket.async_read_some(asio::buffer(co.buffer),
-                              [this, &co](asio::error_code error, size_t bytes) {
+                              [this, &co, cd](asio::error_code error, size_t bytes) {
                                 if (error.value() == 2) { // end of co
                                   co.socket.close();
                                   close_dead_tcp();
                                   return;
                                 }
-                                tcp_receive(error, bytes, co);
-                                read_one_TCP(co);
+                                tcp_receive(error, bytes, cd);
+                                read_one_TCP(cd);
                               });
   }
 
-  void read_all_TCP() {
-    for (auto &co : _tcp_connexions) {
-      read_one_TCP(co);
-    }
-  }
+  // void read_all_TCP() {
+  //   for (auto &cd : _connections) {
+  //     read_one_TCP(cd.first);
+  //   }
+  // }
 
-  template <typename Function>
-  void write_one_TCP(TcpConnexion &co, const std::vector<uint8_t> &data, Function &&func) {
-    co.socket.async_send(asio::buffer(data),
-                         [this, &func](asio::error_code error, size_t bytes) { func(); });
-  }
 };
