@@ -9,6 +9,7 @@
 
 #include <array>
 #include <asio/error_code.hpp>
+#include <asio/ip/address.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -23,8 +24,13 @@
 #include "NetworkBase.hpp"
 #include "network.hpp"
 
-class cevy::CevyNetwork : public cevy::NetworkBase {
+class cevy::CevyNetwork : protected cevy::NetworkBase {
   public:
+
+  using NetworkBase::ConnectionDescriptor;
+
+  using NetworkBase::NetworkMode;
+
   struct Communication {
     enum ECommunication {
       State = 1,
@@ -70,7 +76,7 @@ class cevy::CevyNetwork : public cevy::NetworkBase {
 
   CevyNetwork(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
               size_t client_offset)
-      : NetworkBase(mode, endpoint, udp_port, tcp_port, client_offset){};
+      : NetworkBase(mode, udp_port, tcp_port, client_offset){};
 
   CevyNetwork(CevyNetwork &&rhs) : NetworkBase(rhs){};
   ~CevyNetwork(){};
@@ -377,6 +383,91 @@ class cevy::ServerHandler : public cevy::CevyNetwork {
     for (auto& cd: _clients) {
       CevyNetwork::sendSummon(cd, id, archetype);
     }
+  }
+
+  // void sendActionTo(ConnectionDescriptor to, uint16_t id, const std::vector<uint8_t>& block, uint16_t but_id, const std::vector<uint8_t>& but_block) {
+  //   for (auto& cd: _clients) {
+  //     if (cd == to)
+  //       CevyNetwork::sendAction(cd, id, block);
+  //     else
+  //       CevyNetwork::sendAction(cd, but_id, but_block);
+  //   }
+  // }
+
+  void tcp_receive(asio::error_code error, size_t bytes, ConnectionDescriptor cd) override {
+    auto& co = _connections.at(cd);
+    if (co.buffer[0] == (uint8_t)Communication::HandShake) {
+      handleHandShake(bytes, co.buffer);
+    } else {
+      cevy::CevyNetwork::tcp_receive(error, bytes, cd);
+    }
+  }
+};
+
+
+class cevy::ClientHandler : public cevy::CevyNetwork {
+  public:
+
+    ClientHandler(const std::string &endpoint, size_t udp_port, size_t tcp_port,
+              size_t client_offset)
+      : CevyNetwork(CevyNetwork::NetworkMode::Client, endpoint, udp_port, tcp_port, client_offset){};
+
+  protected:
+  ConnectionDescriptor _server = -1;
+  std::set<ConnectionDescriptor> _clients;
+  std::string server_ip;
+  float server_ping;
+  // uint16_t session_id;
+
+  public:
+  void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
+    // std::cout << "handshake received" << std::endl;
+  }
+
+  void connect(NetworkCommands& netcmd, const std::string& server_ip) {
+    auto callback = make_function<void, ConnectionDescriptor>([](ConnectionDescriptor cd){ std::cout << "PLAYER CONNECTION SUCCESS" << std::endl;});
+    client_connect(asio::ip::address::from_string(server_ip), callback);
+  }
+
+  // void sendHandShake(uint16_t id, uint8_t archetype) {
+  //     half h = {.h = id};
+  //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
+  //     writeUDP(_summon_send[id], [](){});
+  // }
+
+  void sendAction(uint16_t id, const std::vector<uint8_t>& block) override {
+    if (_server != -1)
+      CevyNetwork::sendAction(_server, id, block);
+    else
+      std::cerr << "(WARNING)sendAction before connected" << std::endl;
+  }
+
+  void sendState(uint16_t id, const std::vector<uint8_t> &block) override {
+    if (_server != -1)
+      CevyNetwork::sendState(_server, id, block);
+    else
+      std::cerr << "(WARNING)sendState before connected" << std::endl;
+  }
+
+  void sendEvent(uint16_t id, const std::vector<uint8_t>& block) override {
+    if (_server != -1)
+      CevyNetwork::sendEvent(_server, id, block);
+    else
+      std::cerr << "(WARNING)sendEvent before connected" << std::endl;
+  }
+
+  void sendDismiss(uint16_t id) override {
+    if (_server != -1)
+      CevyNetwork::sendDismiss(_server, id);
+    else
+      std::cerr << "(WARNING)sendDismiss before connected" << std::endl;
+  }
+
+  void sendSummon(uint16_t id, uint8_t archetype) override {
+    if (_server != -1)
+      CevyNetwork::sendSummon(_server, id, archetype);
+    else
+      std::cerr << "(WARNING)sendSummon before connected" << std::endl;
   }
 
   // void sendActionTo(ConnectionDescriptor to, uint16_t id, const std::vector<uint8_t>& block, uint16_t but_id, const std::vector<uint8_t>& but_block) {

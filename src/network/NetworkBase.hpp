@@ -58,7 +58,7 @@ class cevy::NetworkBase {
   NetworkBase(NetworkBase &rhs)
       : quit(rhs.quit), _nw_thread(std::move(rhs._nw_thread)),
 
-        _dest_ip(std::move(rhs._dest_ip)), _dest_tcp_port(std::move(rhs._dest_tcp_port)),
+        _dest_tcp_port(std::move(rhs._dest_tcp_port)),
         _dest_udp_port(std::move(rhs._dest_udp_port)),
 
         _udp_endpoint(std::move(rhs._udp_endpoint)), _tcp_endpoint(std::move(rhs._tcp_endpoint)),
@@ -93,14 +93,30 @@ class cevy::NetworkBase {
     } b;
   };
 
-  void tcp_client_connect() {
+  void client_connect(asio::ip::address dest) {
     std::cout << "async tcp connect" << std::endl;
     ConnectionDescriptor idx = connection_count;
     _connections.emplace(idx, _io_context);
     _connections.at(idx)
         .socket.async_connect(
-            tcp::endpoint(asio::ip::address::from_string(_dest_ip), _dest_tcp_port),
+            tcp::endpoint(dest, _dest_tcp_port),
             [this, idx](asio::error_code error) {
+              std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
+              read_one_TCP(idx);
+            });
+    std::cout << "set async connect" << std::endl;
+  }
+
+  template<typename F>
+  void client_connect(asio::ip::address dest, F callback) {
+    std::cout << "async tcp connect" << std::endl;
+    ConnectionDescriptor idx = connection_count;
+    _connections.emplace(idx, _io_context);
+    _connections.at(idx)
+        .socket.async_connect(
+            tcp::endpoint(dest, _dest_tcp_port),
+            [this, idx, callback](asio::error_code error) {
+              callback(idx);
               std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
               read_one_TCP(idx);
             });
@@ -150,7 +166,6 @@ class cevy::NetworkBase {
   asio::io_context _io_context;
   std::thread _nw_thread;
 
-  std::string _dest_ip;
   size_t _dest_tcp_port;
   size_t _dest_udp_port;
 
@@ -172,9 +187,9 @@ class cevy::NetworkBase {
     _nw_thread = std::thread([this]() { this->_io_context.run(); });
   }
 
-  NetworkBase(NetworkMode mode, const std::string &endpoint, size_t udp_port, size_t tcp_port,
+  NetworkBase(NetworkMode mode, size_t udp_port, size_t tcp_port,
               size_t client_offset)
-      : _dest_ip(endpoint), _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
+      : _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
         _udp_endpoint(asio::ip::udp::v4(),
                       udp_port + (client_offset * (mode == NetworkMode::Client))),
         _tcp_endpoint(asio::ip::tcp::v4(),
