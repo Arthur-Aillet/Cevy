@@ -195,6 +195,11 @@ class cevy::NetworkBase {
     _nw_thread = std::thread([this]() { this->_io_context.run(); });
   }
 
+  void die() {
+    quit = true;
+    _nw_thread.join();
+  }
+
   NetworkBase(NetworkMode mode, size_t udp_port, size_t tcp_port,
               size_t client_offset)
       : _mode(mode), _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
@@ -228,14 +233,20 @@ class cevy::NetworkBase {
 
   template <typename Function>
   void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    if (_connections.find(cd) == _connections.end()) {
+      return;
+    }
     _connections.at(cd).socket.async_send(asio::buffer(data),
-                         [this, &func](asio::error_code error, size_t bytes) { func(); });
+                         [this, func](asio::error_code error, size_t bytes) { func(); });
   }
 
   template <typename Function>
   void writeUDP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    if (_connections.find(cd) == _connections.end()) {
+      return;
+    }
     _udp_socket.async_send_to(asio::buffer(data), _connections.at(cd).udp_endpoint,
-                              [this, &func](asio::error_code error, size_t) {
+                              [this, func](asio::error_code error, size_t) {
                                 if (error)
                                   std::cerr << "(ERROR)async_send:" << error << std::endl;
                                 func();

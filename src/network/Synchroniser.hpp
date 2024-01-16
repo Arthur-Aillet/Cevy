@@ -7,10 +7,13 @@
 
 #pragma once
 
+#include <any>
 #include <cstdint>
 #include <cstring>
 #include <functional>
+#include <sstream>
 #include <stdexcept>
+#include <sys/types.h>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -30,6 +33,16 @@
 
 class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   public:
+  class exception : public std::exception {
+    public:
+    exception(const std::string& msg) : _msg(msg) {};
+    const char *what() const noexcept override {
+      return _msg.c_str();
+    }
+    protected:
+    std::string _msg;
+  };
+
   class SummonStage : public ecs::core_stage::before<ecs::core_stage::PreUpdate> {};
   class SyncStage : public ecs::core_stage::after<SummonStage> {};
   struct SyncId {
@@ -41,10 +54,11 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   class SyncBlock;
   using BlockType = std::type_index;
   using ComponentType = std::type_index;
-  enum class Mode {
-    Server,
-    Client,
-  };
+  using Mode = CevyNetwork::NetworkMode;
+  // enum class Mode {
+  //   Server,
+  //   Client,
+  // };
 
   template <size_t N, typename... T>
   struct Spawnable {
@@ -53,7 +67,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(CevyNetwork &net) : _net(net){};
+  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode) {};
 
   Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
 
@@ -65,8 +79,10 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   void add_sync(cevy::ecs::App &app) {
     _blocks[BlockType(typeid(Block))] = ++_blockCount;
     using F = SyncBlock<Block, Component...>;
-    app.add_class_system<F, SyncStage, cevy::ecs::Query<SyncId, Component...>>(
-        F(mode, *this, _net));
+
+    _block.emplace_back(std::make_any<F>(mode, *this, _net));
+    F& block = std::any_cast<F&>(_block.back());
+    app.add_class_system<F, SyncStage, cevy::ecs::Query<SyncId, Component...>>(block);
     // ([&] {
     //     (_sync_map[typeid(Block)].push_back(typeid(Component)));
     // } (), ...);
@@ -74,7 +90,14 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   template <typename S, typename... T>
   void add_spawnable(T... args) {
-    _spawnCommands[S::value] = [args...](ecs::EntityCommands e) { e.insert(T(args)...); };
+    std::cout << "(INFO)add_spawnable: registering at " << S::value << std::endl;
+    _spawnCommands[S::value] = [args...](ecs::EntityCommands e) { e.insert(args...); };
+  }
+
+    template <typename S>
+  void add_spawnable_command(std::function<void(ecs::EntityCommands)> func) {
+    std::cout << "(INFO)add_spawnable: registering at " << S::value << std::endl;
+    _spawnCommands[S::value] = func;
   }
 
   template <typename T>
@@ -82,7 +105,11 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     if (mode == Mode::Client)
       return;
     auto e = command.spawn_empty();
-    _spawnCommands[T::value](e);
+    if (_spawnCommands.find(T::value) != _spawnCommands.end())
+      _spawnCommands.at(T::value)(e);
+    else {
+      std::cerr << "(ERROR)summon: unmapped spawn command:" << T::value << std::endl;
+    }
     auto id = first_free();
     _occupancy[id] = true;
     e.insert(SyncId({id, T::value}));
@@ -91,15 +118,23 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   template <typename T, typename U>
   void summon(cevy::ecs::Commands &command, CevyNetwork::ConnectionDescriptor cd) {
-    if (mode == Mode::Client)
-      return;
     auto e = command.spawn_empty();
-    _spawnCommands[T::value](e);
+    if (_spawnCommands.find(T::value) != _spawnCommands.end())
+      _spawnCommands.at(T::value)(e);
+    else {
+      std::cerr << "(ERROR)summon: unmapped spawn command:" << T::value << std::endl;
+    }
     auto id = first_free();
     _occupancy[id] = true;
-    e.insert(SyncId({id, T::value}));
-    auto& handler = dynamic_cast<ServerHandler&>(_net);
-    handler.sendSummon(cd, id, T::value, U::value);
+    e.insert(SyncId({id, U::value}));
+    if (mode != Mode::Server)
+      return;
+    auto* handler = dynamic_cast<ServerHandler*>(&_net);
+    if (!handler) {
+      std::cerr << "(ERROR)summon<T, U>: cast went wrong" << std::endl;
+      return;
+    }
+    handler->sendSummon(cd, id, T::value, U::value);
   }
 
   void dismiss(cevy::ecs::Commands &command, SyncId syncId) {
@@ -127,7 +162,11 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
         break;
       auto pair = x.value();
       auto e = command.spawn_empty();
-      _spawnCommands[pair.second](e);
+      if (_spawnCommands.find(pair.second) != _spawnCommands.end())
+        _spawnCommands.at(pair.second)(e);
+      else {
+        std::cerr << "(ERROR)system_summon: unmapped spawn command:" << int(pair.second) << std::endl;
+      }
       e.insert(SyncId{pair.first, pair.second});
       _occupancy[pair.first] = true;
     };
@@ -163,13 +202,17 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   uint8_t _blockCount;
   std::unordered_map<uint8_t, std::function<void(ecs::EntityCommands)>> _spawnCommands;
   std::array<bool, 1024> _occupancy;
+  std::vector<std::any> _block;
   // std::unordered_map<BlockType, std::vector<ComponentType>> _sync_map;
   Mode mode;
 
   protected:
   void build(cevy::ecs::App &app) override {
+    std::cout << "(INFO)Synchroniser::build" << std::endl;
+
     app.add_stage<SummonStage>();
     app.add_stage<SyncStage>();
+    app.init_component<SyncId>();
     std::function<void(ecs::Commands)> func = [this](cevy::ecs::Commands cmd) {
       this->system_summon(cmd);
     };
@@ -235,6 +278,13 @@ class cevy::Synchroniser::SyncBlock {
   Mode mode;
 
   public:
+  void system(cevy::ecs::Query<SyncId, Component...> q) const {
+    if (mode == Mode::Server)
+      system_send(q);
+    if (mode == Mode::Client)
+      system_recv(q);
+  }
+
   void operator()(cevy::ecs::Query<SyncId, Component...> q) const {
     if (mode == Mode::Server)
       system_send(q);

@@ -30,6 +30,17 @@ struct eval_cond<true, Z, X, Else> {
 template <bool test, template <class...> class Z, class X, class Else>
 using eval_cond_t = typename eval_cond<test, Z, X, Else>::type;
 
+template <typename Type>
+struct is_indirect : std::false_type {};
+
+template <typename T>
+struct remove_indirect_t {
+  using value_type = T;
+};
+
+template <typename T>
+using remove_indirect = typename remove_indirect_t<T>::value_type;
+
 /// @brief True if all parameter pack is true
 template <typename... Args>
 constexpr bool all(Args... args) {

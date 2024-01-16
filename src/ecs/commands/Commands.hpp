@@ -10,6 +10,7 @@
 #include "Command.hpp"
 #include "Entity.hpp"
 #include "World.hpp"
+#include <queue>
 #include <type_traits>
 
 namespace cevy {
@@ -23,17 +24,36 @@ class cevy::ecs::Commands {
   friend class cevy::ecs::World;
 
   cevy::ecs::World &_world_access;
+  using command = std::function<void(World &)>;
+  std::queue<command> _command_queue;
   Commands(cevy::ecs::World &world_access) : _world_access(world_access){};
 
   public:
+  ~Commands() { merge_queues(_world_access._command_queue, _command_queue);};
   template <typename GivenCommand,
             typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
   void add(const GivenCommand &a) {
     auto l = [a](cevy::ecs::World &w) { a.apply(w); };
-    _world_access._command_queue.push(l);
+    _command_queue.push(l);
   }
 
   void add(std::function<void(cevy::ecs::World &w)> &&f);
+
+  static void merge_queues(std::queue<command> &to, std::queue<command> &from) {
+        while (from.size()) {
+      to.push(from.front());
+      from.pop();
+    }
+  }
+
+  void merge(Commands& other) {
+    merge_queues(_command_queue, other._command_queue);
+  }
+
+  void clear() {
+    while (_command_queue.size())
+      _command_queue.pop();
+  }
 
   template <typename R>
   void insert_resource(const R &value) {

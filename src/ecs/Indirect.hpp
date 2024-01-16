@@ -17,16 +17,10 @@
 template <typename T>
 class Indirect;
 
-template <typename Type>
-struct is_indirect : std::false_type {};
+#include "cevy.hpp"
 
 template <typename Type>
 struct is_indirect<Indirect<Type>> : std::true_type {};
-
-template <typename T>
-struct remove_indirect_t {
-  using value_type = T;
-};
 
 template <typename T>
 struct remove_indirect_t<Indirect<T>> {
@@ -37,9 +31,6 @@ template <typename T>
 struct remove_indirect_t<Indirect<T &>> {
   using value_type = T &;
 };
-
-template <typename T>
-using remove_indirect = typename remove_indirect_t<T>::value_type;
 
 template <typename T>
 constexpr Indirect<T> make_indirect(const std::function<T()> &f) {
@@ -133,3 +124,13 @@ class Indirect {
 
   private:
 };
+
+template <typename T>
+constexpr T &&make_direct(Indirect<T> &&indirect) {
+  return indirect.get();
+}
+
+template <typename T>
+constexpr T &&make_direct(T &&direct) {
+  return direct;
+}

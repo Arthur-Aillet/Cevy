@@ -66,7 +66,7 @@ class cevy::ecs::App : public cevy::ecs::World {
                   "Given plugin does not derive from Cevy Plugin class");
     static_assert(std::is_move_constructible_v<GivenPlugin>,
                   "Given plugin must be move constructible");
-    _plugins.emplace_back<std::unique_ptr<Plugin>>(std::move(std::make_unique<GivenPlugin>(arg...)));
+    _plugins.push_back(std::move(std::make_unique<GivenPlugin>(arg...)));
 
     _plugins.back()->build(*this);
   }

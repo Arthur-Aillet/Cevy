@@ -92,10 +92,12 @@ using after = Stage<>::after<NextStage>;
  * @brief Default stage constructor
  */
 using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
+using at_end = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
 
 class Startup : public at_start {};
 class PreStartup : public before<Startup> {};
 class PostStartup : public after<Startup> {};
+class ShutDown : public at_start {};
 
 class First : public Stage<> {};
 

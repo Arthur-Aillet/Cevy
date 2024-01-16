@@ -110,8 +110,16 @@ class cevy::NetworkCommands : protected ecs::Commands {
   void dismiss(Synchroniser::SyncId id) { _sync.dismiss(*this, id); }
 
   void connect(const std::string& str) {
-    auto& handler = dynamic_cast<ClientHandler&>(_net);
-    handler.connect(*this, str);
+    auto* handler = dynamic_cast<ClientHandler*>(&_net);
+    if (!handler) {
+      std::cerr << "(ERROR)connect: cast went wrong" << std::endl;
+      std::exit(0);
+    }
+    handler->connect(*this, str);
+  }
+
+  void die() const {
+    _net.die();
   }
 
   protected:

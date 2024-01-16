@@ -24,6 +24,8 @@
 #include "Commands.hpp"
 #include "Plugin.hpp"
 #include "Query.hpp"
+#include "Resource.hpp"
+#include "Stage.hpp"
 #include "network/CevyNetwork.hpp"
 #include "network/network.hpp"
 
@@ -42,6 +44,16 @@ class cevy::NetworkActions : public ecs::Plugin {
   enum class Mode {
     Server,
     Client,
+  };
+
+  class exception : public std::exception {
+    public:
+    exception(const std::string& msg) : _msg(msg) {};
+    const char *what() const noexcept override {
+      return _msg.c_str();
+    }
+    protected:
+    std::string _msg;
   };
 
   /// Contructor
@@ -92,7 +104,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   using ClientJoin = Event<CevyNetwork::Event::ClientJoin, CevyNetwork::ConnectionDescriptor>;
 
 
-  void actions_system(ecs::Resource<ecs::Commands> cmd) {
+  void actions_system(ecs::Commands cmd) {
     while (true) {
       auto event = _net.recvEvent();
       if (!event)
@@ -118,6 +130,7 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   protected:
   void event_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
+    std::cerr << "(INFO)event_remote: treating" << id << std::endl;
     if (_events.find(id) != _events.end()) {
       _events.find(id)->second(cmd);
     } else if (_remote_events.find(id) != _remote_events.end()) {
@@ -128,6 +141,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   }
 
   void actionSuccess_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
+    std::cerr << "(INFO)actionSuccess_remote: treating" << id << std::endl;
     if (_actions.find(id) != _actions.end()) {
       std::get<1>(_actions.find(id)->second)(cmd);
     } else if (_remote_actions.find(id) != _remote_actions.end()) {
@@ -138,6 +152,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   }
 
   void actionFailure_remote(ecs::Commands& cmd, EActionFailureMode fail, uint16_t id, std::vector<uint8_t> &vec) {
+    std::cerr << "(INFO)actionFailure_remote: treating" << id << std::endl;
     if (_actions.find(id) != _actions.end()) {
       std::get<2>(_actions.find(id)->second)(cmd, fail);
     } else if (_remote_actions.find(id) != _remote_actions.end()) {
@@ -150,7 +165,9 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   public:
 
-  virtual void build(cevy::ecs::App &) override {}
+  virtual void build(cevy::ecs::App &app) override {
+    app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { actions_system(cmd);}));
+  }
 
   /**
    * @brief add an action with regular functions
@@ -359,23 +376,29 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A>
   void action(ecs::Commands &cmd, CevyNetwork::ConnectionDescriptor cd = -1) {
+    try {
     if (_mode == Mode::Server) {
-      EActionFailureMode ret = std::get<0>(_actions[A::value])(cmd);
-      if (cd == -1)
-        return;
-      if (ret == ActionFailureMode::Action_Success) {
-        if (A::presume != Presume::success)
-          _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
+        EActionFailureMode ret = std::get<0>(_actions.at(A::value))(cmd);
+        if (cd == -1)
+          return;
+        if (ret == ActionFailureMode::Action_Success) {
+          if (A::presume != Presume::success)
+            _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
+        } else {
+          if (A::presume != Presume::fail)
+            _net.sendActionFailure(cd, A::value, ret);
+        }
       } else {
-        if (A::presume != Presume::fail)
-          _net.sendActionFailure(cd, A::value, ret);
+        if (A::presume == Presume::success)
+          std::get<1>(_actions.at(A::value))(cmd);
+        else if (A::presume == Presume::fail)
+          std::get<2>(_actions.at(A::value))(cmd);
+        _net.sendAction(A::value, std::vector<uint8_t>());
       }
-    } else {
-      if (A::presume == Presume::success)
-        std::get<1>(_actions[A::value])(cmd);
-      else if (A::presume == Presume::fail)
-        std::get<2>(_actions[A::value])(cmd);
-      _net.sendAction(A::value, std::vector<uint8_t>());
+    } catch (std::out_of_range& e) {
+      std::stringstream ss;
+      ss << "no spawnable at " << A::value;
+      throw exception(ss.str());
     }
   }
 
@@ -400,12 +423,13 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A>
   void action_with(ecs::Commands &cmd, typename A::Arg given, CevyNetwork::ConnectionDescriptor cd = -1) {
-    auto &server = std::get<0>(_super_actions[A::value]);
-    auto &client_success = std::get<1>(_super_actions[A::value]);
-    auto &client_fail = std::get<2>(_super_actions[A::value]);
+    try {
+    auto &server = std::get<0>(_super_actions.at(A::value ));
+    auto &client_success = std::get<1>(_super_actions.at(A::value ));
+    auto &client_fail = std::get<2>(_super_actions.at(A::value ));
     if (_mode == Mode::Server) {
       const auto &func =
-          std::any_cast<std::function<EActionFailureMode(ecs::Commands &, typename A::Arg)>>(
+          std::any_cast<super_server_system<typename A::Arg>&>(
               server);
       EActionFailureMode ret = func(cmd, given);
       if (cd == -1)
@@ -420,18 +444,23 @@ class cevy::NetworkActions : public ecs::Plugin {
     } else {
       if (A::presume == Presume::success) {
         const auto &func =
-            std::any_cast<std::function<bool(ecs::Commands &, typename A::Arg)>>(client_success);
+            std::any_cast<super_system_success<typename A::Arg>&>(client_success);
         func(cmd, given);
       } else if (A::presume == Presume::fail) {
         const auto &func =
-            std::any_cast<std::function<bool(ecs::Commands &, typename A::Arg)>>(client_fail);
-        func(cmd, given);
+            std::any_cast<super_system_fail<typename A::Arg>&>(client_fail);
+        func(cmd, ActionFailureMode::Presumed, given);
       }
       std::vector<uint8_t> vec;
       serialize(vec, given);
       if (vec.size() != serialized_size<typename A::Arg>::value)
         throw std::exception();
       _net.sendAction(A::value, vec);
+    }
+    } catch (std::out_of_range& e) {
+      std::stringstream ss;
+      ss << "no spawnable at " << A::value;
+      throw exception(ss.str());
     }
   }
 
@@ -445,9 +474,15 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename E>
   void event(ecs::Commands &cmd) {
-    _events[E::value](cmd);
+    try {
+    _events.at(E::value)(cmd);
     std::vector<uint8_t> vec(E::serialized_size, 0);
     _net.sendEvent(E::value, vec);
+    } catch (std::out_of_range& e) {
+      std::stringstream ss;
+      ss << "no spawnable at " << E::value;
+      throw exception(ss.str());
+    }
   }
 
   /**
@@ -467,14 +502,20 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename E>
   void event_with(ecs::Commands &cmd, typename E::Arg given) {
-    const auto &func = std::any_cast<std::function<bool(ecs::Commands &, typename E::Arg)>>(
-        _super_events[E::value]);
+    try {
+    const auto &func = std::any_cast<super_system_success<typename E::Arg>&>(
+        _super_events.at(E::value));
     func(cmd, given);
     std::vector<uint8_t> vec;
     serialize(vec, given);
     if (vec.size() != serialized_size<typename E::Arg>::value)
       throw std::exception();
     _net.sendEvent(E::value, vec);
+    } catch (std::out_of_range& e) {
+      std::stringstream ss;
+      ss << "no spawnable at " << E::value;
+      throw exception(ss.str());
+    }
   }
 
   public:

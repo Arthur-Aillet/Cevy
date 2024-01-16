@@ -9,7 +9,9 @@
 
 #include "ecs.hpp"
 #include <any>
+#include <exception>
 #include <optional>
+#include <string>
 #include <typeindex>
 #include <unordered_map>
 
@@ -45,6 +47,16 @@ class ResourceManager {
   std::unordered_map<std::type_index, resource_type> _resources_map;
 
   public:
+  class exception : public std::exception {
+    public:
+    exception(const std::string& msg) : _msg(msg) {};
+    const char *what() const noexcept override {
+      return _msg.c_str();
+    }
+    protected:
+    std::string _msg;
+  };
+
   void clear_ressources() { _resources_map.clear(); }
 
   template <typename Content>
@@ -59,22 +71,33 @@ class ResourceManager {
     auto it = _resources_map.find(std::type_index(typeid(Content)));
 
     if (it != _resources_map.end()) {
-      Content val = std::any_cast<Content>(_resources_map[std::type_index(typeid(Content))]);
-
-      _resources_map.erase(it);
-      return std::optional<Content>(val);
+      try {
+        Content val = std::any_cast<Content>(_resources_map[std::type_index(typeid(Content))]);
+        _resources_map.erase(it);
+        return std::optional<Content>(val);
+      } catch (std::bad_any_cast &e) {
+        throw exception(std::string("No ressource '") + typeid(Content).name() + "'");
+      }
     }
     return std::nullopt;
   }
 
   template <typename Content>
   Content &resource() {
-    return std::any_cast<Content &>(_resources_map[std::type_index(typeid(Content))]);
+      try {
+        return std::any_cast<Content &>(_resources_map[std::type_index(typeid(Content))]);
+      } catch (std::exception &e) {
+        throw exception(std::string("No ressource '") + typeid(Content).name() + "'");
+      }
   }
 
   template <typename Content>
   const Content &resource() const {
-    return std::any_cast<const Content &>(_resources_map.at(std::type_index(typeid(Content))));
+    try {
+      return std::any_cast<Content &>(_resources_map.at(std::type_index(typeid(Content))));
+    } catch (std::exception &e) {
+      throw exception(std::string("No ressource '") + typeid(Content).name() + "'");
+    }
   }
 
   template <typename Content>
@@ -88,8 +111,12 @@ class ResourceManager {
 
   template <typename Content>
   cevy::ecs::Resource<Content> get() {
-    return cevy::ecs::Resource(
+    try {
+      return cevy::ecs::Resource(
         std::any_cast<Content &>(_resources_map[std::type_index(typeid(Content))]));
+    } catch (std::exception &e) {
+      throw exception(std::string("No ressource '") + typeid(Content).name() + "'");
+    }
   }
 
   template <typename Content>

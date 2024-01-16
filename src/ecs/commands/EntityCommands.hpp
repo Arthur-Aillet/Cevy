@@ -13,7 +13,7 @@
 class cevy::ecs::EntityCommands {
   private:
   cevy::ecs::Entity _entity;
-  cevy::ecs::Commands &_commands;
+  cevy::ecs::Commands& _commands;
 
   friend class cevy::ecs::Commands;
   EntityCommands(cevy::ecs::Commands &commands, cevy::ecs::Entity entity)
@@ -25,6 +25,10 @@ class cevy::ecs::EntityCommands {
     _commands.add(
         [c..., e = _entity](cevy::ecs::World &w) mutable { (w.add_component(e, c), ...); });
     return *this;
+  }
+
+  cevy::ecs::EntityCommands& merge(const EntityCommands& other) {
+    _commands.merge(other._commands);
   }
 
   template <typename... Components>

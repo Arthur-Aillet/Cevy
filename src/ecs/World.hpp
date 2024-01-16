@@ -390,7 +390,7 @@ class cevy::ecs::World {
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
                is_event_reader<Args>, is_event_writer<Args>>()...),
         "type must be reference to query, world, commands, event reader, event writer or resource");
-    auto sys = [&func, this, given]() mutable -> R { return func(given, get_super<Args>(0)...); };
+    auto sys = [func, this, given]() mutable -> R { return func(given, get_super<Args>(0)...); };
     return sys();
   }
 
@@ -401,7 +401,7 @@ class cevy::ecs::World {
   //              is_event_reader<Args>, is_event_writer<Args>>()...),
   //       "type must be reference to query, world, commands, event reader, event writer or
   //       resource");
-  //   auto sys = [&func, this, given]() mutable {
+  //   auto sys = [func, this, given]() mutable {
   //      func(given, get_super<Args>(0)...);
   //   };
   //   sys();
@@ -442,7 +442,7 @@ class cevy::ecs::World {
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
                is_event_reader<Args>, is_event_writer<Args>, Or<std::is_same<Args, GivenArgs>>...>()...),
         "type must be reference to query, world, commands, event reader, event writer or resource");
-    auto sys = [&func, this, given]() mutable -> R { return func(get_uber<Args>(given, 0)...); };
+    auto sys = [func, this, given]() mutable -> R { return func(get_uber<Args>(given, 0)...); };
     return sys();
   }
 

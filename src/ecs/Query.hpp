@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <iterator>
 #include <optional>
+#include <stdexcept>
 #include <type_traits>
 
 #include "Entity.hpp"
@@ -190,7 +191,11 @@ class Query {
   public:
   size_t size() { return _size; }
 
-  typename iterator::value_type single() { return *begin(); }
+  typename iterator::value_type single() {
+    if (!_size)
+      throw std::out_of_range("single() on an empty query");
+    return *begin();
+  }
 
   std::optional<typename iterator::value_type> get_single() {
     if (_size <= 0) {

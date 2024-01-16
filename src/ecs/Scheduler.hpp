@@ -32,6 +32,7 @@ class Scheduler {
   private:
   std::list<std::type_index> _schedule;
   std::list<std::type_index> _at_start_schedule;
+  std::list<std::type_index> _at_end_schedule;
   SystemId last_id = 0;
 
   public:
@@ -106,7 +107,7 @@ class Scheduler {
       std::cerr << "WARNING/Cevy: Stage not yet added to ecs pipeline" << std::endl;
     }
 
-    system_function sys = [func](World &reg) mutable { func(reg.get_super<Args>(0)...); };
+    system_function sys = [func](World &reg) { func(reg.get_super<Args>(0)...); };
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 
@@ -151,6 +152,7 @@ class Scheduler {
   std::list<std::type_index>::iterator _stage;
 
   void runStartStages(World &world);
+  void runEndStages(World &world);
   void runStages(World &world);
   void runStage(World &world);
 

@@ -32,6 +32,13 @@ void Scheduler::runStartStages(World &world) {
   }
 }
 
+void Scheduler::runEndStages(World &world) {
+  _stage = _at_end_schedule.begin();
+  while (_stage != _at_end_schedule.end()) {
+    runStage(world);
+  }
+}
+
 void Scheduler::runStages(World &world) {
   _stage = _schedule.begin();
   while (_stage != _schedule.end()) {
@@ -53,4 +60,5 @@ void Scheduler::run(World &world) {
       _stop = true;
     }
   }
+  runEndStages(world);
 }
