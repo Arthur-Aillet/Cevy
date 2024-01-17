@@ -14,14 +14,16 @@ using cevy::ecs::Scheduler;
 void Scheduler::runStage(World &world) {
   std::vector<std::reference_wrapper<system>> curr_sys;
 
+
+
   std::copy_if(_systems.begin(), _systems.end(), std::back_inserter(curr_sys),
                [this](const system &sys) { return std::get<1>(sys) == *_stage; });
 
+    // std::cout << "(INFO)runStage" << (*_stage).name() << " " << curr_sys.size() << std::endl;
   /* this part could be multi-threaded */
   for (auto sys : curr_sys) {
     std::get<0>(sys.get())(world);
   }
-
   _stage++;
 }
 

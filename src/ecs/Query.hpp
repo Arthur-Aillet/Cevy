@@ -189,7 +189,11 @@ class Query {
   }
 
   public:
-  size_t size() { return _size; }
+  size_t size() const {
+    size_t size = 0;
+    for (auto _ : *this) size++;
+    return _size;
+  }
 
   typename iterator::value_type single() {
     if (!_size)

@@ -30,7 +30,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   public:
   using NetworkBase::ConnectionDescriptor;
   using NetworkBase::NetworkMode;
-  inline static const NetworkMode mode = NetworkMode::undefined;
 
   struct Communication {
     enum ECommunication {
@@ -86,8 +85,12 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   CevyNetwork(CevyNetwork &&rhs) : NetworkBase(rhs){};
   ~CevyNetwork(){};
 
-  void build(ecs::App& app) override {
+  void build(ecs::App&) override {
     start_thread();
+  }
+
+  NetworkMode mode() const {
+    return _mode;
   }
 
   using NetworkBase::start_thread;
@@ -402,7 +405,7 @@ class cevy::ServerHandler : public cevy::CevyNetwork {
   // uint16_t session_id;
 
   public:
-  void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
+  void handleHandShake(size_t, std::array<uint8_t, 512> &) {
     // std::cout << "handshake received" << std::endl;
   }
 
@@ -497,13 +500,13 @@ class cevy::ClientHandler : public cevy::CevyNetwork {
   // uint16_t session_id;
 
   public:
-  void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
+  void handleHandShake(size_t, std::array<uint8_t, 512> &) {
     // std::cout << "handshake received" << std::endl;
   }
 
-  void connect(NetworkCommands& netcmd, const std::string& server_ip) {
+  void connect(NetworkCommands&, const std::string& server_ip) {
     std::cout << "attempting to connect to " << server_ip << std::endl;
-    auto callback = make_function<void, ConnectionDescriptor>([](ConnectionDescriptor cd){ std::cout << "PLAYER CONNECTION SUCCESS" << std::endl;});
+    auto callback = make_function<void, ConnectionDescriptor>([](ConnectionDescriptor){ std::cout << "PLAYER CONNECTION SUCCESS" << std::endl;});
     client_connect(asio::ip::address::from_string(server_ip), callback);
   }
 

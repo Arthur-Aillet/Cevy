@@ -352,7 +352,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param func system to trigger
    */
   template <typename E, typename... Args>
-  void add_event_with(std::function<bool(typename E::Arg, Args...)> func) {
+  void add_event_with(std::function<bool(typename E::Arg, Args...)> func = success_default) {
     super_system_success<typename E::Arg> lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
       return cmd.system_with<typename E::Arg>(func, given);
     };

@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <sys/types.h>
 #include <typeindex>
+#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -67,7 +68,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode) {};
+  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode()) {};
 
   Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
 
@@ -82,6 +83,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
     _block.emplace_back(std::make_any<F>(mode, *this, _net));
     F& block = std::any_cast<F&>(_block.back());
+    std::cout << "(INFO)SyncBlock::add_sync" << std::endl;
     app.add_class_system<F, SyncStage, cevy::ecs::Query<SyncId, Component...>>(block);
     // ([&] {
     //     (_sync_map[typeid(Block)].push_back(typeid(Component)));
@@ -102,8 +104,6 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   template <typename T>
   void summon(cevy::ecs::Commands &command) {
-    if (mode == Mode::Client)
-      return;
     auto e = command.spawn_empty();
     if (_spawnCommands.find(T::value) != _spawnCommands.end())
       _spawnCommands.at(T::value)(e);
@@ -113,6 +113,8 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     auto id = first_free();
     _occupancy[id] = true;
     e.insert(SyncId({id, T::value}));
+    if (mode == Mode::Client)
+      return;
     _net.sendSummon(id, T::value);
   }
 
@@ -162,9 +164,10 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
         break;
       auto pair = x.value();
       auto e = command.spawn_empty();
-      if (_spawnCommands.find(pair.second) != _spawnCommands.end())
+      if (_spawnCommands.find(pair.second) != _spawnCommands.end()) {
+        std::cerr << "(INFO)system_summon: spawning:" << int(pair.second) << std::endl;
         _spawnCommands.at(pair.second)(e);
-      else {
+      } else {
         std::cerr << "(ERROR)system_summon: unmapped spawn command:" << int(pair.second) << std::endl;
       }
       e.insert(SyncId{pair.first, pair.second});
@@ -246,33 +249,33 @@ class cevy::Synchroniser::SyncBlock {
   }
 
   void system_send(cevy::ecs::Query<SyncId, Component...> &q) const {
+    std::stringstream ss;
+    (ss << ... << typeid(Component).name());
+    // std::cout << "(INFO)ShipSync::system_send " << ss.str() << "[" << q.size() << "]" << std::endl;
     for (auto e : q) {
       auto sync_id = std::get<SyncId &>(e);
+      // std::cout << "(INFO)SyncBlock::system_send " << sync_id.id << std::endl;
       if (sync_id.id == SyncId::unset)
         continue;
       std::vector<uint8_t> block;
-      (
-          [&] {
-            serialize(block, std::get<Component &>(e));
-          }(),
-          ...);
+      (serialize(block, std::get<Component &>(e)), ...);
       _net.sendState(id<Block>(sync_id.id), block);
     }
   }
 
   void system_recv(cevy::ecs::Query<SyncId, Component...> &q) const {
+    std::stringstream ss;
+    (ss << ... << typeid(Component).name());
+    // std::cout << "(INFO)ShipSync::system_recv " << ss.str() << "[" << q.size() << "]" << std::endl;
     for (auto e : q) {
       auto sync_id = std::get<SyncId &>(e);
+      // std::cout << "(INFO)SyncBlock::system_recv " << sync_id.id << std::endl;
       std::optional<std::vector<uint8_t>> block_ = _net.recvState(id<Block>(sync_id.id));
       if (!block_)
         return;
       std::vector<uint8_t> &block = block_.value();
 
-      (
-          [&] {
-            std::get<Component &>(e) = deserialize<Component>(block);
-          }(),
-          ...);
+      ((std::get<Component &>(e) = deserialize<Component>(block)), ...);
     }
   }
   Mode mode;
@@ -286,6 +289,7 @@ class cevy::Synchroniser::SyncBlock {
   }
 
   void operator()(cevy::ecs::Query<SyncId, Component...> q) const {
+  // std::cout << "(INFO)SyncBlock::system()" << std::endl;
     if (mode == Mode::Server)
       system_send(q);
     if (mode == Mode::Client)

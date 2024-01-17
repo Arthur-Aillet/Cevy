@@ -29,6 +29,7 @@ class cevy::ecs::EntityCommands {
 
   cevy::ecs::EntityCommands& merge(const EntityCommands& other) {
     _commands.merge(other._commands);
+    return *this;
   }
 
   template <typename... Components>

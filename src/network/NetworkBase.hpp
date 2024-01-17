@@ -41,7 +41,7 @@ class cevy::NetworkBase {
   enum NetworkMode {
     Server,
     Client,
-    undefined,
+    // undefined,
   };
 
   class Connection {
@@ -117,8 +117,9 @@ class cevy::NetworkBase {
     _connections.at(idx)
         .socket.async_connect(
             tcp::endpoint(dest, _dest_tcp_port),
-            [this, idx, callback](asio::error_code error) {
+            [dest, this, idx, callback](asio::error_code error) {
               callback(idx);
+              _connections.at(idx).udp_endpoint = std::move(asio::ip::udp::endpoint(dest, _dest_udp_port));
               std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
               read_one_TCP(idx);
             });
@@ -135,6 +136,8 @@ class cevy::NetworkBase {
         return;
       }
       std::cout << "new tcp connexion accepted to the server" << std::endl;
+      _temp_tcp_co.udp_endpoint = asio::ip::udp::endpoint(_temp_tcp_co.socket.remote_endpoint().address(), _dest_udp_port);
+
       _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
       tcp_accept(error, idx);
       read_one_TCP(idx);
@@ -163,8 +166,9 @@ class cevy::NetworkBase {
     }
   }
 
-  private:
+  protected:
   NetworkMode _mode;
+  private:
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
@@ -237,7 +241,7 @@ class cevy::NetworkBase {
       return;
     }
     _connections.at(cd).socket.async_send(asio::buffer(data),
-                         [this, func](asio::error_code error, size_t bytes) { func(); });
+                         [this, func](asio::error_code, size_t) { func(); });
   }
 
   template <typename Function>
