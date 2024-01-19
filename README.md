@@ -1,12 +1,12 @@
 ## What is C++evy?
 
-C++evy is a entity component system game engine built in C++, and try to be the C++ alternative of Rust's Bevy!
+C++evy is an entity component system game engine built in C++, and try to be the C++ alternative of Rust's Bevy!
 
 Make sure to check Bevy: https://bevyengine.org/
 
 ## WARNING
 
-Cevy is still in the early stages of development and being developped for a school project it will probably stay this way.
+Cevy is still in the early stages of development and being developed for a school project it will probably stay this way.
 
 ## Design Goals
 
