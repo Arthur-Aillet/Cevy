@@ -415,3 +415,7 @@ class HelloPlugin : public Plugin {
     }
 };
 ```
+
+[1]: https://github.com/Arthur-Aillet/Cevy "Cevy"
+[2]: https://github.com/Arthur-Aillet/RType "Rtype"
+[3]: https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16 "VS"
