@@ -1,10 +1,12 @@
-## What is Cevy?
+## What is C++evy?
 
-Cevy is a entity component system game engine built in C++, and aims to be the C++ alternative of Rust's Bevy !
+C++evy is a entity component system game engine built in C++, and try to be the C++ alternative of Rust's Bevy!
+
+Make sure to check Bevy: https://bevyengine.org/
 
 ## WARNING
 
-As Bevy, Cevy is still in the early stages of development (even earlier than Bevy).
+Cevy is still in the early stages of development and being developped for a school project it will probably stay this way.
 
 ## Design Goals
 
@@ -13,12 +15,12 @@ As Bevy, Cevy is still in the early stages of development (even earlier than Bev
 
 ## Docs
 
-We use *Doxygen* for our doc, you can `make doc` and open `index.html` to see it ! (We'll maybe host it in the future ?) :D
+We use *Doxygen* for our doc, you can `make doc` and open `index.html` to see it ! (We'll maybe host it in the future ?)
+
+[Getting Started](./docs/Getting Started.md)
+[How to use C++evy coming from Bevy](./docs/compare.md)
+[NetworkRFC](./docs/NetworkRFC.md)
 
 ### Contributing
 
-Every contribution is welcomed.
-
-## Getting Started
-
-We have a Getting Started page in our Doxygen doc.
+Every contribution is welcomed! :D
