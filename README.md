@@ -17,7 +17,7 @@ Cevy is still in the early stages of development and being developped for a scho
 
 We use *Doxygen* for our doc, you can `make doc` and open `index.html` to see it ! (We'll maybe host it in the future ?)
 
-[Getting Started](./docs/Getting Started.md)  
+[Getting Started](./docs/Getting%20Started.md)  
 [How to use C++evy coming from Bevy](./docs/compare.md)  
 [NetworkRFC](./docs/NetworkRFC.md)  
 
