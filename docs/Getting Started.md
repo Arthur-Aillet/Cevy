@@ -382,7 +382,7 @@ For simplicity, remove the hello_world system from your App. This way we only ne
 
 Resources are accessed in much the same way that we access components. You can access the Time resource in your system like this:
 ```cpp
-void greet_people(Ressource<Time> time, Query<Name> persons) {
+void greet_people(Resource<Time> time, Query<Name> persons) {
     for (auto p : persons) {
         std::cout << "hello " << p.getName() << std::endl;
     }
@@ -395,7 +395,7 @@ struct GreetTime {
     Timer greet;
 }
 
-void greet_people(Ressource<GreetTimer> timer, Ressource<Time> time, Query<Name> persons) {
+void greet_people(Resource<GreetTimer> timer, Resource<Time> time, Query<Name> persons) {
     if (timer.get().greet.tick(time.delta()).just_finished()) {
         for p : persons {
             std::cout << "hello " << p.getName() << std::endl;

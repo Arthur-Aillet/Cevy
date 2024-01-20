@@ -53,4 +53,4 @@ void World::clear_entities() {
   }
 }
 
-void World::clear_resources() { _resource_manager.clear_ressources(); }
+void World::clear_resources() { _resource_manager.clear_resources(); }

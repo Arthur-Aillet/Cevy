@@ -45,7 +45,7 @@ class ResourceManager {
   std::unordered_map<std::type_index, resource_type> _resources_map;
 
   public:
-  void clear_ressources() { _resources_map.clear(); }
+  void clear_resources() { _resources_map.clear(); }
 
   template <typename Content>
   void insert_resource(const Content &value) {
