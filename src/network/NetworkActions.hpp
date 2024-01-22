@@ -27,6 +27,7 @@
 #include "Resource.hpp"
 #include "Stage.hpp"
 #include "network/CevyNetwork.hpp"
+#include "network/Synchroniser.hpp"
 #include "network/network.hpp"
 
 /**
@@ -57,7 +58,8 @@ class cevy::NetworkActions : public ecs::Plugin {
   };
 
   /// Contructor
-  NetworkActions(CevyNetwork &net) : _net(net){};
+  // NetworkActions(CevyNetwork &net) : _net(net){};
+  NetworkActions(CevyNetwork &net, Synchroniser& sync) : _net(net), _sync(sync) {};
 
   /// deleted copy-constructor
   NetworkActions(const NetworkActions &) = delete;
@@ -131,6 +133,10 @@ class cevy::NetworkActions : public ecs::Plugin {
   protected:
   void event_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
     std::cerr << "(INFO)event_remote: treating" << id << std::endl;
+    if (id == CevyNetwork::Event::Summon) {
+      uint8_t archetype = deserialize<uint8_t>(vec);
+      _sync.get().summon(cmd, archetype);
+    }
     if (_events.find(id) != _events.end()) {
       _events.find(id)->second(cmd);
     } else if (_remote_events.find(id) != _remote_events.end()) {
@@ -166,7 +172,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   public:
 
   virtual void build(cevy::ecs::App &app) override {
-    app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { actions_system(cmd);}));
+    // app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { actions_system(cmd);}));
   }
 
   /**
@@ -569,4 +575,5 @@ class cevy::NetworkActions : public ecs::Plugin {
   std::unordered_map<uint16_t, size_t> _remote_act_arg_size;
   Mode _mode;
   cevy::CevyNetwork &_net;
+  ref<Synchroniser> _sync;
 };

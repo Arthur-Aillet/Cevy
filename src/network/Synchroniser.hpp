@@ -115,8 +115,26 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     e.insert(SyncId({id, T::value}));
     if (mode == Mode::Client)
       return;
+    std::cerr << "(INFO)summon: sending:" << T::value << std::endl;
     _net.sendSummon(id, T::value);
   }
+
+  void summon(cevy::ecs::Commands &command, uint8_t value) {
+    auto e = command.spawn_empty();
+    if (_spawnCommands.find(value) != _spawnCommands.end())
+      _spawnCommands.at(value)(e);
+    else {
+      std::cerr << "(ERROR)summon: unmapped spawn command:" << value << std::endl;
+    }
+    auto id = first_free();
+    _occupancy[id] = true;
+    e.insert(SyncId({id, value}));
+    if (mode == Mode::Client)
+      return;
+    std::cerr << "(INFO)summon: sending:" << value << std::endl;
+    _net.sendSummon(id, value);
+  }
+
 
   template <typename T, typename U>
   void summon(cevy::ecs::Commands &command, CevyNetwork::ConnectionDescriptor cd) {
@@ -136,6 +154,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
       std::cerr << "(ERROR)summon<T, U>: cast went wrong" << std::endl;
       return;
     }
+    std::cerr << "(INFO)summon<T, U>: sending:" << T::value << std::endl;
     handler->sendSummon(cd, id, T::value, U::value);
   }
 
@@ -162,16 +181,16 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
       auto x = _net.recvSummon();
       if (!x)
         break;
-      auto pair = x.value();
+      auto summmon = x.value();
       auto e = command.spawn_empty();
-      if (_spawnCommands.find(pair.second) != _spawnCommands.end()) {
-        std::cerr << "(INFO)system_summon: spawning:" << int(pair.second) << std::endl;
-        _spawnCommands.at(pair.second)(e);
+      if (_spawnCommands.find(summmon.type) != _spawnCommands.end()) {
+        std::cerr << "(INFO)system_summon: spawning:" << int(summmon.type) << "with id=" << int(summmon.id) << std::endl;
+        _spawnCommands.at(summmon.type)(e);
       } else {
-        std::cerr << "(ERROR)system_summon: unmapped spawn command:" << int(pair.second) << std::endl;
+        std::cerr << "(ERROR)system_summon: unmapped spawn command:" << int(summmon.type) << std::endl;
       }
-      e.insert(SyncId{pair.first, pair.second});
-      _occupancy[pair.first] = true;
+      e.insert(SyncId{summmon.id, summmon.type});
+      _occupancy[summmon.id] = true;
     };
     while (true) {
       auto x = _net.recvDismiss();

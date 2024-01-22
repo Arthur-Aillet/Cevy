@@ -16,11 +16,13 @@
 #include <iostream>
 #include <list>
 #include <optional>
+#include <type_traits>
 #include <unordered_map>
 #include <set>
 #include <vector>
 #include <mutex>
 
+#include "network.hpp"
 #include "App.hpp"
 #include "NetworkBase.hpp"
 #include "Plugin.hpp"
@@ -77,6 +79,11 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   class EventIterator {
 
+  };
+
+  struct Summon {
+    uint16_t id;
+    uint8_t type;
   };
 
   CevyNetwork(NetworkMode mode, size_t udp_port, size_t tcp_port, size_t client_offset)
@@ -138,11 +145,15 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   void sendEvent(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::Event), byte(id, 0), byte(id, 1)};
     fullblock.insert(fullblock.end(), block.begin(), block.end());
-    auto it = _events_send.begin();
+    auto it = _events_send.end();
     {
       const std::lock_guard<std::mutex> lock(_mx);
       it = _events_send.emplace(_events_send.begin(), std::make_pair(cd, fullblock));
     }
+    std::cout << "TCP WRITE EVENT: [";
+    for (auto& i : fullblock)
+      std::cout << " " << int(i) << ",";
+    std::cout << "]" << std::endl;
     writeTCP(cd, it->second, [this, it]() { _events_send.erase(it); });
   }
 
@@ -227,21 +238,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   virtual void sendSummon(uint16_t id, uint8_t archetype) = 0;
 
-  void sendSummon(ConnectionDescriptor cd, uint16_t id, uint8_t archetype) {
-    std::vector<uint8_t> fullblock;
-    serialize(fullblock, id);
-    serialize(fullblock, archetype);
-    sendEvent(cd, Event::Summon, fullblock);
-  }
+  void sendSummon(ConnectionDescriptor cd, uint16_t id, uint8_t type);
 
-  std::optional<std::pair<uint16_t, uint8_t>> recvSummon() {
-    auto buff = recvEvent(Event::Summon);
-    if (!buff.has_value())
-      return std::nullopt;
-    uint16_t id = deserialize<uint16_t>(buff.value());
-    uint8_t type = deserialize<uint8_t>(buff.value());
-    return std::make_pair(id, type);
-  }
+  std::optional<Summon> recvSummon();
 
   virtual void sendDismiss(uint16_t id) = 0;
 
@@ -275,7 +274,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   void handle_action(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin(), buffer.begin() + bytes);
+    vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes);
     {
       const std::lock_guard<std::mutex> lock(_mx);
       _actions_recv.push_back({cd, vec});
@@ -285,11 +284,16 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   void handle_events(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes - 1);
+    vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes);
     {
       const std::lock_guard<std::mutex> lock(_mx);
       _events_recv.push_back({cd, vec});
     }
+
+    std::cout << "TCP READ EVENT: [";
+    for (size_t i = 0; i < bytes; ++i)
+      std::cout << " " << int(buffer[i]) << ",";
+    std::cout << "]" << std::endl;
 
     std::cout << "(INFO)handle_events: from " << cd << std::endl;
   }
@@ -343,7 +347,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     }
     std::vector<uint8_t> block;
     serialize(block, idx);
-    sendEvent(Event::ClientJoin, block);
+    // sendEvent(Event::ClientJoin, block);
     std::cout << "(INFO)tcp_accept" << std::endl;
   };
 
@@ -569,3 +573,38 @@ class cevy::ClientHandler : public cevy::CevyNetwork {
     }
   }
 };
+
+template<>
+struct cevy::serialized_size<cevy::CevyNetwork::Summon> : std::integral_constant<size_t, sizeof(uint16_t) + sizeof(uint8_t)> {};
+
+template <>
+inline std::vector<uint8_t> &cevy::serialize<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec, const cevy::CevyNetwork::Summon &t) {
+  serialize(vec, t.id);
+  serialize(vec, t.type);
+  return vec;
+}
+
+template <>
+inline cevy::CevyNetwork::Summon cevy::deserialize<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec) {
+  cevy::CevyNetwork::Summon t;
+  t.id = deserialize<uint16_t>(vec);
+  t.type = deserialize<uint8_t>(vec);
+  return t;
+}
+
+inline void cevy::CevyNetwork::sendSummon(ConnectionDescriptor cd, uint16_t id, uint8_t type) {
+  std::vector<uint8_t> fullblock;
+  serialize(fullblock, Summon{id, type});
+  std::cout << "sendSummon(" << id << ", " << int(type) << ")" << std::endl;
+  sendEvent(cd, Event::Summon, fullblock);
+}
+
+inline std::optional<cevy::CevyNetwork::Summon> cevy::CevyNetwork::recvSummon() {
+  auto opt = recvEvent(Event::Summon);
+  if (!opt.has_value())
+    return std::nullopt;
+  auto& buff = opt.value();
+  Summon ret = deserialize<Summon>(buff);
+  std::cout << "recvSummon(" << ret.id << ", " << int(ret.type) << ")" << std::endl;
+  return ret;
+}

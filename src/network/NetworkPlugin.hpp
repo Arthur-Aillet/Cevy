@@ -27,13 +27,15 @@ class cevy::NetworkPlugin : public ecs::Plugin {
   //             size_t client_offset)
   //     : _net(mode, endpoint, udp_port, tcp_port, client_offset), _sync(_net), _action(_net){};
 
-  NetworkPlugin(N &&net) : _net(std::move(net)), _sync(_net), _action(_net){};
+  NetworkPlugin(N &&net) : _net(std::move(net)), _sync(_net), _action(_net, _sync){};
 
   template<typename... Args>
-  NetworkPlugin(Args... args) : _net(args...), _sync(_net), _action(_net){};
+  NetworkPlugin(Args... args) : _net(args...), _sync(_net), _action(_net, _sync){};
 
 
-  NetworkPlugin(NetworkPlugin &&rhs) : _net(std::move(rhs._net)), _sync(std::move(rhs._sync)), _action(std::move(rhs._net)) {};
+  NetworkPlugin(NetworkPlugin &&rhs) : _net(std::move(rhs._net)), _sync(std::move(rhs._sync)), _action(std::move(rhs._net)) {
+      _action._sync = _sync;
+  };
 
 
   // template<typename S, typename A>
