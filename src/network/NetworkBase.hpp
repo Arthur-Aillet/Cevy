@@ -24,6 +24,7 @@
 #include <typeinfo>
 #include <unistd.h>
 #include <vector>
+#include <list>
 
 #include "../ecs/SparseVector.hpp"
 #include "Plugin.hpp"
@@ -49,6 +50,8 @@ class cevy::NetworkBase {
     tcp::socket socket;
     udp::endpoint udp_endpoint;
     std::array<uint8_t, 512> buffer;
+    std::vector<uint8_t> _tcp_queue;
+    std::vector<uint8_t> _udp_queue;
 
     Connection(asio::io_context &socket) : socket(socket) {}
   };
@@ -139,7 +142,7 @@ class cevy::NetworkBase {
       _temp_tcp_co.udp_endpoint = asio::ip::udp::endpoint(_temp_tcp_co.socket.remote_endpoint().address(), _dest_udp_port);
 
       _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
-      tcp_accept(error, idx);
+      AcceptTCP(error, idx);
       read_one_TCP(idx);
       tcp_accept_new_connexion();
     });
@@ -168,7 +171,6 @@ class cevy::NetworkBase {
 
   protected:
   NetworkMode _mode;
-  private:
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
@@ -185,18 +187,47 @@ class cevy::NetworkBase {
   tcp::acceptor _tcp_acceptor;
   Connection _temp_tcp_co;
 
+  const std::vector<uint8_t> _tcp_init_header;
+  const std::vector<uint8_t> _udp_init_header;
+
+  std::vector<uint8_t> _tcp_queue;
+  std::vector<uint8_t> _udp_queue;
+
   std::array<uint8_t, 512> _udp_recv;
   protected:
   std::unordered_map<ConnectionDescriptor, Connection> _connections;
 
   public:
 
-  void start_thread() {
-    if (_mode == NetworkMode::Server) {
-      tcp_accept_new_connexion();
+  void send() {
+    std::vector<uint8_t> tcp_header = HeaderTCP();
+    std::vector<uint8_t> udp_header = HeaderUDP();
+    std::copy(tcp_header.begin(), tcp_header.end(), _tcp_queue.begin());
+    std::copy(udp_header.begin(), udp_header.end(), _udp_queue.begin());
+    for (auto &[cd, c] : _connections) {
+      send_to_if(c.socket, c._tcp_queue, tcp_header, true);
+      send_to_if(c.socket, _tcp_queue, tcp_header);
+      send_to_if(c.udp_endpoint, c._udp_queue, udp_header, true);
+      send_to_if(c.udp_endpoint, _udp_queue, udp_header);
+      c._tcp_queue = _tcp_init_header;
+      c._udp_queue = _udp_init_header;
     }
-    readUDP();
-    _nw_thread = std::thread([this]() { this->_io_context.run(); });
+  }
+
+  inline void send_to_if(asio::ip::tcp::socket& socket, std::vector<uint8_t>& buff, const std::vector<uint8_t>& header, bool rewrite = false) {
+    if (buff.size() >= header.size()) {
+      if (rewrite)
+        std::copy(header.begin(), header.end(), buff.begin());
+      socket.send(buff);
+    }
+  }
+
+  inline void send_to_if(asio::ip::udp::endpoint& endpoint, std::vector<uint8_t>& buff, const std::vector<uint8_t>& header, bool rewrite = false) {
+    if (buff.size() >= header.size()) {
+      if (rewrite)
+        std::copy(header.begin(), header.end(), buff.begin());
+      _udp_socket.send_to(buff, endpoint);
+    }
   }
 
   void die() {
@@ -221,7 +252,7 @@ class cevy::NetworkBase {
     _udp_socket.async_receive_from(
         asio::buffer(_udp_recv), _udp_endpoint,
         [this](asio::error_code error, size_t bytes) {
-          this->udp_receive(error, bytes, this->_udp_recv, std::find_if(_connections.begin(), _connections.end(),
+          this->ReceiveUDP(error, bytes, this->_udp_recv, std::find_if(_connections.begin(), _connections.end(),
             [this](auto &pair){return pair.second.udp_endpoint == _udp_endpoint;}
           )->first);
           readUDP();
@@ -229,33 +260,45 @@ class cevy::NetworkBase {
   }
 
   protected:
-  virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
+  virtual void ReceiveUDP(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
                            ConnectionDescriptor cd) = 0;
-  virtual void tcp_receive(asio::error_code error, size_t bytes, ConnectionDescriptor cd) = 0;
+  virtual void ReceiveTCP(asio::error_code error, size_t bytes, ConnectionDescriptor cd) = 0;
 
-  virtual void tcp_accept(asio::error_code error, size_t idx) = 0;
+  virtual void AcceptTCP(asio::error_code error, size_t idx) = 0;
+
+  virtual std::vector<uint8_t> HeaderTCP() const;
+  virtual std::vector<uint8_t> HeaderUDP() const;
 
   template <typename Function>
-  void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+  void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data) {
     if (_connections.find(cd) == _connections.end()) {
       return;
     }
-    _connections.at(cd).socket.async_send(asio::buffer(data),
-                         [this, func](asio::error_code, size_t) { func(); });
+    auto& q = _connections.at(cd)._tcp_queue;
+    q.insert(q.end(), data.begin(), data.end());
   }
 
   template <typename Function>
-  void writeUDP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+  void writeUDP(ConnectionDescriptor cd, const std::vector<uint8_t> &data) {
     if (_connections.find(cd) == _connections.end()) {
       return;
     }
-    _udp_socket.async_send_to(asio::buffer(data), _connections.at(cd).udp_endpoint,
-                              [this, func](asio::error_code error, size_t) {
-                                if (error)
-                                  std::cerr << "(ERROR)async_send:" << error << std::endl;
-                                func();
-                              });
+    auto& q = _connections.at(cd)._udp_queue;
+    q.insert(q.end(), data.begin(), data.end());
   }
+
+  template <typename Function>
+  void writeTCP(const std::vector<uint8_t> &data) {
+    auto& q = _tcp_queue;
+    q.insert(q.end(), data.begin(), data.end());
+  }
+
+  template <typename Function>
+  void writeUDP(const std::vector<uint8_t> &data) {
+    auto& q = _udp_queue;
+    q.insert(q.end(), data.begin(), data.end());
+  }
+
 
   void read_one_TCP(ConnectionDescriptor cd) {
     auto& co = _connections.at(cd);
@@ -266,7 +309,7 @@ class cevy::NetworkBase {
                                   close_dead_tcp();
                                   return;
                                 }
-                                tcp_receive(error, bytes, cd);
+                                ReceiveTCP(error, bytes, cd);
                                 read_one_TCP(cd);
                               });
   }

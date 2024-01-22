@@ -68,9 +68,13 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode()) {};
+  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode()) {
+    _occupancy.fill(false);
+  };
 
-  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
+  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {
+    _occupancy.fill(false);
+  }
 
   // Synchroniser(Mode mode, const std::string &host = std::string(""))
   //     : mode(mode), _net(host, 4995){};
