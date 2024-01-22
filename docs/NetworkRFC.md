@@ -20,9 +20,11 @@ the allowed maximum payload size is 506 bytes (to be encoded as `253` in the hea
 |    Shorthand     |   Meta Object    |         Type        |                 Composition               |
 |------------------|------------------|---------------------|-------------------------------------------|
 |      Magic       |   Magic number   |     single value    |                   4 bytes                 |
-|                  |     Paylaod      |      composite      |     *Payload header* + *Payload data*     |
-|                  |  Payload header  |     single value    |                   1 bytes                 |
-|                  |   Payload data   |      composite      |       2 * [*Payload header*] bytes        |
+|                  |     Payload      |      composite      |     *Payload header* + *Payload data*     |
+|                  |  Payload Header  |      composite      |     *Timestamp* + *Payload Size*          |
+|                  |    Timestamp     |     single value    |                   4 bytes                 |
+|                  |   Payload size   |     single value    |                   1 bytes                 |
+|                  |   Payload data   |      composite      |       2 * [*Payload Size*] bytes          |
 
 The Payload Data itself contains a concatenation of Objects;
 |    Shorthand     |   Emitter   |      Object      |         Type        |                 Composition               |

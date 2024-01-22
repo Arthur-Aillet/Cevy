@@ -19,6 +19,7 @@
 #include <type_traits>
 #include <unordered_map>
 #include <set>
+#include <utility>
 #include <vector>
 #include <mutex>
 
@@ -119,11 +120,12 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   void sendState(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
     fullblock.insert(fullblock.end(), block.begin(), block.end());
+    auto it = _states_send.end();
     {
       const std::lock_guard<std::mutex> lock(_mx);
-      _states_send[id] = fullblock;
+      it = _states_send.emplace(_states_send.begin(), fullblock);
     }
-    writeUDP(cd, _states_send[id], [this, id]() { _states_send.erase(id); });
+    writeUDP(cd, *it, [this, it]() { _states_send.erase(it); });
   }
 
   std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
@@ -346,7 +348,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   private:
   // the data part contains only pure state data
   std::unordered_map<uint16_t, std::vector<uint8_t>> _states_recv;
-  std::unordered_map<uint16_t, std::vector<uint8_t>> _states_send;
+  std::list<std::vector<uint8_t>> _states_send;
 
   using data_list = std::list<std::pair<ConnectionDescriptor, std::vector<uint8_t>>>;
 
