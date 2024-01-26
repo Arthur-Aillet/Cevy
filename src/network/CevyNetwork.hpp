@@ -126,8 +126,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       it = _states_send.emplace(_states_send.begin(), fullblock);
       _mx.unlock();
     }
-    // std::cout << "SENDING A STATE" << std::endl;
-    writeTCP(cd, *it, [this, it]() {
+    writeUDP(cd, *it, [this, it]() {
       _mx.lock(); _states_send.erase(it); _mx.unlock();
       });
   }
@@ -269,8 +268,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       const std::lock_guard<std::mutex> lock(_mx);
       _states_recv[id] = vec;
     }
-
-    std::cout << "(INFO)handle_state: from " << cd << ", is " << id << std::endl;
   }
 
   void handle_action(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
@@ -280,7 +277,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       const std::lock_guard<std::mutex> lock(_mx);
       _actions_recv.push_back({cd, vec});
     }
-    std::cout << "(INFO)handle_action: from " << cd << std::endl;
   }
 
   void handle_events(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
@@ -290,8 +286,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       const std::lock_guard<std::mutex> lock(_mx);
       _events_recv.push_back({cd, vec});
     }
-
-    std::cout << "(INFO)handle_events: from " << cd << std::endl;
   }
 
   protected:
