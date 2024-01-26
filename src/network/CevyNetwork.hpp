@@ -91,7 +91,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       : NetworkBase(mode, udp_port, tcp_port, client_offset){};
 
   CevyNetwork(CevyNetwork &&rhs) : NetworkBase(rhs){};
-  ~CevyNetwork(){};
+  ~CevyNetwork() {
+    die();
+  };
 
   void build(ecs::App&) override {
     start_thread();
