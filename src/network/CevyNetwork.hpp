@@ -135,7 +135,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
     const std::lock_guard<std::mutex> lock(_mx);
-    const auto &it = _states_recv.find(id);
+    // auto it = _states_recv.end();
+    auto it = _states_recv.find(id);
     if (it != _states_recv.end()) {
       auto ret = std::move(it->second);
       _states_recv.erase(id);
@@ -339,8 +340,13 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     }
     std::vector<uint8_t> block;
     serialize(block, idx);
-    // sendEvent(Event::ClientJoin, block);
-    std::cout << "(INFO)tcp_accept" << std::endl;
+    sendEvent(Event::ClientJoin, block);
+    block.insert(block.begin(), byte(Event::ClientJoin, 0));
+    block.insert(block.begin(), byte(Event::ClientJoin, 1));
+    _mx.lock();
+    _events_recv.push_front(std::make_pair(0, block));
+    _mx.unlock();
+    std::cout << "(INFO)tcp_accept and added event" << std::endl;
   };
 
 
@@ -451,14 +457,8 @@ class cevy::ServerHandler : public cevy::CevyNetwork {
   }
 
   void tcp_accept(asio::error_code error, ConnectionDescriptor idx) override {
-    if (error) {
-      std::cerr << "(ERROR)tcp_accept:" << error << std::endl;
-    }
     _clients.insert(idx);
-    std::vector<uint8_t> block;
-    serialize(block, idx);
-    sendEvent(Event::ClientJoin, block);
-    std::cout << "(INFO)tcp_accept" << std::endl;
+    CevyNetwork::tcp_accept(error, idx);
   };
 
 

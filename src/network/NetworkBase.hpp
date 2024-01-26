@@ -104,7 +104,7 @@ class cevy::NetworkBase {
   template<typename F>
   void client_connect(asio::ip::address dest, F callback) {
     std::cout << "async tcp connect" << std::endl;
-    ConnectionDescriptor idx = connection_count;
+    ConnectionDescriptor idx = ++connection_count;
     _connections.emplace(idx, _io_context);
     _connections.at(idx)
         .socket.async_connect(

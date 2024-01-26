@@ -117,6 +117,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     auto id = first_free();
     _occupancy[id] = true;
     e.insert(SyncId({id, T::value}));
+    command.apply();
     if (mode == Mode::Client)
       return;
     std::cerr << "(INFO)summon: sending:" << T::value << std::endl;
@@ -133,6 +134,8 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     auto id = first_free();
     _occupancy[id] = true;
     e.insert(SyncId({id, value}));
+    command.apply();
+
     if (mode == Mode::Client)
       return;
     std::cerr << "(INFO)summon: sending:" << value << std::endl;
@@ -150,7 +153,9 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     }
     auto id = first_free();
     _occupancy[id] = true;
-    e.insert(SyncId({id, U::value}));
+    e.insert(SyncId({id, T::value}));
+    command.apply();
+
     if (mode != Mode::Server)
       return;
     auto* handler = dynamic_cast<ServerHandler*>(&_net);
@@ -175,6 +180,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
           }
         };
     command.system(deletor);
+    command.apply();
     _occupancy[target] = false;
     _net.sendDismiss(target);
   }

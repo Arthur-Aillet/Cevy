@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include "Diffuse.hpp"
+#include "Handle.hpp"
+#include "Mesh.hpp"
+#include "assets.hpp"
 #include "AssetManager.hpp"
 
 namespace cevy::engine {
-template <typename Type>
-class Asset {};
-
 template <>
 class Asset<Diffuse> {
   using Type = Diffuse;
@@ -23,8 +24,10 @@ class Asset<Diffuse> {
   Asset<Diffuse>(AssetManager &ref) : _ref(ref){};
 
   Handle<Diffuse> load(const std::string &path) {
-    _ref._diffuses.push_back(Diffuse(LoadTexture(path.c_str())));
-    return Handle<Diffuse>(_ref._diffuses[_ref._diffuses.size() - 1]);
+    auto find = _ref._diffuses.find(path);
+    if (find != _ref._diffuses.end())
+      return Handle<Diffuse>(find);
+    return Handle<Diffuse>(_ref._diffuses.emplace(path, Diffuse(LoadTexture(path.c_str()))).first);
   }
 };
 
@@ -38,8 +41,10 @@ class Asset<cevy::engine::Mesh> {
   Asset<Mesh>(AssetManager &ref) : _ref(ref){};
 
   Handle<Mesh> load(const std::string &path) {
-    _ref._meshs.push_back(Mesh(LoadModel(path.c_str())));
-    return Handle<Mesh>(_ref._meshs[_ref._meshs.size() - 1]);
+    auto find = _ref._meshs.find(path);
+    if (find != _ref._meshs.end())
+      return Handle<Mesh>(find);
+    return Handle<Mesh>(_ref._meshs.emplace(path, Mesh(LoadModel(path.c_str()))).first);
   }
 };
 

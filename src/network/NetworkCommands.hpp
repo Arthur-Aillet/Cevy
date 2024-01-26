@@ -11,6 +11,7 @@
 #include "Synchroniser.hpp"
 #include "ecs.hpp"
 #include "network.hpp"
+#include "network/NetworkBase.hpp"
 #include <type_traits>
 
 /**
@@ -75,7 +76,8 @@ class cevy::NetworkCommands : protected ecs::Commands {
    */
   template <typename E>
   void event() {
-    _actions.event<E>(*this);
+    // if (_net.mode() == NetworkBase::Server)
+      _actions.event<E>(*this);
   };
 
   /**
@@ -94,20 +96,26 @@ class cevy::NetworkCommands : protected ecs::Commands {
    */
   template <typename E>
   void event_with(typename E::Arg given) {
-    _actions.event_with<E>(*this, given);
+    if (_net.mode() == CevyNetwork::NetworkMode::Server)
+      _actions.event_with<E>(*this, given);
   };
 
   template <typename T>
   void summon() {
-    _sync.summon<T>(*this);
+    if (_net.mode() == CevyNetwork::NetworkMode::Server)
+      _sync.summon<T>(*this);
   };
 
   template <typename T, typename U>
   void summon(CevyNetwork::ConnectionDescriptor cd) {
-    _sync.summon<T, U>(*this, cd);
+    if (_net.mode() == CevyNetwork::NetworkMode::Server)
+      _sync.summon<T, U>(*this, cd);
   };
 
-  void dismiss(Synchroniser::SyncId id) { _sync.dismiss(*this, id); }
+  void dismiss(Synchroniser::SyncId id) {
+    if (_net.mode() == CevyNetwork::NetworkMode::Server)
+      _sync.dismiss(*this, id);
+  }
 
   void connect(const std::string& str) {
     auto* handler = dynamic_cast<ClientHandler*>(&_net);

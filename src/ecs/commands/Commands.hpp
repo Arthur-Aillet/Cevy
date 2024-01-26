@@ -29,7 +29,7 @@ class cevy::ecs::Commands {
   Commands(cevy::ecs::World &world_access) : _world_access(world_access){};
 
   public:
-  ~Commands() { merge_queues(_world_access._command_queue, _command_queue);};
+  ~Commands() { apply(); };
   template <typename GivenCommand,
             typename std::enable_if_t<std::is_base_of_v<Command, GivenCommand>, bool> = true>
   void add(const GivenCommand &a) {
@@ -44,6 +44,10 @@ class cevy::ecs::Commands {
       to.push(from.front());
       from.pop();
     }
+  }
+
+  void apply() {
+    merge_queues(_world_access._command_queue, _command_queue);
   }
 
   void merge(Commands& other) {

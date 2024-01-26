@@ -106,7 +106,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   using ClientJoin = Event<CevyNetwork::Event::ClientJoin, CevyNetwork::ConnectionDescriptor>;
 
 
-  void actions_system(ecs::Commands cmd) {
+  void activity_system(ecs::Commands cmd) {
     while (true) {
       auto event = _net.recvEvent();
       if (!event)
@@ -172,7 +172,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   public:
 
   virtual void build(cevy::ecs::App &app) override {
-    // app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { actions_system(cmd);}));
+    app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { activity_system(cmd);}));
   }
 
   /**
@@ -401,6 +401,7 @@ class cevy::NetworkActions : public ecs::Plugin {
           std::get<2>(_actions.at(A::value))(cmd);
         _net.sendAction(A::value, std::vector<uint8_t>());
       }
+      cmd.apply();
     } catch (std::out_of_range& e) {
       std::stringstream ss;
       ss << "no spawnable at " << A::value;
@@ -463,6 +464,7 @@ class cevy::NetworkActions : public ecs::Plugin {
         throw std::exception();
       _net.sendAction(A::value, vec);
     }
+    cmd.apply();
     } catch (std::out_of_range& e) {
       std::stringstream ss;
       ss << "no spawnable at " << A::value;
@@ -482,6 +484,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   void event(ecs::Commands &cmd) {
     try {
     _events.at(E::value)(cmd);
+    cmd.apply();
     std::vector<uint8_t> vec(E::serialized_size, 0);
     _net.sendEvent(E::value, vec);
     } catch (std::out_of_range& e) {
@@ -512,6 +515,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     const auto &func = std::any_cast<super_system_success<typename E::Arg>&>(
         _super_events.at(E::value));
     func(cmd, given);
+    cmd.apply();
     std::vector<uint8_t> vec;
     serialize(vec, given);
     if (vec.size() != serialized_size<typename E::Arg>::value)

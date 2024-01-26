@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+
+#include "assets.hpp"
 #include "App.hpp"
 #include "Diffuse.hpp"
 #include "Engine.hpp"
@@ -15,16 +19,14 @@
 #include "Plugin.hpp"
 #include "ecs.hpp"
 
-#include <vector>
-
 void init_asset_manager(cevy::ecs::World &w);
 
 namespace cevy::engine {
 class AssetManager {
   public:
   // using map = std::unordered_map<std::type_index, std::any>;
-  std::vector<cevy::engine::Mesh> _meshs;
-  std::vector<Diffuse> _diffuses;
+  std::unordered_map<std::string, cevy::engine::Mesh> _meshs;
+  std::unordered_map<std::string, Diffuse> _diffuses;
 };
 
 class AssetManagerPlugin : public ecs::Plugin {

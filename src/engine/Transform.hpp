@@ -19,8 +19,8 @@ namespace cevy {
 namespace engine {
 class Transform {
   public:
-  Quaternion rotation;
   Vector position;
+  Quaternion rotation;
   Vector scale;
 
   Transform() : rotation(QuaternionIdentity()), position(0, 0, 0), scale(1, 1, 1) {}
@@ -30,6 +30,7 @@ class Transform {
   Transform(const Quaternion &quat) : rotation(quat), position(0, 0, 0), scale(1, 1, 1) {}
 
   std::tuple<Vector, Quaternion, Vector> get() const {
+    return {position, rotation, scale};
     if (!cache_valid()) {
       if (_parent) {
         auto [p_vec, p_rot, p_scale] = _parent->get();
