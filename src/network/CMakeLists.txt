@@ -8,6 +8,8 @@
 add_library(network
   STATIC
   NetworkPlugin.cpp
+  NetworkBase.cpp
+  CevyNetwork.cpp
   # network.cpp
 )
 

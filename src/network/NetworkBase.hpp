@@ -66,7 +66,8 @@ class cevy::NetworkBase {
         _dest_tcp_port(std::move(rhs._dest_tcp_port)),
         _dest_udp_port(std::move(rhs._dest_udp_port)),
 
-        _udp_endpoint(std::move(rhs._udp_endpoint)), _tcp_endpoint(std::move(rhs._tcp_endpoint)),
+        // _udp_endpoint(std::move(rhs._udp_endpoint)),
+        _tcp_endpoint(std::move(rhs._tcp_endpoint)),
 
         _udp_socket(std::move(rhs._udp_socket)), _tcp_socket(std::move(rhs._tcp_socket)),
         _tcp_acceptor(std::move(rhs._tcp_acceptor)), _temp_tcp_co(std::move(rhs._temp_tcp_co)),
@@ -98,19 +99,7 @@ class cevy::NetworkBase {
     } b;
   };
 
-  void client_connect(asio::ip::address dest) {
-    std::cout << "async tcp connect" << std::endl;
-    ConnectionDescriptor idx = connection_count;
-    _connections.emplace(idx, _io_context);
-    _connections.at(idx)
-        .socket.async_connect(
-            tcp::endpoint(dest, _dest_tcp_port),
-            [this, idx](asio::error_code error) {
-              std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
-              read_one_TCP(idx);
-            });
-    std::cout << "set async connect" << std::endl;
-  }
+  void client_connect(asio::ip::address dest);
 
   template<typename F>
   void client_connect(asio::ip::address dest, F callback) {
@@ -130,46 +119,11 @@ class cevy::NetworkBase {
     std::cout << "set async connect" << std::endl;
   }
 
-  void tcp_accept_new_connexion() {
-    _temp_tcp_co = Connection(_io_context);
-    ConnectionDescriptor idx = connection_count;
+  void tcp_accept_new_connexion();
 
-    _tcp_acceptor.async_accept(_temp_tcp_co.socket, [this, idx](asio::error_code error) {
-      if (error) {
-        std::cerr << "(ERROR)async_accept:" << error << std::endl;
-        return;
-      }
-      std::cout << "new tcp connexion accepted to the server" << std::endl;
-      std::cout << "address:" << _temp_tcp_co.socket.remote_endpoint().address().to_string() << ", port: " << _dest_udp_port << std::endl;
-      _temp_tcp_co.udp_endpoint = asio::ip::udp::endpoint(_temp_tcp_co.socket.remote_endpoint().address(), _dest_udp_port);
+  void close_all_tcp();
 
-      _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
-      tcp_accept(error, idx);
-      read_one_TCP(idx);
-      tcp_accept_new_connexion();
-    });
-    std::cout << "log apres" << std::endl;
-  }
-
-  void close_all_tcp() {
-    std::cout << "closing tcp connexions" << std::endl;
-    for (auto& [idx, co] : _connections) {
-      co.socket.close();
-    }
-    _connections.clear();
-  }
-
-  void close_dead_tcp() {
-    std::cout << "closing dead tcp connexions" << std::endl;
-    std::vector<std::unordered_map<ConnectionDescriptor, Connection>::iterator> to_erase;
-    for (auto it = _connections.begin(); it != _connections.end(); ++it) {
-      if (!it->second.socket.is_open())
-        to_erase.push_back(it);
-    }
-    for (auto erase : to_erase) {
-      _connections.erase(erase);
-    }
-  }
+  void close_dead_tcp();
 
   protected:
   NetworkMode _mode;
@@ -198,13 +152,7 @@ class cevy::NetworkBase {
 
   public:
 
-  void start_thread() {
-    if (_mode == NetworkMode::Server) {
-      tcp_accept_new_connexion();
-    }
-    readUDP();
-    _nw_thread = std::thread([this]() { this->_io_context.run(); });
-  }
+  void start_thread();
 
   void die() {
     quit = true;
@@ -220,22 +168,19 @@ class cevy::NetworkBase {
         _dest_udp_port(udp_port + (client_offset * (mode == NetworkMode::Server))),
         _udp_endpoint(asio::ip::udp::v4(), _udp_port),
         _tcp_endpoint(asio::ip::tcp::v4(), _tcp_port),
-        _udp_socket(_io_context), _tcp_socket(_io_context),
-        _tcp_acceptor(_io_context, _tcp_endpoint), _temp_tcp_co(_io_context) {
-    _udp_socket.open(asio::ip::udp::v4());
-    _tcp_socket.open(asio::ip::tcp::v4());
+        _udp_socket(_io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), _udp_port)),
+        _tcp_socket(_io_context),
+        _tcp_acceptor(_io_context), _temp_tcp_co(_io_context) {
+    if (_mode == NetworkMode::Server) {
+      _tcp_acceptor = asio::ip::tcp::acceptor(_io_context, _tcp_endpoint);
+    } else {
+      _tcp_socket = asio::ip::tcp::socket(_io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), _tcp_port));
+    }
+    // _udp_socket.open(asio::ip::udp::v4());
+    // _tcp_socket.open(asio::ip::tcp::v4());
   }
 
-  void readUDP() {
-    _udp_socket.async_receive_from(
-        asio::buffer(_udp_recv), _udp_endpoint,
-        [this](asio::error_code error, size_t bytes) { std::cout << "UDP_GET" << std::endl;
-          this->udp_receive(error, bytes, _udp_recv, std::find_if(_connections.begin(), _connections.end(),
-            [this](auto &pair){return pair.second.udp_endpoint == _udp_endpoint;}
-          )->first);
-          readUDP();
-        });
-  }
+  void readUDP();
 
   protected:
   virtual void udp_receive(asio::error_code error, size_t bytes, std::array<uint8_t, 512> &buffer,
@@ -270,19 +215,7 @@ class cevy::NetworkBase {
                               });
   }
 
-  void read_one_TCP(ConnectionDescriptor cd) {
-    auto& co = _connections.at(cd);
-    co.socket.async_read_some(asio::buffer(co.buffer),
-                              [this, &co, cd](asio::error_code error, size_t bytes) {
-                                if (error.value() == 2) { // end of co
-                                  co.socket.close();
-                                  close_dead_tcp();
-                                  return;
-                                }
-                                tcp_receive(error, bytes, cd);
-                                read_one_TCP(cd);
-                              });
-  }
+  void read_one_TCP(ConnectionDescriptor cd);
 
   // void read_all_TCP() {
   //   for (auto &cd : _connections) {
