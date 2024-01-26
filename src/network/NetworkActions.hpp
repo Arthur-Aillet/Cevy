@@ -57,6 +57,8 @@ class cevy::NetworkActions : public ecs::Plugin {
     std::string _msg;
   };
 
+  using Actor = CevyNetwork::ConnectionDescriptor;
+
   /// Contructor
   // NetworkActions(CevyNetwork &net) : _net(net){};
   NetworkActions(CevyNetwork &net, Synchroniser& sync) : _net(net), _sync(sync) {};
@@ -103,7 +105,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     using Arg = Data;
   };
 
-  using ClientJoin = Event<CevyNetwork::Event::ClientJoin, CevyNetwork::ConnectionDescriptor>;
+  using ClientJoin = Event<CevyNetwork::Event::ClientJoin, Actor>;
 
 
   void activity_system(ecs::Commands cmd) {
@@ -112,16 +114,16 @@ class cevy::NetworkActions : public ecs::Plugin {
       if (!event)
         break;
       auto& [id, vec] = event.value();
-      vec.resize(_remote_event_arg_size[id]);
+      vec.resize(std::max(vec.size(), _remote_event_arg_size[id]));
       event_remote(cmd, id, vec);
     }
     while (true) {
       auto action = _net.recvAction();
       if (!action)
         break;
-      auto& [state, id, vec] = action.value();
+      auto& [actor, state, id, vec] = action.value();
       EActionFailureMode fail = EActionFailureMode(state);
-      vec.resize(_remote_act_arg_size[id]);
+      vec.resize(std::max(vec.size(), _remote_act_arg_size[id]));
       if (fail == EActionFailureMode::Action_Success) {
         actionSuccess_remote(cmd, id, vec);
       } else {
@@ -187,10 +189,12 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param client_fail system triggered on action failure
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
-  void add_action(EActionFailureMode (&&server)(Arg0...), bool (&&client_success)(Arg1...),
-                  bool (&&client_fail)(EActionFailureMode, Arg2...)) {
+  void add_action(
+      EActionFailureMode (&&server)(Actor, Arg0...),
+      bool (&&client_success)(Arg1...),
+      bool (&&client_fail)(EActionFailureMode, Arg2...)) {
     _actions[A::value] = std::make_tuple(
-        server_system([server](ecs::Commands &cmd) { return cmd.system(server); }),
+        server_system([server](ecs::Commands &cmd, Actor actor) { return cmd.system_with(server, actor); }),
         system_success([client_success](ecs::Commands &cmd) { return cmd.system(client_success); }),
         system_fail([client_fail](ecs::Commands &cmd, EActionFailureMode fail) { return cmd.system_with(client_fail, fail); }));
   };
@@ -208,11 +212,11 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action(
-      std::function<EActionFailureMode(Arg0...)> server = server_default,
+      std::function<EActionFailureMode(Actor, Arg0...)> server = server_default,
       std::function<bool(Arg1...)> client_success = success_default,
       std::function<bool(EActionFailureMode, Arg2...)> client_fail = failure_default) {
     _actions[A::value] = std::make_tuple(
-        server_system([server](ecs::Commands &cmd) { return cmd.system(server); }),
+        server_system([server](ecs::Commands &cmd, Actor actor) { return cmd.system_with(server, actor); }),
         system_success([client_success](ecs::Commands &cmd) { return cmd.system(client_success); }),
         system_fail([client_fail](ecs::Commands &cmd, EActionFailureMode fail) { return cmd.system_with(client_fail, fail); }));
   }
@@ -236,15 +240,15 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action_with(
-      std::function<EActionFailureMode(typename A::Arg, Arg0...)> server,
+      std::function<EActionFailureMode(Actor, typename A::Arg, Arg0...)> server,
       std::function<bool(typename A::Arg, Arg1...)> client_success,
       std::function<bool(Arg2...)> client_fail) {
 
     static_assert(std::is_same<typename head<Arg2...>::value_type, EActionFailureMode>::value, "first arg of fail function must be `EActionFailure`");
     // static_assert(std::is_same<Arg2...[0], EActionFailureMode>::value, "");
     // , typename A::Arg, , );
-    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, typename A::Arg given) {
-      return cmd.system_with(server, given);
+    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, Actor actor, typename A::Arg given) {
+      return cmd.system_with_tuple(server, std::make_tuple(actor, given));
     };
     super_system_success<typename A::Arg> success_lambda = [client_success](ecs::Commands &cmd, typename A::Arg given) {
       return cmd.system_with(client_success, given);
@@ -260,10 +264,11 @@ class cevy::NetworkActions : public ecs::Plugin {
     );
 
     _remote_actions[A::value] = std::make_tuple(
-      [server_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, std::move(arg));},
+      [server_lambda](ecs::Commands &cmd, Actor actor, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, actor, std::move(arg));},
       [success_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return success_lambda(cmd, std::move(arg));},
       [fail_lambda](ecs::Commands &cmd, EActionFailureMode fail, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return fail_lambda(cmd, std::make_pair(fail, std::move(arg)));}
     );
+    _remote_act_arg_size[A::value] = A::serialized_size;
   }
 
   /**
@@ -280,11 +285,11 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename A, typename... Arg0, typename... Arg1, typename... Arg2>
   void add_action_with(
-      EActionFailureMode (&&server)(typename A::Arg, Arg0...),
+      EActionFailureMode (&&server)(Actor actor, typename A::Arg, Arg0...),
       bool (&&client_success)(typename A::Arg, Arg1...) = []() {},
       bool (&&client_fail)(EActionFailureMode, typename A::Arg, Arg2...) = []() {}) {
-    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, typename A::Arg given) {
-      return cmd.system_with(server, given);
+    super_server_system<typename A::Arg> server_lambda = [server](ecs::Commands &cmd, Actor actor, typename A::Arg given) {
+      return cmd.system_with_tuple(server, std::make_tuple(actor, given));
     };
     super_system_success<typename A::Arg> success_lambda = [client_success](ecs::Commands &cmd, typename A::Arg given) {
       return cmd.system_with(client_success, given);
@@ -301,10 +306,12 @@ class cevy::NetworkActions : public ecs::Plugin {
     );
 
     _remote_actions[A::value] = std::make_tuple(
-      [server_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, std::move(arg));},
+      [server_lambda](ecs::Commands &cmd, Actor actor, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return server_lambda(cmd, actor, std::move(arg));},
       [success_lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return success_lambda(cmd, std::move(arg));},
       [fail_lambda](ecs::Commands &cmd, EActionFailureMode fail, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return fail_lambda(cmd, std::make_pair(fail, std::move(arg)));}
     );
+
+    _remote_act_arg_size[A::value] = A::serialized_size;
   }
 
   /**
@@ -347,7 +354,9 @@ class cevy::NetworkActions : public ecs::Plugin {
       std::make_any<super_system_success<typename E::Arg>>(lambda);
 
     _remote_events[E::value] = [lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename E::Arg arg = deserialize<typename E::Arg>(vec); return lambda(cmd, arg); };
+    _remote_event_arg_size[E::value] = E::serialized_size;
   };
+
 
   /**
    * @brief add an event with an std::function, taking an extra parameter
@@ -366,6 +375,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       std::make_any<super_system_success<typename E::Arg>>(lambda);
 
     _remote_events[E::value] = [lambda](ecs::Commands &cmd, std::vector<uint8_t> &vec){ typename E::Arg arg = deserialize<typename E::Arg>(vec); return lambda(cmd, arg); };
+    _remote_event_arg_size[E::value] = E::serialized_size;
   };
 
   /**
@@ -381,25 +391,25 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param cmd a reference to Commands
    */
   template <typename A>
-  void action(ecs::Commands &cmd, CevyNetwork::ConnectionDescriptor cd = -1) {
+  void action(ecs::Commands &cmd, Actor actor = -1) {
     try {
     if (_mode == Mode::Server) {
-        EActionFailureMode ret = std::get<0>(_actions.at(A::value))(cmd);
-        if (cd == -1)
+        EActionFailureMode ret = std::get<0>(_actions.at(A::value, actor))(cmd, actor);
+        if (actor == -1)
           return;
         if (ret == ActionFailureMode::Action_Success) {
           if (A::presume != Presume::success)
-            _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
+            _net.sendActionSuccess(actor, A::value, std::vector<uint8_t>(serialized_size<typename A::Arg>::value));
         } else {
           if (A::presume != Presume::fail)
-            _net.sendActionFailure(cd, A::value, ret);
+            _net.sendActionFailure(actor, A::value, ret, std::vector<uint8_t>(serialized_size<typename A::Arg>::value));
         }
       } else {
         if (A::presume == Presume::success)
           std::get<1>(_actions.at(A::value))(cmd);
         else if (A::presume == Presume::fail)
           std::get<2>(_actions.at(A::value))(cmd);
-        _net.sendAction(A::value, std::vector<uint8_t>());
+        _net.sendAction(A::value, std::vector<uint8_t>(2 + serialized_size<typename A::Arg>::value));
       }
       cmd.apply();
     } catch (std::out_of_range& e) {
@@ -421,7 +431,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * the action is responded to with a failure or success
    *
    * the argument will be send, so it must be defined for
-   * \link cevy::serialize serialize \endlink
+   * \link cevy::serialize_impl serialize \endlink
    *
    * @tparam A Action to call
    * @tparam A::Arg Argument required
@@ -429,24 +439,25 @@ class cevy::NetworkActions : public ecs::Plugin {
    * @param given argument to give
    */
   template <typename A>
-  void action_with(ecs::Commands &cmd, typename A::Arg given, CevyNetwork::ConnectionDescriptor cd = -1) {
+  void action_with(ecs::Commands &cmd, typename A::Arg given, Actor actor = -1) {
     try {
-    auto &server = std::get<0>(_super_actions.at(A::value ));
-    auto &client_success = std::get<1>(_super_actions.at(A::value ));
-    auto &client_fail = std::get<2>(_super_actions.at(A::value ));
+    auto &server = std::get<0>(_super_actions.at(A::value, actor));
+    auto &client_success = std::get<1>(_super_actions.at(A::value));
+    auto &client_fail = std::get<2>(_super_actions.at(A::value));
     if (_mode == Mode::Server) {
       const auto &func =
           std::any_cast<super_server_system<typename A::Arg>&>(
               server);
-      EActionFailureMode ret = func(cmd, given);
-      if (cd == -1)
+      EActionFailureMode ret = func(cmd, actor, given);
+      if (actor == -1)
         return;
+      std::vector<uint8_t> block;
       if (ret == ActionFailureMode::Action_Success) {
         if (A::Presume != Presume::success)
-          _net.sendActionSuccess(cd, A::value, std::vector<uint8_t>({0}));
+          _net.sendActionSuccess(actor, A::value);
       } else {
         if (A::Presume != Presume::fail)
-          _net.sendActionFailure(cd, A::value, ret);
+          _net.sendActionFailure(actor, A::value, ret);
       }
     } else {
       if (A::presume == Presume::success) {
@@ -483,9 +494,10 @@ class cevy::NetworkActions : public ecs::Plugin {
   template <typename E>
   void event(ecs::Commands &cmd) {
     try {
-    _events.at(E::value)(cmd);
+    _events.at(E::value)(cmd, 0);
     cmd.apply();
-    std::vector<uint8_t> vec(E::serialized_size, 0);
+    std::vector<uint8_t> vec;
+    vec.resize(E::serialized_size);
     _net.sendEvent(E::value, vec);
     } catch (std::out_of_range& e) {
       std::stringstream ss;
@@ -502,7 +514,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    * Event will be sent, and the system will be run on the server and all clients
    *
    * the argument will be send, so it must be defined for
-   * \link cevy::serialize serialize \endlink
+   * \link cevy::serialize_impl serialize \endlink
    *
    * @tparam E Event to send
    * @tparam E::Arg Argument required
@@ -518,8 +530,6 @@ class cevy::NetworkActions : public ecs::Plugin {
     cmd.apply();
     std::vector<uint8_t> vec;
     serialize(vec, given);
-    if (vec.size() != serialized_size<typename E::Arg>::value)
-      throw std::exception();
     _net.sendEvent(E::value, vec);
     } catch (std::out_of_range& e) {
       std::stringstream ss;
@@ -554,18 +564,18 @@ class cevy::NetworkActions : public ecs::Plugin {
   inline static std::function<failure_function<>> failure_default = [](auto, auto){ return true; };
 
   protected:
-  using server_system = std::function<EActionFailureMode(ecs::Commands &)>;
+  using server_system = std::function<EActionFailureMode(ecs::Commands &, size_t actor)>;
   using system_success = std::function<bool(ecs::Commands &)>;
   using system_fail = std::function<bool(ecs::Commands &, EActionFailureMode)>;
 
   template<typename Arg>
-  using super_server_system = std::function<EActionFailureMode(ecs::Commands &, Arg)>;
+  using super_server_system = std::function<EActionFailureMode(ecs::Commands &, size_t actor, Arg)>;
   template<typename Arg>
   using super_system_success = std::function<bool(ecs::Commands &, Arg)>;
   template<typename Arg>
   using super_system_fail = std::function<bool(ecs::Commands &, std::tuple<EActionFailureMode, Arg>)>;
 
-  using remote_server_system = std::function<EActionFailureMode(ecs::Commands &, std::vector<uint8_t>&)>;
+  using remote_server_system = std::function<EActionFailureMode(ecs::Commands &, size_t actor, std::vector<uint8_t>&)>;
   using remote_system_sucess = std::function<bool(ecs::Commands &, std::vector<uint8_t>&)>;
   using remote_system_fail = std::function<bool(ecs::Commands &, EActionFailureMode, std::vector<uint8_t>&)>;
 

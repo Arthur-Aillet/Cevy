@@ -36,7 +36,7 @@ struct cevy::serialized_size<cevy::engine::PhysicsProps>
     : public std::integral_constant<size_t, serialized_size<float>::value * 2> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::PhysicsProps>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::engine::PhysicsProps>(std::vector<uint8_t> &vec,
                                                                    const cevy::engine::PhysicsProps &t) {
   serialize(vec, t.mass);
   serialize(vec, t.decay);
@@ -44,7 +44,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::PhysicsProps>(std::ve
 }
 
 template <>
-inline cevy::engine::PhysicsProps cevy::deserialize<cevy::engine::PhysicsProps>(std::vector<uint8_t> &vec) {
+inline cevy::engine::PhysicsProps cevy::deserialize_impl<cevy::engine::PhysicsProps>(std::vector<uint8_t> &vec) {
   cevy::engine::PhysicsProps t;
   t.mass = deserialize<float>(vec);
   t.decay = deserialize<float>(vec);

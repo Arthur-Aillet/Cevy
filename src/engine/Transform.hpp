@@ -23,11 +23,11 @@ class Transform {
   Quaternion rotation;
   Vector scale;
 
-  Transform() : rotation(QuaternionIdentity()), position(0, 0, 0), scale(1, 1, 1) {}
+  Transform() :  position(0, 0, 0), rotation(QuaternionIdentity()), scale(1, 1, 1) {}
   Transform(float x, float y, float z)
-      : rotation(QuaternionIdentity()), position(x, y, z), scale(1, 1, 1) {}
-  Transform(const Vector &vec) : rotation(QuaternionIdentity()), position(vec), scale(1, 1, 1) {}
-  Transform(const Quaternion &quat) : rotation(quat), position(0, 0, 0), scale(1, 1, 1) {}
+      :  position(x, y, z), rotation(QuaternionIdentity()), scale(1, 1, 1) {}
+  Transform(const Vector &vec) :  position(vec), rotation(QuaternionIdentity()), scale(1, 1, 1) {}
+  Transform(const Quaternion &quat) : position(0, 0, 0), rotation(quat), scale(1, 1, 1) {}
 
   std::tuple<Vector, Quaternion, Vector> get() const {
     return {position, rotation, scale};
@@ -338,7 +338,7 @@ struct cevy::serialized_size<Quaternion>
     : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<Quaternion>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<Quaternion>(std::vector<uint8_t> &vec,
                                                                    const Quaternion &t) {
   serialize(vec, t.x);
   serialize(vec, t.y);
@@ -348,7 +348,7 @@ inline std::vector<uint8_t> &cevy::serialize<Quaternion>(std::vector<uint8_t> &v
 }
 
 template <>
-inline Quaternion cevy::deserialize<Quaternion>(std::vector<uint8_t> &vec) {
+inline Quaternion cevy::deserialize_impl<Quaternion>(std::vector<uint8_t> &vec) {
   Quaternion t;
   t.x = deserialize<float>(vec);
   t.y = deserialize<float>(vec);
@@ -362,7 +362,7 @@ struct cevy::serialized_size<cevy::engine::Transform>
     : public std::integral_constant<size_t, serialized_size<engine::Vector>::value + serialized_size<engine::Vector>::value + serialized_size<Quaternion>::value> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Transform>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::engine::Transform>(std::vector<uint8_t> &vec,
                                                                    const cevy::engine::Transform &t) {
   serialize(vec, t.position);
   serialize(vec, t.rotation);
@@ -371,7 +371,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Transform>(std::vecto
 }
 
 template <>
-inline cevy::engine::Transform cevy::deserialize<cevy::engine::Transform>(std::vector<uint8_t> &vec) {
+inline cevy::engine::Transform cevy::deserialize_impl<cevy::engine::Transform>(std::vector<uint8_t> &vec) {
   cevy::engine::Transform t;
   t.position = deserialize<engine::Vector>(vec);
   t.rotation = deserialize<Quaternion>(vec);

@@ -49,6 +49,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   struct SyncId {
     size_t id = unset;
     size_t type = 0;
+    size_t owner;
     inline static const size_t unset = -1;
   };
   template <typename Block, typename... Component>
@@ -153,7 +154,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     }
     auto id = first_free();
     _occupancy[id] = true;
-    e.insert(SyncId({id, T::value}));
+    e.insert(SyncId({id, T::value, cd}));
     command.apply();
 
     if (mode != Mode::Server)
@@ -199,7 +200,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
       } else {
         std::cerr << "(ERROR)system_summon: unmapped spawn command:" << int(summmon.type) << std::endl;
       }
-      e.insert(SyncId{summmon.id, summmon.type});
+      e.insert(SyncId{summmon.id, summmon.type, 0});
       _occupancy[summmon.id] = true;
     };
     while (true) {

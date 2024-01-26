@@ -45,6 +45,9 @@ struct is_world<const cevy::ecs::World &> : public std::true_type {};
 template <typename... T>
 struct Or : std::integral_constant<bool, any<T...>()> {};
 
+template <typename T, typename... Ts>
+struct is_in : std::integral_constant<bool, Or<std::is_same<T, Ts>...>::value> {};
+
 namespace cevy::ecs {
 class Commands;
 } // namespace cevy::ecs
@@ -440,7 +443,7 @@ class cevy::ecs::World {
   R run_system_with_tuple(std::function<R(Args...)> func, std::tuple<GivenArgs...> given) {
     static_assert(
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
-               is_event_reader<Args>, is_event_writer<Args>, Or<std::is_same<Args, GivenArgs>>...>()...),
+               is_event_reader<Args>, is_event_writer<Args>, Or<is_in<Args, GivenArgs...>>>()...),
         "type must be reference to query, world, commands, event reader, event writer or resource");
     auto sys = [func, this, given]() mutable -> R { return func(get_uber<Args>(given, 0)...); };
     return sys();

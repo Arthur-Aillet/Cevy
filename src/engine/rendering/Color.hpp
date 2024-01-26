@@ -29,7 +29,7 @@ struct cevy::serialized_size<cevy::engine::Color>
     : public std::integral_constant<size_t, serialized_size<float>::value * 4> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Color>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::engine::Color>(std::vector<uint8_t> &vec,
                                                                    const cevy::engine::Color &t) {
   serialize(vec, t.r);
   serialize(vec, t.g);
@@ -39,7 +39,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Color>(std::vector<ui
 }
 
 template <>
-inline cevy::engine::Color cevy::deserialize<cevy::engine::Color>(std::vector<uint8_t> &vec) {
+inline cevy::engine::Color cevy::deserialize_impl<cevy::engine::Color>(std::vector<uint8_t> &vec) {
   cevy::engine::Color t{0, 0, 0, 0};
   t.r = deserialize<float>(vec);
   t.g = deserialize<float>(vec);

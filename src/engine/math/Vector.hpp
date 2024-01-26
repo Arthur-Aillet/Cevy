@@ -128,7 +128,7 @@ struct cevy::serialized_size<cevy::engine::Vector>
     : public std::integral_constant<size_t, 3 * serialized_size<float>::value> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::engine::Vector>(std::vector<uint8_t> &vec,
                                                                    const engine::Vector &t) {
   serialize(vec, t.x);
   serialize(vec, t.y);
@@ -137,7 +137,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<u
 }
 
 template <>
-inline cevy::engine::Vector cevy::deserialize<cevy::engine::Vector>(std::vector<uint8_t> &vec) {
+inline cevy::engine::Vector cevy::deserialize_impl<cevy::engine::Vector>(std::vector<uint8_t> &vec) {
   engine::Vector t;
   t.x = deserialize<float>(vec);
   t.y = deserialize<float>(vec);

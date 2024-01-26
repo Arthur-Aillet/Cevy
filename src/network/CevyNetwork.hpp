@@ -157,6 +157,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       const std::lock_guard<std::mutex> lock(_mx);
       it = _events_send.emplace(_events_send.begin(), std::make_pair(cd, fullblock));
     }
+    std::cout << "SEND EVENT WITH SIZE = " << fullblock.size() << std::endl;
     writeTCP(cd, it->second, [this, it]() { _events_send.erase(it); });
   }
 
@@ -168,9 +169,11 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
         });
     if (it != _events_recv.end()) {
       auto buff = it->second;
+      std::cout << "EXTRACT EVENT WITH SIZE = " << buff.size() << std::endl;
       buff.erase(buff.begin(), buff.begin() + 2);
       _events_recv.erase(it);
       return buff;
+
     }
     return std::nullopt;
   }
@@ -178,7 +181,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     std::optional<std::pair<uint16_t, std::vector<uint8_t>>> recvEvent() {
     const std::lock_guard<std::mutex> lock(_mx);
     if (!_events_recv.empty()) {
-      auto buff = std::move(_events_recv.front().second);
+      auto buff = _events_recv.front().second;
+      std::cout << "EXTRACT EVENT WITH SIZE = " << buff.size() << std::endl;
       uint16_t id = deserialize<uint16_t>(buff);
       _events_recv.erase(_events_recv.begin());
       return std::make_pair(id, buff);
@@ -202,10 +206,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
   }
 
-  void sendActionSuccess(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
+  void sendActionSuccess(ConnectionDescriptor cd, uint16_t id) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionSuccess), byte(id, 0),
                                       byte(id, 1)};
-    fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _actions_send.begin();
     {
       const std::lock_guard<std::mutex> lock(_mx);
@@ -226,13 +229,14 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
   }
 
-  std::optional<std::tuple<uint8_t, uint16_t, std::vector<uint8_t>>> recvAction() {
+  std::optional<std::tuple<ConnectionDescriptor, uint8_t, uint16_t, std::vector<uint8_t>>> recvAction() {
     if (!_actions_recv.empty()) {
+      auto actor = _actions_recv.front().first;
       auto buff = _actions_recv.front().second;
       _actions_recv.erase(_actions_recv.begin());
-      uint16_t state = deserialize<uint8_t>(buff);
+      uint8_t state = deserialize<uint8_t>(buff);
       uint16_t id = deserialize<uint16_t>(buff);
-      return std::make_tuple(state, id, buff);
+      return std::make_tuple(actor, state, id, buff);
     }
     return std::nullopt;
   }
@@ -284,6 +288,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   void handle_events(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
     std::vector<uint8_t> vec;
+    std::cout << "GOT EVENT WITH SIZE = " << bytes << std::endl;
     vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes);
     {
       const std::lock_guard<std::mutex> lock(_mx);
@@ -339,6 +344,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       std::cerr << "(ERROR)tcp_accept:" << error << std::endl;
     }
     std::vector<uint8_t> block;
+    serialize(block, idx);
     serialize(block, idx);
     sendEvent(Event::ClientJoin, block);
     block.insert(block.begin(), byte(Event::ClientJoin, 0));
@@ -570,14 +576,14 @@ template<>
 struct cevy::serialized_size<cevy::CevyNetwork::Summon> : std::integral_constant<size_t, sizeof(uint16_t) + sizeof(uint8_t)> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec, const cevy::CevyNetwork::Summon &t) {
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec, const cevy::CevyNetwork::Summon &t) {
   serialize(vec, t.id);
   serialize(vec, t.type);
   return vec;
 }
 
 template <>
-inline cevy::CevyNetwork::Summon cevy::deserialize<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec) {
+inline cevy::CevyNetwork::Summon cevy::deserialize_impl<cevy::CevyNetwork::Summon>(std::vector<uint8_t> &vec) {
   cevy::CevyNetwork::Summon t;
   t.id = deserialize<uint16_t>(vec);
   t.type = deserialize<uint8_t>(vec);

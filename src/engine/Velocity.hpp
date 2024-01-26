@@ -82,7 +82,7 @@ struct cevy::serialized_size<cevy::engine::TransformVelocity>
     : public std::integral_constant<size_t, serialized_size<engine::Vector>::value + serialized_size<engine::Vector>::value + serialized_size<Quaternion>::value> {};
 
 template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec,
+inline std::vector<uint8_t> &cevy::serialize_impl<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec,
                                                                    const cevy::engine::TransformVelocity &t) {
   serialize(vec, t.position);
   serialize(vec, t.rotation);
@@ -91,7 +91,7 @@ inline std::vector<uint8_t> &cevy::serialize<cevy::engine::TransformVelocity>(st
 }
 
 template <>
-inline cevy::engine::TransformVelocity cevy::deserialize<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec) {
+inline cevy::engine::TransformVelocity cevy::deserialize_impl<cevy::engine::TransformVelocity>(std::vector<uint8_t> &vec) {
   cevy::engine::Transform t;
   t.position = deserialize<engine::Vector>(vec);
   t.rotation = deserialize<Quaternion>(vec);

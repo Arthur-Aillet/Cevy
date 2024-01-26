@@ -56,7 +56,7 @@ class cevy::NetworkCommands : protected ecs::Commands {
    * the action is responded to with a failure or success
    *
    * the argument will be send, so it must be defined for
-   * \link cevy::serialize serialize \endlink
+   * \link cevy::serialize_impl serialize \endlink
    *
    * @tparam A Action to call
    * @tparam A::Arg Argument required
@@ -88,7 +88,7 @@ class cevy::NetworkCommands : protected ecs::Commands {
    * Event will be sent, and the system will be run on the server and all clients
    *
    * the argument will be send, so it must be defined for
-   * \link cevy::serialize serialize \endlink
+   * \link serialize_impl serialize_impl \endlink
    *
    * @tparam E Event to send
    * @tparam E::Arg Argument required
