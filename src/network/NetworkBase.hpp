@@ -60,6 +60,9 @@ class cevy::NetworkBase {
   NetworkBase(NetworkBase &rhs)
       : quit(rhs.quit), _nw_thread(std::move(rhs._nw_thread)),
 
+        _tcp_port(std::move(rhs._tcp_port)),
+        _udp_port(std::move(rhs._udp_port)),
+
         _dest_tcp_port(std::move(rhs._dest_tcp_port)),
         _dest_udp_port(std::move(rhs._dest_udp_port)),
 
@@ -119,6 +122,7 @@ class cevy::NetworkBase {
             tcp::endpoint(dest, _dest_tcp_port),
             [dest, this, idx, callback](asio::error_code error) {
               callback(idx);
+              std::cout << "address:" << dest.to_string() << ", port: " << _dest_udp_port << std::endl;
               _connections.at(idx).udp_endpoint = std::move(asio::ip::udp::endpoint(dest, _dest_udp_port));
               std::cout << "triggered here, maybe with error : " << error.message() << std::endl;
               read_one_TCP(idx);
@@ -136,6 +140,7 @@ class cevy::NetworkBase {
         return;
       }
       std::cout << "new tcp connexion accepted to the server" << std::endl;
+      std::cout << "address:" << _temp_tcp_co.socket.remote_endpoint().address().to_string() << ", port: " << _dest_udp_port << std::endl;
       _temp_tcp_co.udp_endpoint = asio::ip::udp::endpoint(_temp_tcp_co.socket.remote_endpoint().address(), _dest_udp_port);
 
       _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
@@ -173,6 +178,8 @@ class cevy::NetworkBase {
   asio::io_context _io_context;
   std::thread _nw_thread;
 
+  size_t _tcp_port;
+  size_t _udp_port;
   size_t _dest_tcp_port;
   size_t _dest_udp_port;
 
@@ -206,11 +213,13 @@ class cevy::NetworkBase {
 
   NetworkBase(NetworkMode mode, size_t udp_port, size_t tcp_port,
               size_t client_offset)
-      : _mode(mode), _dest_tcp_port(tcp_port), _dest_udp_port(udp_port),
-        _udp_endpoint(asio::ip::udp::v4(),
-                      udp_port + (client_offset * (mode == NetworkMode::Client))),
-        _tcp_endpoint(asio::ip::tcp::v4(),
-                      tcp_port + (client_offset * mode == NetworkMode::Client)),
+      : _mode(mode),
+        _tcp_port(tcp_port + (client_offset * (mode == NetworkMode::Client))),
+        _udp_port(udp_port + (client_offset * (mode == NetworkMode::Client))),
+        _dest_tcp_port(tcp_port + (client_offset * (mode == NetworkMode::Server))),
+        _dest_udp_port(udp_port + (client_offset * (mode == NetworkMode::Server))),
+        _udp_endpoint(asio::ip::udp::v4(), _udp_port),
+        _tcp_endpoint(asio::ip::tcp::v4(), _tcp_port),
         _udp_socket(_io_context), _tcp_socket(_io_context),
         _tcp_acceptor(_io_context, _tcp_endpoint), _temp_tcp_co(_io_context) {
     _udp_socket.open(asio::ip::udp::v4());
@@ -220,8 +229,8 @@ class cevy::NetworkBase {
   void readUDP() {
     _udp_socket.async_receive_from(
         asio::buffer(_udp_recv), _udp_endpoint,
-        [this](asio::error_code error, size_t bytes) {
-          this->udp_receive(error, bytes, this->_udp_recv, std::find_if(_connections.begin(), _connections.end(),
+        [this](asio::error_code error, size_t bytes) { std::cout << "UDP_GET" << std::endl;
+          this->udp_receive(error, bytes, _udp_recv, std::find_if(_connections.begin(), _connections.end(),
             [this](auto &pair){return pair.second.udp_endpoint == _udp_endpoint;}
           )->first);
           readUDP();
@@ -241,7 +250,11 @@ class cevy::NetworkBase {
       return;
     }
     _connections.at(cd).socket.async_send(asio::buffer(data),
-                         [this, func](asio::error_code, size_t) { func(); });
+                         [this, func](asio::error_code error, size_t) {
+                            if (error)
+                              std::cerr << "(ERROR)writeTCP:" << error << std::endl;
+                            func();
+                          });
   }
 
   template <typename Function>
@@ -252,7 +265,7 @@ class cevy::NetworkBase {
     _udp_socket.async_send_to(asio::buffer(data), _connections.at(cd).udp_endpoint,
                               [this, func](asio::error_code error, size_t) {
                                 if (error)
-                                  std::cerr << "(ERROR)async_send:" << error << std::endl;
+                                  std::cerr << "(ERROR)writeUDP:" << error << std::endl;
                                 func();
                               });
   }

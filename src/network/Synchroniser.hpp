@@ -68,9 +68,13 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
 
-  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode()) {};
+  Synchroniser(CevyNetwork &net) : _net(net), mode(_net.mode()) {
+    _occupancy.fill(false);
+  };
 
-  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {}
+  Synchroniser(Synchroniser &&rhs) : Plugin(rhs), _net(rhs._net) {
+    _occupancy.fill(false);
+  }
 
   // Synchroniser(Mode mode, const std::string &host = std::string(""))
   //     : mode(mode), _net(host, 4995){};
@@ -261,7 +265,7 @@ class cevy::Synchroniser::SyncBlock {
     if (it != _sync._blocks.end()) {
       uint16_t block = it->second;
       block <<= 10;
-      block &= (sync_id & ((1 << 10) - 1));
+      block |= (sync_id & ((1 << 10) - 1));
       return block;
     }
     return 0;
@@ -283,15 +287,15 @@ class cevy::Synchroniser::SyncBlock {
   }
 
   void system_recv(cevy::ecs::Query<SyncId, Component...> &q) const {
-    std::stringstream ss;
-    (ss << ... << typeid(Component).name());
+    // std::stringstream ss;
+    // (ss << ... << typeid(Component).name());
     // std::cout << "(INFO)ShipSync::system_recv " << ss.str() << "[" << q.size() << "]" << std::endl;
     for (auto e : q) {
       auto sync_id = std::get<SyncId &>(e);
       // std::cout << "(INFO)SyncBlock::system_recv " << sync_id.id << std::endl;
       std::optional<std::vector<uint8_t>> block_ = _net.recvState(id<Block>(sync_id.id));
       if (!block_)
-        return;
+        continue;
       std::vector<uint8_t> &block = block_.value();
 
       ((std::get<Component &>(e) = deserialize<Component>(block)), ...);

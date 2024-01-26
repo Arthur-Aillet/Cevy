@@ -192,7 +192,7 @@ class Query {
   size_t size() const {
     size_t size = 0;
     for (auto _ : *this) size++;
-    return _size;
+    return size;
   }
 
   typename iterator::value_type single() {

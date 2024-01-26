@@ -349,10 +349,10 @@ inline std::vector<uint8_t> &cevy::serialize<Quaternion>(std::vector<uint8_t> &v
 template <>
 inline Quaternion cevy::deserialize<Quaternion>(std::vector<uint8_t> &vec) {
   Quaternion t;
-  t.w = deserialize<float>(vec);
+  t.x = deserialize<float>(vec);
+  t.y = deserialize<float>(vec);
   t.z = deserialize<float>(vec);
-  t.y = deserialize<float>(vec);
-  t.y = deserialize<float>(vec);
+  t.w = deserialize<float>(vec);
   return t;
 }
 

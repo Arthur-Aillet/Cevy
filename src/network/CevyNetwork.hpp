@@ -122,10 +122,14 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _states_send.end();
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      _mx.lock();
       it = _states_send.emplace(_states_send.begin(), fullblock);
+      _mx.unlock();
     }
-    writeUDP(cd, *it, [this, it]() { _states_send.erase(it); });
+    // std::cout << "SENDING A STATE" << std::endl;
+    writeTCP(cd, *it, [this, it]() {
+      _mx.lock(); _states_send.erase(it); _mx.unlock();
+      });
   }
 
   std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
@@ -134,7 +138,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     if (it != _states_recv.end()) {
       auto ret = std::move(it->second);
       _states_recv.erase(id);
-      ret.erase(ret.begin(), ret.begin() + 2);
       return ret;
     }
     return std::nullopt;
@@ -206,7 +209,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
       const std::lock_guard<std::mutex> lock(_mx);
       it = _actions_send.emplace(_actions_send.begin(), std::make_pair(cd, fullblock));
     }
-    writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
+    writeTCP(cd, it->second, [this, it] {  _actions_send.erase(it); });
   }
 
   void sendActionFailure(ConnectionDescriptor cd, uint16_t id, ActionFailureMode::EActionFailureMode mode) {
@@ -258,10 +261,10 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   private:
   void handle_state(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
-    uint64_t id;
+    uint16_t id;
     std::memcpy(&id, &buffer[1], sizeof(id));
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin() + 3, buffer.begin() + bytes - 3);
+    vec.insert(vec.begin(), buffer.begin() + 3, buffer.begin() + bytes);
     {
       const std::lock_guard<std::mutex> lock(_mx);
       _states_recv[id] = vec;
