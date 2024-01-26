@@ -73,10 +73,14 @@ void cevy::NetworkBase::start_thread() {
 void cevy::NetworkBase::readUDP() {
   _udp_socket.async_receive_from(
       asio::buffer(_udp_recv), _udp_endpoint,
-      [this](asio::error_code error, size_t bytes) { std::cout << "UDP_GET" << std::endl;
-        this->udp_receive(error, bytes, _udp_recv, std::find_if(_connections.begin(), _connections.end(),
-          [this](auto &pair){return pair.second.udp_endpoint == _udp_endpoint;}
-        )->first);
+      [this](asio::error_code error, size_t bytes) {
+        // std::cout << "UDP_GET " <<  _udp_endpoint.address().to_string() << std::endl;
+        auto cd_it = std::find_if(_connections.begin(), _connections.end(),
+          [this](auto &pair){return pair.second.udp_endpoint.address() == _udp_endpoint.address();}
+        );
+        if (cd_it != _connections.end()) {
+          this->udp_receive(error, bytes, _udp_recv, cd_it->first);
+        }
         readUDP();
       });
 }
