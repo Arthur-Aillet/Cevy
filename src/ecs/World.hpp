@@ -48,6 +48,10 @@ struct Or : std::integral_constant<bool, any<T...>()> {};
 template <typename T, typename... Ts>
 struct is_in : std::integral_constant<bool, Or<std::is_same<T, Ts>...>::value> {};
 
+template <typename T, typename... Ts>
+struct is_in<T, std::tuple<Ts...>> : std::integral_constant<bool, Or<std::is_same<T, Ts>...>::value> {};
+
+
 namespace cevy::ecs {
 class Commands;
 } // namespace cevy::ecs

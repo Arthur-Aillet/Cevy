@@ -65,6 +65,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
   template <size_t N, typename... T>
   struct Spawnable {
     static const uint16_t value = N;
+    using Components = std::tuple<T...>;
   };
 
   virtual void build_custom(cevy::ecs::App &app) = 0;
@@ -118,6 +119,26 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     auto id = first_free();
     _occupancy[id] = true;
     e.insert(SyncId({id, T::value}));
+    command.apply();
+    if (mode == Mode::Client)
+      return;
+    std::cerr << "(INFO)summon: sending:" << T::value << std::endl;
+    _net.sendSummon(id, T::value);
+  }
+
+  template <typename T, typename... Components>
+  void summon(cevy::ecs::Commands &command, Components... component) {
+    static_assert((... && is_in<Components, typename T::Components>::value), "specified arguments must belong in the summonned type");
+    auto e = command.spawn_empty();
+    if (_spawnCommands.find(T::value) != _spawnCommands.end())
+      _spawnCommands.at(T::value)(e);
+    else {
+      std::cerr << "(ERROR)summon: unmapped spawn command:" << T::value << std::endl;
+    }
+    auto id = first_free();
+    _occupancy[id] = true;
+    e.insert(SyncId({id, T::value}));
+    e.insert(component...);
     command.apply();
     if (mode == Mode::Client)
       return;

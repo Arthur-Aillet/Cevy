@@ -109,6 +109,12 @@ class cevy::NetworkCommands : protected ecs::Commands {
       _sync.summon<T>(*this);
   };
 
+  template <typename T, typename... Components>
+  void summon(Components... components) {
+    if (_net.mode() == CevyNetwork::NetworkMode::Server)
+      _sync.summon<T>(*this, components...);
+  };
+
   template <typename T, typename U>
   void summon(CevyNetwork::ConnectionDescriptor cd) {
     if (_net.mode() == CevyNetwork::NetworkMode::Server)
