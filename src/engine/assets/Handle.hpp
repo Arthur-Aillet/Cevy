@@ -32,14 +32,18 @@ class Handle {
   Handle(const Handle& other) : _ref(other._ref), path(other.path) {};
   Handle(Handle&& other) : _ref(other._ref), path(other.path) {};
 
-  Handle& operator=(const Handle other) {
+  Handle& operator=(const Handle& other) {
     _ref = other._ref;
     return *this;
   }
 
-  const Type &get() { return _ref; };
-  const Type &operator * (){ return _ref.get(); };
-  const Type *operator -> (){ return &_ref.get(); };
+  const Type &get() const { return _ref; };
+  const Type &operator * () const { return _ref.get(); };
+  const Type *operator -> () const { return &_ref.get(); } ;
+
+  Type &get() { return _ref; };
+  Type &operator * () { return _ref.get(); };
+  Type *operator -> () { return &_ref.get(); } ;
   // operator bool () {
   //   // return _ref.base() != nullptr;
   // }

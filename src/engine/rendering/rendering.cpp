@@ -58,7 +58,7 @@ static void render_model(const Model& model, const engine::Transform &transform,
   Matrix rot = QuaternionToMatrix(transform.rotation);
   Matrix pos = MatrixTranslate(transform.position.x, transform.position.y, transform.position.z);
   Matrix scale = MatrixScale(transform.scale.x, transform.scale.y, transform.scale.z);
-  Matrix final = MatrixMultiply(rot, MatrixMultiply(scale, pos));
+  Matrix final = MatrixMultiply(model.transform, MatrixMultiply(rot, MatrixMultiply(scale, pos)));
   // transform = MatrixMultiply(model.transform, transform);
   for (int i = 0; i < model.meshCount; ++i) {
     // if (model.meshMaterial[i] < model.materialCount)
