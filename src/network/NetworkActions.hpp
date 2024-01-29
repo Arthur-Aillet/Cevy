@@ -414,7 +414,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       cmd.apply();
     } catch (std::out_of_range& e) {
       std::stringstream ss;
-      ss << "no spawnable at " << A::value;
+      ss << "no action at " << A::value;
       throw exception(ss.str());
     }
   }
@@ -441,7 +441,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   template <typename A>
   void action_with(ecs::Commands &cmd, typename A::Arg given, Actor actor = -1) {
     try {
-    auto &server = std::get<0>(_super_actions.at(A::value, actor));
+    auto &server = std::get<0>(_super_actions.at(A::value));
     auto &client_success = std::get<1>(_super_actions.at(A::value));
     auto &client_fail = std::get<2>(_super_actions.at(A::value));
     if (_mode == Mode::Server) {
@@ -453,10 +453,10 @@ class cevy::NetworkActions : public ecs::Plugin {
         return;
       std::vector<uint8_t> block;
       if (ret == ActionFailureMode::Action_Success) {
-        if (A::Presume != Presume::success)
+        if (A::presume != Presume::success)
           _net.sendActionSuccess(actor, A::value);
       } else {
-        if (A::Presume != Presume::fail)
+        if (A::presume != Presume::fail)
           _net.sendActionFailure(actor, A::value, ret);
       }
     } else {
@@ -467,7 +467,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       } else if (A::presume == Presume::fail) {
         const auto &func =
             std::any_cast<super_system_fail<typename A::Arg>&>(client_fail);
-        func(cmd, ActionFailureMode::Presumed, given);
+        func(cmd, std::make_tuple(ActionFailureMode::Presumed, given));
       }
       std::vector<uint8_t> vec;
       serialize(vec, given);
@@ -478,7 +478,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     cmd.apply();
     } catch (std::out_of_range& e) {
       std::stringstream ss;
-      ss << "no spawnable at " << A::value;
+      ss << "no action at " << A::value;
       throw exception(ss.str());
     }
   }
@@ -501,7 +501,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     _net.sendEvent(E::value, vec);
     } catch (std::out_of_range& e) {
       std::stringstream ss;
-      ss << "no spawnable at " << E::value;
+      ss << "no event at " << E::value;
       throw exception(ss.str());
     }
   }
@@ -533,7 +533,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     _net.sendEvent(E::value, vec);
     } catch (std::out_of_range& e) {
       std::stringstream ss;
-      ss << "no spawnable at " << E::value;
+      ss << "no event at " << E::value;
       throw exception(ss.str());
     }
   }

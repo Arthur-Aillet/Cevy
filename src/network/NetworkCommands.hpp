@@ -64,7 +64,7 @@ class cevy::NetworkCommands : protected ecs::Commands {
    */
   template <typename A>
   void action_with(typename A::Arg given) {
-    _actions.event_with<A>(*this, given);
+    _actions.action_with<A>(*this, given);
   };
 
   /**
