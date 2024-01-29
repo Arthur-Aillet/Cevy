@@ -35,7 +35,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   using NetworkBase::NetworkMode;
 
   struct Communication {
-    enum ECommunication {
+    enum ECommunication : uint8_t {
       State = 1,
       StateRequest = 2,
       Event = 3,
@@ -56,7 +56,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   };
 
   struct ActionFailureMode {
-    enum EActionFailureMode {
+    enum EActionFailureMode : uint8_t {
+      Action_Yet = uint8_t(-1),
       Action_Success = 0,
       Action_Unavailable = 1,
       Action_Disabled = 2,
@@ -220,7 +221,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   void sendActionFailure(ConnectionDescriptor cd, uint16_t id, ActionFailureMode::EActionFailureMode mode) {
     std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionFailure), byte(id, 0),
                                       byte(id, 1)};
-    fullblock.push_back(mode);
+    serialize<uint8_t>(fullblock, mode);
     auto it = _actions_send.begin();
     {
       const std::lock_guard<std::mutex> lock(_mx);
@@ -229,15 +230,26 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
   }
 
-  std::optional<std::tuple<ConnectionDescriptor, uint8_t, uint16_t, std::vector<uint8_t>>> recvAction() {
+  std::optional<std::tuple<ConnectionDescriptor, ActionFailureMode::EActionFailureMode, uint16_t, std::vector<uint8_t>>> recvAction() {
+    // const std::lock_guard<std::mutex> lock(_mx);
+    _mx.lock();
     if (!_actions_recv.empty()) {
       auto actor = _actions_recv.front().first;
       auto buff = _actions_recv.front().second;
       _actions_recv.erase(_actions_recv.begin());
-      uint8_t state = deserialize<uint8_t>(buff);
+      _mx.unlock();
+
+
+      Communication::ECommunication comm = Communication::ECommunication(deserialize<uint8_t>(buff));
       uint16_t id = deserialize<uint16_t>(buff);
+      ActionFailureMode::EActionFailureMode state = ActionFailureMode::Action_Yet;
+      if (comm == Communication::ActionFailure)
+        state = ActionFailureMode::EActionFailureMode(deserialize<uint8_t>(buff));
+      else if (comm == Communication::ActionSuccess)
+        state = ActionFailureMode::Action_Success;
       return std::make_tuple(actor, state, id, buff);
     }
+    _mx.unlock();
     return std::nullopt;
   }
 
@@ -279,7 +291,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   void handle_action(ConnectionDescriptor cd, size_t bytes, std::array<uint8_t, 512> &buffer) {
     std::vector<uint8_t> vec;
-    vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes);
+    vec.insert(vec.begin(), buffer.begin(), buffer.begin() + bytes);
     {
       const std::lock_guard<std::mutex> lock(_mx);
       _actions_recv.push_back({cd, vec});
@@ -325,7 +337,10 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     }
     if (bytes <= 0)
       return;
-    auto& co = _connections.at(cd);
+    auto it = _connections.find(cd);
+    if (it == _connections.end())
+      return;
+    auto &co = it->second;
     if (co.buffer[0] == (uint8_t)Communication::State) {
       return handle_state(cd, bytes, co.buffer);
     }
@@ -363,9 +378,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   using data_list = std::list<std::pair<ConnectionDescriptor, std::vector<uint8_t>>>;
 
-  // the data part contains the action status as 1 byte
-  // and the name_descriptor/id data, as a prefix of 2 bytes
   std::mutex _mx;
+  // the data part contains the communication (action, success, failure),
+  // action status as 1 byte and the id data, as a prefix of 2 bytes
   data_list _actions_recv;
   data_list _actions_send;
 
@@ -373,32 +388,6 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   data_list _events_recv;
   data_list _events_send;
 };
-
-// class cevy::ClientHandler : cevy::CevyNetwork {
-
-//   std::string server_ip;
-//   float server_ping;
-//   // uint16_t session_id;
-
-//   public:
-//   void handleHandShake(size_t bytes, std::array<uint8_t, 512> &buffer) {
-//     // std::cout << "handshake received" << std::endl;
-//   }
-
-//   // void sendHandShake(uint16_t id, uint8_t archetype) {
-//   //     half h = {.h = id};
-//   //     std::vector<uint8_t> fullblock = { Communication::HandShake, archetype};
-//   //     writeUDP(_summon_send[id], [](){});
-//   // }
-
-//   void tcp_receive(asio::error_code error, size_t bytes, TcpConnexion &co) override {
-//     if (co.buffer[0] == (uint8_t)Communication::HandShake) {
-//       handleHandShake(bytes, co.buffer);
-//     } else {
-//       cevy::CevyNetwork::udp_receive(error, bytes, buffer, udp_endpoint); /// TODO: FIX
-//     }
-//   }
-// };
 
 class cevy::ServerHandler : public cevy::CevyNetwork {
   public:
@@ -508,7 +497,7 @@ class cevy::ClientHandler : public cevy::CevyNetwork {
 
   void connect(NetworkCommands&, const std::string& server_ip) {
     std::cout << "attempting to connect to " << server_ip << std::endl;
-    auto callback = make_function<void, ConnectionDescriptor>([](ConnectionDescriptor){ std::cout << "PLAYER CONNECTION SUCCESS" << std::endl;});
+    auto callback = make_function<void, ConnectionDescriptor>([this](ConnectionDescriptor cd){ std::cout << "PLAYER CONNECTION SUCCESS" << std::endl; _server = cd;});
     client_connect(asio::ip::address::from_string(server_ip), callback);
   }
 

@@ -23,6 +23,9 @@
  *
  */
 class cevy::NetworkCommands : protected ecs::Commands {
+  friend class NetworkActions;
+  template<typename S, typename A, typename N>
+  friend class NetworkPlugin;
   public:
   NetworkCommands(CevyNetwork& net, NetworkActions &actions, Synchroniser &sync, ecs::World &world)
       : Commands(world), _net(net), _actions(actions), _sync(sync){};

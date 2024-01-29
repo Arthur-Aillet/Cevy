@@ -134,7 +134,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     }
     auto id = first_free();
     _occupancy[id] = true;
-    e.insert(SyncId({id, value}));
+    e.insert(SyncId({id, value, 0}));
     command.apply();
 
     if (mode == Mode::Client)
@@ -290,6 +290,13 @@ class cevy::Synchroniser::SyncBlock {
       std::vector<uint8_t> block;
       (serialize(block, std::get<Component &>(e)), ...);
       _net.sendState(id<Block>(sync_id.id), block);
+    }
+  }
+
+  template<typename T>
+  void replace_different(T& dest, const T& source) {
+    if (dest != source) {
+      dest = source;
     }
   }
 

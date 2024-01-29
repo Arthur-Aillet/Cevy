@@ -91,7 +91,9 @@ void cevy::NetworkBase::read_one_TCP(ConnectionDescriptor cd) {
                             [this, &co, cd](asio::error_code error, size_t bytes) {
                               if (error.value() == 2) { // end of co
                                 co.socket.close();
+                                _mx.lock();
                                 close_dead_tcp();
+                                _mx.unlock();
                                 return;
                               }
                               tcp_receive(error, bytes, cd);

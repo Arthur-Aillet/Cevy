@@ -27,7 +27,7 @@
 #include "Resource.hpp"
 #include "Stage.hpp"
 #include "network/CevyNetwork.hpp"
-#include "network/Synchroniser.hpp"
+// #include "network/Synchroniser.hpp"
 #include "network/network.hpp"
 
 /**
@@ -38,14 +38,10 @@
  *
  */
 class cevy::NetworkActions : public ecs::Plugin {
+  template<typename S, typename A, typename N>
+  friend class NetworkPlugin;
   public:
-  /**
-   * Whether it acts on behalf of a server or client
-   */
-  enum class Mode {
-    Server,
-    Client,
-  };
+  using Mode = CevyNetwork::NetworkMode;
 
   class exception : public std::exception {
     public:
@@ -61,7 +57,7 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   /// Contructor
   // NetworkActions(CevyNetwork &net) : _net(net){};
-  NetworkActions(CevyNetwork &net, Synchroniser& sync) : _net(net), _sync(sync) {};
+  NetworkActions(CevyNetwork &net) : _net(net), _mode(net.mode()) {};
 
   /// deleted copy-constructor
   NetworkActions(const NetworkActions &) = delete;
@@ -107,74 +103,9 @@ class cevy::NetworkActions : public ecs::Plugin {
 
   using ClientJoin = Event<CevyNetwork::Event::ClientJoin, Actor>;
 
-
-  void activity_system(ecs::Commands cmd) {
-    while (true) {
-      auto event = _net.recvEvent();
-      if (!event)
-        break;
-      auto& [id, vec] = event.value();
-      vec.resize(std::max(vec.size(), _remote_event_arg_size[id]));
-      event_remote(cmd, id, vec);
-    }
-    while (true) {
-      auto action = _net.recvAction();
-      if (!action)
-        break;
-      auto& [actor, state, id, vec] = action.value();
-      EActionFailureMode fail = EActionFailureMode(state);
-      vec.resize(std::max(vec.size(), _remote_act_arg_size[id]));
-      if (fail == EActionFailureMode::Action_Success) {
-        actionSuccess_remote(cmd, id, vec);
-      } else {
-        actionFailure_remote(cmd, fail, id, vec);
-      }
-    }
-  }
-
-  protected:
-  void event_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
-    std::cerr << "(INFO)event_remote: treating" << id << std::endl;
-    if (id == CevyNetwork::Event::Summon) {
-      uint8_t archetype = deserialize<uint8_t>(vec);
-      _sync.get().summon(cmd, archetype);
-    }
-    if (_events.find(id) != _events.end()) {
-      _events.find(id)->second(cmd);
-    } else if (_remote_events.find(id) != _remote_events.end()) {
-      _remote_events.find(id)->second(cmd, vec);
-    } else {
-      std::cerr << "(WARNING)event_remote: unmapped" << std::endl;
-    }
-  }
-
-  void actionSuccess_remote(ecs::Commands& cmd, uint16_t id, std::vector<uint8_t> &vec) {
-    std::cerr << "(INFO)actionSuccess_remote: treating" << id << std::endl;
-    if (_actions.find(id) != _actions.end()) {
-      std::get<1>(_actions.find(id)->second)(cmd);
-    } else if (_remote_actions.find(id) != _remote_actions.end()) {
-      std::get<1>(_remote_actions.find(id)->second)(cmd, vec);
-    } else {
-      std::cerr << "(WARNING)actionSuccess_remote: unmapped" << std::endl;
-    }
-  }
-
-  void actionFailure_remote(ecs::Commands& cmd, EActionFailureMode fail, uint16_t id, std::vector<uint8_t> &vec) {
-    std::cerr << "(INFO)actionFailure_remote: treating" << id << std::endl;
-    if (_actions.find(id) != _actions.end()) {
-      std::get<2>(_actions.find(id)->second)(cmd, fail);
-    } else if (_remote_actions.find(id) != _remote_actions.end()) {
-      std::get<2>(_remote_actions.find(id)->second)(cmd, fail, vec);
-    } else {
-      std::cerr << "(WARNING)actionFailure_remote: unmapped" << std::endl;
-    }
-  }
-
-
   public:
 
   virtual void build(cevy::ecs::App &app) override {
-    app.add_systems<ecs::core_stage::PreUpdate>(make_function<void, ecs::Commands>([this](auto cmd) -> void { activity_system(cmd);}));
   }
 
   /**
@@ -269,6 +200,7 @@ class cevy::NetworkActions : public ecs::Plugin {
       [fail_lambda](ecs::Commands &cmd, EActionFailureMode fail, std::vector<uint8_t> &vec){ typename A::Arg arg = deserialize<typename A::Arg>(vec); return fail_lambda(cmd, std::make_pair(fail, std::move(arg)));}
     );
     _remote_act_arg_size[A::value] = A::serialized_size;
+    _remote_act_presume[A::value] = A::presume;
   }
 
   /**
@@ -312,6 +244,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     );
 
     _remote_act_arg_size[A::value] = A::serialized_size;
+    _remote_act_presume[A::value] = A::presume;
   }
 
   /**
@@ -445,6 +378,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     auto &client_success = std::get<1>(_super_actions.at(A::value));
     auto &client_fail = std::get<2>(_super_actions.at(A::value));
     if (_mode == Mode::Server) {
+      std::cout << "IS SERVER" << std::endl;
       const auto &func =
           std::any_cast<super_server_system<typename A::Arg>&>(
               server);
@@ -587,7 +521,8 @@ class cevy::NetworkActions : public ecs::Plugin {
   std::unordered_map<uint16_t, remote_system_sucess> _remote_events;
   std::unordered_map<uint16_t, size_t> _remote_event_arg_size;
   std::unordered_map<uint16_t, size_t> _remote_act_arg_size;
+  std::unordered_map<uint16_t, Presume> _remote_act_presume;
   Mode _mode;
   cevy::CevyNetwork &_net;
-  ref<Synchroniser> _sync;
+  // ref<Synchroniser> _sync;
 };

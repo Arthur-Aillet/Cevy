@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <stdint.h>
 #include <string>
@@ -131,6 +132,7 @@ class cevy::NetworkBase {
   bool quit = 0;
   asio::io_context _io_context;
   std::thread _nw_thread;
+  std::mutex _mx;
 
   size_t _tcp_port;
   size_t _udp_port;
@@ -191,6 +193,7 @@ class cevy::NetworkBase {
 
   template <typename Function>
   void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    std::lock_guard lock(_mx);
     if (_connections.find(cd) == _connections.end()) {
       return;
     }
@@ -204,6 +207,7 @@ class cevy::NetworkBase {
 
   template <typename Function>
   void writeUDP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
+    std::lock_guard lock(_mx);
     if (_connections.find(cd) == _connections.end()) {
       return;
     }

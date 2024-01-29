@@ -48,6 +48,10 @@ class Transform {
     return {_cache_vector, _cache_quaternion, _cache_scale};
   }
 
+  bool operator==(const Transform& other) {
+    return position == other.position && scale == other.scale;
+  }
+
   Transform &operator*=(const Transform &other) {
     invalidate();
     auto [vec, rot, sca] = other.get();

@@ -130,8 +130,11 @@ Vector &Vector::operator=(const Vector &rhs) {
   return *this;
 }
 
-bool Vector::operator==(const Vector &rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
-
+bool Vector::operator==(const Vector &rhs) const {
+  return std::abs(x - rhs.x) < 0.1
+      && std::abs(y - rhs.y) < 0.1
+      && std::abs(z - rhs.z) < 0.1;
+}
 #if __cplusplus >= 202300
 auto Vector::operator<=>(const Vector &rhs) const { return eval() - rhs.eval(); }
 #endif

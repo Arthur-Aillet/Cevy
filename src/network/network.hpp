@@ -61,8 +61,6 @@ T deserialize_impl(std::vector<uint8_t> &);
  */
 template <typename T>
 T deserialize(std::vector<uint8_t> &vec) {
-  size_t presize = vec.size();
-  std::cout << "deserializing " << serialized_size<T>::value << "/" << vec.size() << std::endl;
   if (vec.size() < serialized_size<T>::value) {
     std::stringstream ss;
     ss << "Deserializing type '" << typeid(T).name() << "' (" << typeid(T).hash_code() << ") when only " << vec.size() << " bytes available, expecting " << serialized_size<T>::value;
@@ -70,7 +68,6 @@ T deserialize(std::vector<uint8_t> &vec) {
   }
 
   T t = deserialize_impl<T>(vec);
-  std::cout << "(" << presize << "->" << vec.size() << ")" << std::endl;
   return t;
 };
 
