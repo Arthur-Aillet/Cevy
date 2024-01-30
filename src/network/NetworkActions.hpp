@@ -327,21 +327,21 @@ class cevy::NetworkActions : public ecs::Plugin {
   void action(ecs::Commands &cmd, Actor actor = -1) {
     try {
     if (_mode == Mode::Server) {
-        EActionFailureMode ret = std::get<0>(_actions.at(A::value, actor))(cmd, actor);
+        EActionFailureMode ret = std::get<0>(_actions.at(A::value))(cmd, actor);
         if (actor == -1)
           return;
         if (ret == ActionFailureMode::Action_Success) {
           if (A::presume != Presume::success)
-            _net.sendActionSuccess(actor, A::value, std::vector<uint8_t>(serialized_size<typename A::Arg>::value));
+            _net.sendActionSuccess(actor, A::value);
         } else {
           if (A::presume != Presume::fail)
-            _net.sendActionFailure(actor, A::value, ret, std::vector<uint8_t>(serialized_size<typename A::Arg>::value));
+            _net.sendActionFailure(actor, A::value, ret);
         }
       } else {
         if (A::presume == Presume::success)
           std::get<1>(_actions.at(A::value))(cmd);
         else if (A::presume == Presume::fail)
-          std::get<2>(_actions.at(A::value))(cmd);
+          std::get<2>(_actions.at(A::value))(cmd, EActionFailureMode::Presumed);
         _net.sendAction(A::value, std::vector<uint8_t>(2 + serialized_size<typename A::Arg>::value));
       }
       cmd.apply();
