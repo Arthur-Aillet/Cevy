@@ -7,6 +7,7 @@
 
 #include "Time.hpp"
 #include "World.hpp"
+#include <chrono>
 
 using cevy::ecs::Time;
 
@@ -18,9 +19,14 @@ void update_timer(cevy::ecs::Resource<Time> time) {
   time.get().update_with_instant(std::chrono::high_resolution_clock::now());
 }
 
-std::chrono::duration<double, std::ratio<1>> Time::startup() {
+std::chrono::duration<double, std::ratio<1>> Time::startup() const {
   return std::chrono::high_resolution_clock::now() - _first_update;
 }
+
+std::chrono::time_point<std::chrono::high_resolution_clock> Time::now() const {
+  return _last_update;
+}
+
 
 void Time::update_with_instant(
     std::chrono::time_point<std::chrono::high_resolution_clock> &&instant) {
@@ -28,6 +34,6 @@ void Time::update_with_instant(
   _last_update = instant;
 }
 
-std::chrono::duration<double, std::ratio<1>> Time::delta() { return _last_update_delta; }
+std::chrono::duration<double, std::ratio<1>> Time::delta() const { return _last_update_delta; }
 
-double Time::delta_seconds() { return _last_update_delta.count(); }
+double Time::delta_seconds() const { return _last_update_delta.count(); }

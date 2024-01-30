@@ -19,13 +19,18 @@ class Time {
   std::chrono::duration<double, std::ratio<1>> _last_update_delta;
 
   public:
-  std::chrono::duration<double, std::ratio<1>> startup();
+  using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
+
+
+  std::chrono::duration<double, std::ratio<1>> startup() const;
+
+  time_point now() const;
 
   void update_with_instant(std::chrono::time_point<std::chrono::high_resolution_clock> &&instant);
 
-  std::chrono::duration<double, std::ratio<1>> delta();
+  std::chrono::duration<double, std::ratio<1>> delta() const;
 
-  double delta_seconds();
+  double delta_seconds() const;
 
   Time();
 };
