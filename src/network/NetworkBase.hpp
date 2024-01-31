@@ -122,7 +122,7 @@ class cevy::NetworkBase {
 
   void tcp_accept_new_connexion();
 
-  void close_all_tcp();
+  void close_all();
 
   void close_dead_tcp();
 
@@ -158,7 +158,11 @@ class cevy::NetworkBase {
 
   void die() {
     quit = true;
+    close_all();
+    _io_context.stop();
+
     _nw_thread.join();
+    close_dead_tcp();
   }
 
   NetworkBase(NetworkMode mode, size_t udp_port, size_t tcp_port,

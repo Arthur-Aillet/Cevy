@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "cevy.hpp"
 #include <optional>
 #include <type_traits>
 
@@ -19,6 +20,11 @@ namespace core_stage {
  * @brief Base class for Stage used as Id for type checking
  */
 struct IsStage {};
+
+struct Setup {};
+struct Loop {};
+struct Unwind {};
+
 
 /**
  * @brief Base class for any Stage, is made to be user generated
@@ -48,18 +54,19 @@ struct IsStage {};
  * std::false_type or std::true_type (default)
  */
 template <typename Before = std::nullopt_t, typename After = std::nullopt_t,
-          typename Repeat = std::true_type>
+          typename Type = Loop>
 class Stage : public IsStage {
   public:
-  using is_repeat = Repeat;
+  // using is_repeat = Repeat;
+  using type = Type;
   using previous = Before;
   using next = After;
 
   template <typename T>
-  using before = Stage<T, std::nullopt_t, typename T::is_repeat>;
+  using before = Stage<T, std::nullopt_t, typename T::type>;
 
   template <typename T>
-  using after = Stage<std::nullopt_t, T, typename T::is_repeat>;
+  using after = Stage<std::nullopt_t, T, typename T::type>;
 };
 
 /**
@@ -91,13 +98,14 @@ using after = Stage<>::after<NextStage>;
 /**
  * @brief Default stage constructor
  */
-using at_start = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
-using at_end = Stage<std::nullopt_t, std::nullopt_t, std::false_type>;
+using at_start = Stage<std::nullopt_t, std::nullopt_t, Setup>;
+using at_end = Stage<std::nullopt_t, std::nullopt_t, Unwind>;
 
 class Startup : public at_start {};
 class PreStartup : public before<Startup> {};
 class PostStartup : public after<Startup> {};
-class ShutDown : public at_start {};
+class ShutDown : public at_end {};
+class PreShutDown : public before<ShutDown> {};
 
 class First : public Stage<> {};
 

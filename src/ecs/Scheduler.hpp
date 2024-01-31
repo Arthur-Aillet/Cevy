@@ -29,6 +29,10 @@ typedef struct AppExit {
 class Scheduler {
   using SystemId = size_t;
 
+  using Setup = core_stage::Setup;
+  using Loop = core_stage::Loop;
+  using Unwind = core_stage::Unwind;
+
   private:
   std::list<std::type_index> _schedule;
   std::list<std::type_index> _at_start_schedule;
@@ -37,7 +41,7 @@ class Scheduler {
 
   public:
   template <typename S, typename std::enable_if_t<
-                            std::is_same_v<typename S::is_repeat, std::true_type>, bool> = true>
+                            std::is_same_v<typename S::type, Loop>, bool> = true>
   bool schedule_defined() {
     auto it = std::find(_schedule.begin(), _schedule.end(), std::type_index(typeid(S)));
 
@@ -45,7 +49,7 @@ class Scheduler {
   }
 
   template <typename S, typename std::enable_if_t<
-                            std::is_same_v<typename S::is_repeat, std::false_type>, bool> = true>
+                            std::is_same_v<typename S::type, Setup>, bool> = true>
   bool schedule_defined() {
     auto it =
         std::find(_at_start_schedule.begin(), _at_start_schedule.end(), std::type_index(typeid(S)));
@@ -53,8 +57,17 @@ class Scheduler {
     return (it != _at_start_schedule.end());
   }
 
+  template <typename S, typename std::enable_if_t<
+                            std::is_same_v<typename S::type, Unwind>, bool> = true>
+  bool schedule_defined() {
+    auto it =
+        std::find(_at_end_schedule.begin(), _at_end_schedule.end(), std::type_index(typeid(S)));
+
+    return (it != _at_end_schedule.end());
+  }
+
   template <typename T, typename std::enable_if_t<
-                            std::is_same_v<typename T::is_repeat, std::true_type>, bool> = true>
+                            std::is_same_v<typename T::type, Loop>, bool> = true>
   void insert_schedule() {
     if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
       auto it = std::find(_schedule.begin(), _schedule.end(),
@@ -73,7 +86,7 @@ class Scheduler {
   }
 
   template <typename T, typename std::enable_if_t<
-                            std::is_same_v<typename T::is_repeat, std::false_type>, bool> = true>
+                            std::is_same_v<typename T::type, Setup>, bool> = true>
   void insert_schedule() {
     if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
       auto it = std::find(_at_start_schedule.begin(), _at_start_schedule.end(),
@@ -88,6 +101,25 @@ class Scheduler {
       _at_start_schedule.insert(it, std::type_index(typeid(T)));
     } else {
       _at_start_schedule.push_back(std::type_index(typeid(T)));
+    }
+  }
+
+  template <typename T, typename std::enable_if_t<
+                            std::is_same_v<typename T::type, Unwind>, bool> = true>
+  void insert_schedule() {
+    if constexpr (!std::is_same_v<typename T::previous, std::nullopt_t>) {
+      auto it = std::find(_at_end_schedule.begin(), _at_end_schedule.end(),
+                          std::type_index(typeid(typename T::previous)));
+
+      _at_end_schedule.insert(it, std::type_index(typeid(T)));
+    } else if constexpr (!std::is_same_v<typename T::next, std::nullopt_t>) {
+      auto it = std::find(_at_end_schedule.begin(), _at_end_schedule.end(),
+                          std::type_index(typeid(typename T::next)));
+
+      ++it;
+      _at_end_schedule.insert(it, std::type_index(typeid(T)));
+    } else {
+      _at_end_schedule.push_back(std::type_index(typeid(T)));
     }
   }
 

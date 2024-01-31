@@ -7,6 +7,7 @@
 
 #include "DefaultPlugin.hpp"
 #include "App.hpp"
+#include "Stage.hpp"
 #include "Time.hpp"
 
 void init_default_schedules(cevy::ecs::App &app) {
@@ -21,6 +22,9 @@ void init_default_schedules(cevy::ecs::App &app) {
   app.add_stage<PreUpdate>();
   app.add_stage<PostUpdate>();
   app.add_stage<Last>();
+
+  app.add_stage<ShutDown>();
+  app.add_stage<PreShutDown>();
 }
 
 void cevy::ecs::DefaultPlugin::build(cevy::ecs::App &app) {

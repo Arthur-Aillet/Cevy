@@ -43,20 +43,20 @@ void cevy::NetworkBase::tcp_accept_new_connexion() {
   std::cout << "log apres" << std::endl;
 }
 
-void cevy::NetworkBase::close_all_tcp() {
-  std::cout << "closing tcp connexions" << std::endl;
+void cevy::NetworkBase::close_all() {
+  std::cout << "closing connexions" << std::endl;
   for (auto& [idx, co] : _connections) {
     co.socket.close();
   }
-  _connections.clear();
+  _udp_socket.close();
 }
 
 void cevy::NetworkBase::close_dead_tcp() {
   std::cout << "closing dead tcp connexions" << std::endl;
-  std::vector<std::unordered_map<ConnectionDescriptor, Connection>::iterator> to_erase;
-  for (auto it = _connections.begin(); it != _connections.end(); ++it) {
-    if (!it->second.socket.is_open())
-      to_erase.push_back(it);
+  std::vector<ConnectionDescriptor> to_erase;
+  for (auto& [cd, co] : _connections) {
+    if (!co.socket.is_open())
+      to_erase.push_back(cd);
   }
   for (auto erase : to_erase) {
     _connections.erase(erase);
@@ -68,7 +68,7 @@ void cevy::NetworkBase::start_thread() {
     tcp_accept_new_connexion();
   }
   readUDP();
-  _nw_thread = std::thread([this]() { this->_io_context.run(); });
+  _nw_thread = std::thread([this]() { while (!quit) this->_io_context.run(); });
 }
 
 void cevy::NetworkBase::readUDP() {

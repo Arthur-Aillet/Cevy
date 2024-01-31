@@ -545,7 +545,7 @@ class cevy::NetworkActions : public ecs::Plugin {
   std::unordered_map<uint16_t, size_t> _remote_event_arg_size;
   std::unordered_map<uint16_t, size_t> _remote_act_arg_size;
   std::unordered_map<uint16_t, Presume> _remote_act_presume;
-  Mode _mode;
   cevy::CevyNetwork &_net;
+  Mode _mode;
   // ref<Synchroniser> _sync;
 };
