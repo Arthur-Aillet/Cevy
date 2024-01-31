@@ -27,6 +27,7 @@
 #include "Resource.hpp"
 #include "Stage.hpp"
 #include "network/CevyNetwork.hpp"
+#include "network/NetworkBase.hpp"
 #include "network/Synchroniser.hpp"
 #include "network/network.hpp"
 
@@ -114,7 +115,8 @@ class cevy::NetworkActions : public ecs::Plugin {
           }
           return true;
       });
-    add_event_with<ClientJoin>(catchup);
+    if (_mode == Mode::Server)
+      add_event_with<ClientJoin>(catchup);
   }
 
   /**
