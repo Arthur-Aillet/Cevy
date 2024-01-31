@@ -175,7 +175,7 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     }
     auto id = first_free();
     _occupancy[id] = true;
-    e.insert(SyncId({id, T::value, cd}));
+    e.insert(SyncId({id, U::value, cd}));
     command.apply();
 
     if (mode != Mode::Server)

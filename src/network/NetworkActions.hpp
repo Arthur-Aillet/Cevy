@@ -110,7 +110,7 @@ class cevy::NetworkActions : public ecs::Plugin {
     auto catchup = make_function<bool, CevyNetwork::ConnectionDescriptor, ecs::Query<Synchroniser::SyncId>>(
       [&app, this](CevyNetwork::ConnectionDescriptor cd, ecs::Query<Synchroniser::SyncId> q){
           for (auto [id] : q) {
-            this->_net.sendSummon(cd, id.type);
+            this->_net.sendSummon(cd, id.id, id.type);
           }
           return true;
       });

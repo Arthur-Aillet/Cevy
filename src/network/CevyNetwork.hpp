@@ -122,21 +122,23 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
 
   void sendState(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
-    std::vector<uint8_t> fullblock = {uint8_t(Communication::State), byte(id, 0), byte(id, 1)};
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::State)};
+    serialize<uint16_t>(fullblock, id);
     fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _states_send.end();
     {
-      _mx.lock();
+      _send_lock.lock();
       it = _states_send.emplace(_states_send.begin(), fullblock);
-      _mx.unlock();
+      _send_lock.unlock();
     }
     writeUDP(cd, *it, [this, it]() {
-      _mx.lock(); _states_send.erase(it); _mx.unlock();
+      const std::lock_guard<std::mutex> lock(_send_lock);
+      _states_send.erase(it);
       });
   }
 
   std::optional<std::vector<uint8_t>> recvState(uint16_t id) {
-    const std::lock_guard<std::mutex> lock(_mx);
+    const std::lock_guard<std::mutex> lock(_recv_lock);
     // auto it = _states_recv.end();
     auto it = _states_recv.find(id);
     if (it != _states_recv.end()) {
@@ -152,19 +154,20 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   virtual void sendEvent(uint16_t id, const std::vector<uint8_t> &block) = 0;
 
   void sendEvent(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
-    std::vector<uint8_t> fullblock = {uint8_t(Communication::Event), byte(id, 0), byte(id, 1)};
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::Event)};
+    serialize<uint16_t>(fullblock, id);
     fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _events_send.end();
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_send_lock);
       it = _events_send.emplace(_events_send.begin(), std::make_pair(cd, fullblock));
     }
     std::cout << "SEND EVENT WITH SIZE = " << fullblock.size() << std::endl;
-    writeTCP(cd, it->second, [this, it]() { _events_send.erase(it); });
+    writeTCP(cd, it->second, [this, it]() { const std::lock_guard<std::mutex> lock(_send_lock); _events_send.erase(it); });
   }
 
   std::optional<std::vector<uint8_t>> recvEvent(uint16_t id) {
-    const std::lock_guard<std::mutex> lock(_mx);
+    const std::lock_guard<std::mutex> lock(_recv_lock);
     const auto &it =
         std::find_if(_events_recv.begin(), _events_recv.end(), [id](auto &a) {
           return a.second[0] == byte(id, 0) && a.second[1] == byte(id, 1);
@@ -181,7 +184,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   }
 
     std::optional<std::pair<uint16_t, std::vector<uint8_t>>> recvEvent() {
-    const std::lock_guard<std::mutex> lock(_mx);
+    const std::lock_guard<std::mutex> lock(_recv_lock);
     if (!_events_recv.empty()) {
       auto buff = _events_recv.front().second;
       std::cout << "EXTRACT EVENT WITH SIZE = " << buff.size() << std::endl;
@@ -198,47 +201,48 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
   virtual void sendAction(uint16_t id, const std::vector<uint8_t> &block) = 0;
 
   void sendAction(ConnectionDescriptor cd, uint16_t id, const std::vector<uint8_t> &block) {
-    std::vector<uint8_t> fullblock = {uint8_t(Communication::Action), byte(id, 0), byte(id, 1)};
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::Action)};
+    serialize<uint16_t>(fullblock, id);
+
     fullblock.insert(fullblock.end(), block.begin(), block.end());
     auto it = _actions_send.begin();
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_send_lock);
       it = _actions_send.emplace(_actions_send.begin(), std::make_pair(cd, fullblock));
     }
-    writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
+    writeTCP(cd, it->second, [this, it] { const std::lock_guard<std::mutex> lock(_send_lock); _actions_send.erase(it); });
   }
 
   void sendActionSuccess(ConnectionDescriptor cd, uint16_t id) {
-    std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionSuccess), byte(id, 0),
-                                      byte(id, 1)};
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionSuccess)};
+    serialize<uint16_t>(fullblock, id);
     auto it = _actions_send.begin();
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_send_lock);
       it = _actions_send.emplace(_actions_send.begin(), std::make_pair(cd, fullblock));
     }
-    writeTCP(cd, it->second, [this, it] {  _actions_send.erase(it); });
+    writeTCP(cd, it->second, [this, it] { const std::lock_guard<std::mutex> lock(_send_lock);  _actions_send.erase(it); });
   }
 
   void sendActionFailure(ConnectionDescriptor cd, uint16_t id, ActionFailureMode::EActionFailureMode mode) {
-    std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionFailure), byte(id, 0),
-                                      byte(id, 1)};
+    std::vector<uint8_t> fullblock = {uint8_t(Communication::ActionFailure)};
+    serialize<uint16_t>(fullblock, id);
     serialize<uint8_t>(fullblock, mode);
     auto it = _actions_send.begin();
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_send_lock);
       it = _actions_send.emplace(_actions_send.begin(), std::make_pair(cd, fullblock));
     }
-    writeTCP(cd, it->second, [this, it] { _actions_send.erase(it); });
+    writeTCP(cd, it->second, [this, it] { const std::lock_guard<std::mutex> lock(_send_lock); _actions_send.erase(it); });
   }
 
   std::optional<std::tuple<ConnectionDescriptor, ActionFailureMode::EActionFailureMode, uint16_t, std::vector<uint8_t>>> recvAction() {
     // const std::lock_guard<std::mutex> lock(_mx);
-    _mx.lock();
+    _recv_lock.lock();
     if (!_actions_recv.empty()) {
-      auto actor = _actions_recv.front().first;
-      auto buff = _actions_recv.front().second;
+      auto [actor, buff] = _actions_recv.front();
       _actions_recv.erase(_actions_recv.begin());
-      _mx.unlock();
+      _recv_lock.unlock();
 
 
       Communication::ECommunication comm = Communication::ECommunication(deserialize<uint8_t>(buff));
@@ -250,7 +254,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
         state = ActionFailureMode::Action_Success;
       return std::make_tuple(actor, state, id, buff);
     }
-    _mx.unlock();
+    _recv_lock.unlock();
     return std::nullopt;
   }
 
@@ -285,7 +289,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     std::vector<uint8_t> vec;
     vec.insert(vec.begin(), buffer.begin() + 3, buffer.begin() + bytes);
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_recv_lock);
       _states_recv[id] = vec;
     }
   }
@@ -294,7 +298,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     std::vector<uint8_t> vec;
     vec.insert(vec.begin(), buffer.begin(), buffer.begin() + bytes);
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_recv_lock);
       _actions_recv.push_back({cd, vec});
     }
   }
@@ -304,7 +308,7 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     std::cout << "GOT EVENT WITH SIZE = " << bytes << std::endl;
     vec.insert(vec.begin(), buffer.begin() + 1, buffer.begin() + bytes);
     {
-      const std::lock_guard<std::mutex> lock(_mx);
+      const std::lock_guard<std::mutex> lock(_recv_lock);
       _events_recv.push_back({cd, vec});
     }
   }
@@ -364,9 +368,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     sendEvent(Event::ClientJoin, block);
     block.insert(block.begin(), byte(Event::ClientJoin, 1));
     block.insert(block.begin(), byte(Event::ClientJoin, 0));
-    _mx.lock();
+    _recv_lock.lock();
     _events_recv.push_front(std::make_pair(0, block));
-    _mx.unlock();
+    _recv_lock.unlock();
     std::cout << "(INFO)tcp_accept and added event" << std::endl;
   };
 
@@ -377,9 +381,9 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     sendEvent(Event::ClientLeave, block);
     block.insert(block.begin(), byte(Event::ClientLeave, 1));
     block.insert(block.begin(), byte(Event::ClientLeave, 0));
-    _mx.lock();
+    _recv_lock.lock();
     _events_recv.push_front(std::make_pair(0, block));
-    _mx.unlock();
+    _recv_lock.unlock();
     std::cout << "(INFO)tcp_accept and added event" << std::endl;
   };
 
@@ -390,7 +394,8 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   using data_list = std::list<std::pair<ConnectionDescriptor, std::vector<uint8_t>>>;
 
-  std::mutex _mx;
+  std::mutex _send_lock;
+  std::mutex _recv_lock;
   // the data part contains the communication (action, success, failure),
   // action status as 1 byte and the id data, as a prefix of 2 bytes
   data_list _actions_recv;

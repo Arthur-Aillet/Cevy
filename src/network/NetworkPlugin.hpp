@@ -112,7 +112,7 @@ class cevy::NetworkPlugin : public ecs::Plugin {
     } else if (_action._remote_actions.find(id) != _action._remote_actions.end()) {
       state = std::get<0>(_action._remote_actions.find(id)->second)(cmd, actor, vec);
     } else {
-      std::cerr << "(WARNING)actionSuccess_remote: unmapped" << std::endl;
+      std::cerr << "(WARNING)action_remote: unmapped" << std::endl;
       return;
     }
     if (state == ActionFailureMode::Action_Success) {
