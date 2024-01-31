@@ -25,6 +25,7 @@
 #include "Indirect.hpp"
 #include "Plugin.hpp"
 #include "Query.hpp"
+#include "Resource.hpp"
 #include "Scheduler.hpp"
 #include "cevy.hpp"
 #include "commands/Commands.hpp"
@@ -163,7 +164,6 @@ class cevy::Synchroniser : virtual public cevy::ecs::Plugin {
     std::cerr << "(INFO)summon: sending:" << value << std::endl;
     _net.sendSummon(id, value);
   }
-
 
   template <typename T, typename U>
   void summon(cevy::ecs::Commands &command, CevyNetwork::ConnectionDescriptor cd) {

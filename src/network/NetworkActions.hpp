@@ -27,7 +27,7 @@
 #include "Resource.hpp"
 #include "Stage.hpp"
 #include "network/CevyNetwork.hpp"
-// #include "network/Synchroniser.hpp"
+#include "network/Synchroniser.hpp"
 #include "network/network.hpp"
 
 /**
@@ -102,10 +102,19 @@ class cevy::NetworkActions : public ecs::Plugin {
   };
 
   using ClientJoin = Event<CevyNetwork::Event::ClientJoin, Actor>;
+  using ClientLeave = Event<CevyNetwork::Event::ClientLeave, Actor>;
 
   public:
 
   virtual void build(cevy::ecs::App &app) override {
+    auto catchup = make_function<bool, CevyNetwork::ConnectionDescriptor, ecs::Query<Synchroniser::SyncId>>(
+      [&app, this](CevyNetwork::ConnectionDescriptor cd, ecs::Query<Synchroniser::SyncId> q){
+          for (auto [id] : q) {
+            this->_net.sendSummon(cd, id.type);
+          }
+          return true;
+      });
+    add_event_with<ClientJoin>(catchup);
   }
 
   /**
@@ -254,7 +263,7 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename F>
   void on_client_join(F &&func) {
-    add_event_with<ClientJoin>(func);
+
   };
 
 
@@ -301,9 +310,21 @@ class cevy::NetworkActions : public ecs::Plugin {
    */
   template <typename E, typename... Args>
   void add_event_with(std::function<bool(typename E::Arg, Args...)> func = success_default) {
-    super_system_success<typename E::Arg> lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
-      return cmd.system_with<typename E::Arg>(func, given);
-    };
+
+    super_system_success<typename E::Arg> lambda;
+
+    if (_super_events.find(E::value) == _super_events.end()) {
+      lambda = [func](ecs::Commands &cmd, typename E::Arg given) {
+        return cmd.system_with<typename E::Arg>(func, given);
+      };
+    } else {
+      auto prev = _super_events[E::value];
+      lambda = [func, prev](ecs::Commands &cmd, typename E::Arg given) {
+        std::any_cast<super_system_success<typename E::Arg>>(prev)(cmd, given);
+        return cmd.system_with<typename E::Arg>(func, given);
+      };
+    }
+
     _super_events[E::value] =
       std::make_any<super_system_success<typename E::Arg>>(lambda);
 

@@ -48,9 +48,10 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
 
   struct Event {
     enum EEvent : uint16_t {
-      ClientJoin = 0,
       Summon = 1,
       Dismiss = 2,
+      ClientJoin = 3,
+      ClientLeave = 4,
       FREE,
     };
   };
@@ -360,16 +361,27 @@ class cevy::CevyNetwork : protected cevy::NetworkBase, public ecs::Plugin {
     }
     std::vector<uint8_t> block;
     serialize(block, idx);
-    serialize(block, idx);
     sendEvent(Event::ClientJoin, block);
-    block.insert(block.begin(), byte(Event::ClientJoin, 0));
     block.insert(block.begin(), byte(Event::ClientJoin, 1));
+    block.insert(block.begin(), byte(Event::ClientJoin, 0));
     _mx.lock();
     _events_recv.push_front(std::make_pair(0, block));
     _mx.unlock();
     std::cout << "(INFO)tcp_accept and added event" << std::endl;
   };
 
+
+  void tcp_leave(ConnectionDescriptor idx) override {
+    std::vector<uint8_t> block;
+    serialize(block, idx);
+    sendEvent(Event::ClientLeave, block);
+    block.insert(block.begin(), byte(Event::ClientLeave, 1));
+    block.insert(block.begin(), byte(Event::ClientLeave, 0));
+    _mx.lock();
+    _events_recv.push_front(std::make_pair(0, block));
+    _mx.unlock();
+    std::cout << "(INFO)tcp_accept and added event" << std::endl;
+  };
 
   private:
   // the data part contains only pure state data
@@ -425,6 +437,12 @@ class cevy::ServerHandler : public cevy::CevyNetwork {
   }
 
   void sendEvent(uint16_t id, const std::vector<uint8_t>& block) override {
+    // std::vector<uint8_t> block2 = block;
+    // block2.insert(block2.begin(), byte(id, 0));
+    // block2.insert(block2.begin(), byte(id, 1));
+    // _mx.lock();
+    // _events_recv.push_front(std::make_pair(0, block));
+    // _mx.unlock();
     for (auto& cd: _clients) {
       CevyNetwork::sendEvent(cd, id, block);
     }

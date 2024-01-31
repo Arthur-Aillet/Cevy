@@ -191,6 +191,11 @@ class cevy::NetworkBase {
 
   virtual void tcp_accept(asio::error_code error, size_t idx) = 0;
 
+  virtual void tcp_leave(size_t idx) = 0;
+
+
+
+
   template <typename Function>
   void writeTCP(ConnectionDescriptor cd, const std::vector<uint8_t> &data, Function &&func) {
     std::lock_guard lock(_mx);

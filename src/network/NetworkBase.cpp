@@ -35,6 +35,7 @@ void cevy::NetworkBase::tcp_accept_new_connexion() {
     _temp_tcp_co.udp_endpoint = asio::ip::udp::endpoint(_temp_tcp_co.socket.remote_endpoint().address(), _dest_udp_port);
 
     _connections.emplace(std::make_pair(idx, std::move(_temp_tcp_co)));
+    connection_count++;
     tcp_accept(error, idx);
     read_one_TCP(idx);
     tcp_accept_new_connexion();
@@ -91,6 +92,7 @@ void cevy::NetworkBase::read_one_TCP(ConnectionDescriptor cd) {
                             [this, &co, cd](asio::error_code error, size_t bytes) {
                               if (error.value() == 2) { // end of co
                                 co.socket.close();
+                                tcp_leave(cd);
                                 _mx.lock();
                                 close_dead_tcp();
                                 _mx.unlock();

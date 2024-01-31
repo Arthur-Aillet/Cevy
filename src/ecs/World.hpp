@@ -493,3 +493,13 @@ template <typename... T>
 cevy::ecs::Query<T...> cevy::ecs::Query<T...>::query(World &w) {
   return Query<T...>(w.entities().size(), w.get_components<remove_optional<T>>()...);
 }
+
+template <>
+inline SparseVector<cevy::ecs::Entity> &cevy::ecs::World::get_components<cevy::ecs::Entity>() {
+  return _entities;
+}
+
+template <>
+inline SparseVector<cevy::ecs::Entity> const &cevy::ecs::World::get_components<cevy::ecs::Entity>() const {
+  return _entities;
+}
