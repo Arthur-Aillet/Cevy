@@ -19,7 +19,6 @@ the allowed maximum payload size is 506 bytes (to be encoded as `253` in the hea
 
 |    Shorthand     |   Meta Object    |         Type        |                 Composition               |
 |------------------|------------------|---------------------|-------------------------------------------|
-|      Magic       |   Magic number   |     single value    |                   4 bytes                 |
 |                  |     Payload      |      composite      |     *Payload header* + *Payload data*     |
 |                  |  Payload Header  |      composite      |     *Timestamp* + *Payload Size*          |
 |                  |    Timestamp     |     single value    |                   4 bytes                 |
@@ -46,8 +45,7 @@ Objects are composed of Sub-Objects;
 |        C         |  Communication   |        Enum         |            1 byte           |
 |      Reason      |  Failure reason  |        Enum         |            1 byte           |
 |    Descriptor    | Named descriptor |         ID          |            2 bytes          |
-
-
+|      Actor       | Actor Descriptor |         ID          |            2 bytes          |
 
 
 ---
@@ -87,15 +85,15 @@ The client may request the server to specify a State. By default, the server is 
 
 #### State Communication
 
-|  Emitter  | Communication |      Component     |       Value       |
-|-----------|---------------|--------------------|-------------------|
-|  Server   |    State      | {named descriptor} | {structured data} |
-|           |    1 byte     |       2 bytes      |   variable size   |
+|  Emitter  | Communication |    Value    |      Component     |       Data        |
+|-----------|---------------|-------------|--------------------|-------------------|
+|  Server   |    State      |     0x01    | {named descriptor} | {structured data} |
+|           |    1 byte     |             |       2 bytes      |   variable size   |
 
-|  Emitter  |   Request     |      Component     |
-|-----------|---------------|--------------------|
-|  Client   |  RequestState | {named descriptor} |
-|           |    1 byte     |       2 bytes      |
+|  Emitter  |   Request     |    Value    |      Component     |
+|-----------|---------------|-------------|--------------------|
+|  Client   |  RequestState |     0x02    | {named descriptor} |
+|           |    1 byte     |             |       2 bytes      |
 
 ### Event
 
@@ -103,46 +101,52 @@ An Event is a trigger. It is defined to have happened at a given timepoint.
 
 #### State Communication
 
-|  Emitter  | Communication |      Component     |       Value       |
-|-----------|---------------|--------------------|-------------------|
-|  Server   |     Event     | {named descriptor} | {structured data} |
-|           |    1 byte     |       2 bytes      |   variable size   |
+|  Emitter  | Communication |    Value    |      Component     |       Data        |
+|-----------|---------------|-------------|--------------------|-------------------|
+|  Server   |     Event     |     0x03    | {named descriptor} | {structured data} |
+|           |    1 byte     |             |       2 bytes      |   variable size   |
 
 ### Client Action
 
 A Client Action is a request, initiated by the client. By default, the server must respond to with a success or failure.
-It has one Success response, with an optionnal structured message, and several Failure responses.
 
+
+|  Emitter  |   Request     |    Value    |      Component     |       Data        |
+|-----------|---------------|-------------|--------------------|-------------------|
+|  Client   |     Action    |     0x04    |   {named action}   | {structured data} |
+|           |    1 byte     |             |       2 bytes      |   variable size   |
 
 #### Client Action Responses
 
-|  Emitter  |   Request     |      Component     |       Value       |
-|-----------|---------------|--------------------|-------------------|
-|  Client   |     Action    |   {named action}   | {structured data} |
-|           |    1 byte     |       2 bytes      |   variable size   |
+| Emitter |   Response    |    Value    |     Component      |       Data         |
+|---------|---------------|-------------|--------------------|--------------------|
+| Server  | ActionSuccess |     0x05    |   {named action}   | {optional message} |
+|         |    1 byte     |             |      2 bytes       |    variable size   |
 
-| Emitter |
-|---------|
-| Server  |
 
-↘
+| Emitter |   Response    |    Value    |     Component      |       Data         |
+|---------|---------------|-------------|--------------------|--------------------|
+| Server  | ActionFailure |     0x06    |   {named action}   |   Failure reason   |
+|         |    1 byte     |             |      2 bytes       |       1 byte       |
 
-|   Response    |     Component      |       Value        |                 Meaning                      | Consequence                                                                                                    |
-|---------------|--------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------|
-| ActionSuccess |   {named action}   | {optional message} | this action was sucessful                    | the client can operate following this action's sucess                                                          |
-| ActionFailure |   {named action}   | ActionUnavailable  | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                  |
-| ActionFailure |   {named action}   |   ActionDisabled   | this action is not available for this server | the client should not try this action again                                                                    |
-| ActionFailure |   {named action}   |     ActionError    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                   |
-| ActionFailure |   {named action}   |    ActionWaiting   | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                  |
-| ActionFailure |   {named action}   |    ActionDelayed   | this action will succeed at a later time     | the client should consider the action failed. The server may later send an ActionSuccess regarding this Action |
-| ActionFailure |   {named action}   |        BUSY        | the server refused to process the action     | the client should send the action request again after a small delay                                            |
-|    1 byte     |      2 bytes       | 1 byte or variable |                                              |                                                                                                                |
+Actions may fail for one of many reasons.
+
+|   Failure reason   |    Value    |                 Meaning                      | Consequence                                                                                                    |
+|--------------------|-------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| ActionUnavailable  |     0x01    | this action failed due to the current states | the client should communicate the error to the user such that they may attempt it again later                  |
+|   ActionDisabled   |     0x02    | this action is not available for this server | the client should not try this action again                                                                    |
+|     ActionError    |     0x03    | this action does not exist or is not valid   | the client has generated an erroneous Action                                                                   |
+|    ActionWaiting   |     0x04    | this action failed due to a time trigger     | the client should communicate the error to the user such that they may attempt it again later                  |
+|    ActionDelayed   |     0x05    | this action will succeed at a later time     | the client should consider the action failed. The server may later send an ActionSuccess regarding this Action |
+|        BUSY        |     0x06    | the server refused to process the action     | the client should send the action request again after a small delay                                            |
 
 ## Built in Events
 
 ### Summon Entity
 
-|  Emitter  | Communication |      Component     |         Value         |
-|-----------|---------------|--------------------|-----------------------|
-|  Server   |     Event     |       Summon       | SyncId + Archetype ID |
-|           |    1 byte     |       2 bytes      |   2 bytes + 1 byte    |
+|        Event       |    Value    |        Data        |       Data size       |                Meaning                                  |
+|--------------------|-------------|--------------------|-----------------------|---------------------------------------------------------|
+|       Summon       |     0x01    | SyncId + Archetype |   2 bytes + 1 byte    | spawn a new entity with id SyncId, of type Archetype ID |
+|      Dismiss       |     0x02    |         SyncId     |         2 bytes       | despawn an (any) entity with the id SyncId              |
+|     ClientJoin     |     0x03    |         Actor      |         2 bytes       | a client has joined with id Actor                       |
+|     ClientLeave    |     0x04    |         Actor      |         2 bytes       | the client at id Actor left                             |
