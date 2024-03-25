@@ -23,4 +23,4 @@ We use *Doxygen* for our doc, you can `make doc` and open `index.html` to see it
 
 ### Contributing
 
-Every contribution is welcomed! :D
+Every contribution is welcome! :D
