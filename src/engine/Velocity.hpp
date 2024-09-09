@@ -17,7 +17,7 @@
 #include "Transform.hpp"
 #include "Vector.hpp"
 
-#ifdef ____cpp_lib_interpolate
+#if __cpp_lib_interpolate
 using std::lerp;
 #else
 namespace std {

@@ -7,7 +7,5 @@
 
 #pragma once
 
-#pragma GCC system_header
-
 #include "raylib.h"
 #include "raymath.h"

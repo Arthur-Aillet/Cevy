@@ -5,7 +5,6 @@
 ## engine-cmake
 ##
 
-set(CMAKE_CXX_STANDARD 17)
 
 add_library(engine
   Engine.cpp

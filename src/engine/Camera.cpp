@@ -13,9 +13,9 @@
 
 cevy::engine::Camera::Camera() {
   this->camera = {
-      (Vector3){10.0f, 10.0f, 10.0f},
-      (Vector3){0.0f, 0.0f, 0.0f},
-      (Vector3){0.0f, 0.0f, 90.0f},
+      Vector3{10.0f, 10.0f, 10.0f},
+      Vector3{0.0f, 0.0f, 0.0f},
+      Vector3{0.0f, 0.0f, 90.0f},
       45.0f,
       CAMERA_PERSPECTIVE,
   };

@@ -1,4 +1,5 @@
-if (NOT EXISTS ${CMAKE_BINARY_DIR}/_deps/rlimgui) # If there's none, fetch and build rlimgui
+# TODO: Fix
+#if (NOT EXISTS ${CMAKE_BINARY_DIR}/_deps/rlimgui) # If there's none, fetch and build rlimgui
   FetchContent_Declare(
       rlimgui
       DOWNLOAD_EXTRACT_TIMESTAMP OFF
@@ -8,10 +9,11 @@ if (NOT EXISTS ${CMAKE_BINARY_DIR}/_deps/rlimgui) # If there's none, fetch and b
     )
 
   FetchContent_Populate(rlimgui)
-endif()
+#endif()
 
 set(RLIMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/rlimgui)
 set(IMGUI_FOLDER ${CMAKE_BINARY_DIR}/_deps/imgui)
+
 
 add_library(rlImGui STATIC
   ${RLIMGUI_FOLDER}/rlImGui.cpp

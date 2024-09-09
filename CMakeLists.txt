@@ -7,7 +7,10 @@
 
 cmake_minimum_required(VERSION 3.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
+#TODO: Remove
+set(CMAKE_MAKE_PROGRAM "C:\\Program Files (x86)\\GnuWin32\\bin\\make.exe")
 
 project(Cevy LANGUAGES CXX VERSION 0.1)
 set(Cevy_VERSION 0.1)
@@ -18,7 +21,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(deps)
 
-add_compile_options(-Wall -Wextra)
+#add_compile_options(-Wall -Wextra)
 
 option(DEBUG_MODE "Set DEBUG Mode" ON)
 

@@ -22,6 +22,7 @@
 #include "cevy.hpp"
 
 #include <any>
+#include <stdexcept>
 #include <cstddef>
 #include <functional>
 #include <queue>

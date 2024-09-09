@@ -5,8 +5,6 @@
 ## ecs-cmake
 ##
 
-set(CMAKE_CXX_STANDARD 17)
-
 add_library(SparseVector
   STATIC
   SparseVector.cpp
@@ -57,7 +55,7 @@ add_library(app
   )
 
 file(GLOB CEVY_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "../../public/*")
-add_library(ecs SHARED ${CEVY_HEADERS})
+add_library(ecs SHARED ${CEVY_HEADERS} "ecs.cpp")
 target_link_libraries(ecs SparseVector world commands app entity schedule default_plugin time)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/commands)

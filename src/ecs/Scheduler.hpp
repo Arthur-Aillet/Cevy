@@ -127,8 +127,9 @@ class Scheduler {
     _systems.push_back(std::make_tuple(sys, std::type_index(typeid(S))));
   }
 
+  /// TODO investigate this change
   template <class S, class R, class... Args>
-  void add_system(R (&&func)(Args...)) {
+  void add_system(R (&func)(Args...)) {
     static_assert(
         all(Or<is_query<Args>, is_world<Args>, is_resource<Args>, is_commands<Args>,
                is_event_reader<Args>, is_event_writer<Args>>()...),

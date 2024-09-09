@@ -18,7 +18,8 @@ namespace cevy::engine {
  */
 class Vector {
   public:
-  struct __attribute__((aligned(16))) {
+//TODO: Update to MVSC
+  struct /*__attribute__((aligned(16)))*/ {
     float x;
     float y;
     float z;
@@ -32,7 +33,7 @@ class Vector {
   Vector(const Vector &) = default;
 
   Vector(const Vector3 &v) : x(v.x), y(v.y), z(v.z){};
-  operator Vector3() const { return ((Vector3){(float)x, (float)y, (float)z}); }
+  operator Vector3() const { return (Vector3{(float)x, (float)y, (float)z}); }
 
   Vector &operator=(const Vector &);
 
@@ -123,15 +124,15 @@ std::ostream &operator<<(std::ostream &cout, const Vector &vec);
 
 } // namespace cevy::engine
 
-template <>
-struct cevy::serialized_size<cevy::engine::Vector>
-    : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
-
-template <>
-inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t> &vec,
-                                                                   const engine::Vector &t) {
-  serialize(vec, t.x);
-  serialize(vec, t.y);
-  serialize(vec, t.z);
-  return vec;
-}
+//template <>
+//struct cevy::serialized_size<cevy::engine::Vector>
+//    : public std::integral_constant<size_t, 4 * serialized_size<float>::value> {};
+//
+//template <>
+//inline std::vector<uint8_t> &cevy::serialize<cevy::engine::Vector>(std::vector<uint8_t> &vec,
+//                                                                   const engine::Vector &t) {
+//  serialize(vec, t.x);
+//  serialize(vec, t.y);
+//  serialize(vec, t.z);
+//  return vec;
+//}
