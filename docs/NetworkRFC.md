@@ -71,7 +71,7 @@ the server keeps track of all connect Client Actions, and will relay state-chang
 The *user* operates the Client. By default, the user is not privy to all exchanges between client and server. The user may be a human or an other program, for the purposes of this protocol
 
 ### Bot:
-A *bot* is a special type of client with no user. It is privy to all information and will perform Client Actions based on its internal logic. Bots should be run on the same machine as the server and skip UDP transactions for a more direct IPC. Bots may be run on a different machine through UDP, or on the same machine trough UDP, but care should be taken not to waste ressources.
+A *bot* is a special type of client with no user. It is privy to all information and will perform Client Actions based on its internal logic. Bots should be run on the same machine as the server and skip UDP transactions for a more direct IPC. Bots may be run on a different machine through UDP, or on the same machine trough UDP, but care should be taken not to waste resources.
 
 ---
 

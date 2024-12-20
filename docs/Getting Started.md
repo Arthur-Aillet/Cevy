@@ -222,26 +222,15 @@ Greeting the whole world is great, but what if we want to greet specific people?
 Create your class `Person`
 
 ```cpp
-class Name {
+class Person {
     private:
         std::string _name;
 
     public:
-        Name(std::string) : _name(name) {}
-        ~Name() {}
-
-        std::string getName() { return _name; }
-};
-
-class Person {
-    private:
-        Name& _name;
-
-    public:
-        Person(Name& name) : _name(name) {}
+        Person(std::string name) : _name(name) {}
         ~Person() {}
 
-        Name& getName() { return _name.getName(); }
+        std::string& getName() { return _name; }
 };
 ```
 We can then add people to our `World` using a "startup system". Startup systems are just like normal systems, but they run exactly once, before all other systems, right when our app starts. Let's use `Commands` to spawn some entities into our `World`:
@@ -260,7 +249,6 @@ Now register the startup system like this:
 
 int main() {
     App app;
-    app.init_component<Name>();
     app.init_component<Person>();
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world);
@@ -290,7 +278,6 @@ Now we just register the system in our `App`. Note that you can pass more than o
 
 int main() {
     App app;
-    app.init_component<Name>();
     app.init_component<Person>();
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world, greet_people);
@@ -324,7 +311,6 @@ Let's make our app more interesting by adding the "default Cevy plugins".
 int main() {
     App app;
     app.add_plugins(DefaultPlugins());
-    app.init_component<Name>();
     app.init_component<Person>();
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world, greet_people);
@@ -352,7 +338,6 @@ Then register the plugin in your App like this:
 int main() {
     App app;
     app.add_plugins(DefaultPlugins(), HelloPlugin());
-    app.init_component<Name>();
     app.init_component<Person>();
     app.add_systems<core_stage::Startup>(add_people);
     app.add_systems<core_stage::Update>(hello_world, greet_people);
@@ -366,7 +351,6 @@ Note add_plugins can add any number of plugins (or plugin groups like DefaultPlu
 class HelloPlugin : public Plugin {
     public:
     void build(App &app) {
-        app.init_component<Name>();
         app.init_component<Person>();
         app.add_systems<core_stage::Startup>(add_people);
         app.add_systems<core_stage::Update>(hello_world, greet_people);
@@ -398,8 +382,8 @@ For simplicity, remove the hello_world system from your App. This way we only ne
 
 Resources are accessed in much the same way that we access components. You can access the Time resource in your system like this:
 ```cpp
-void greet_people(Ressource<Time> time, Query<Name> persons) {
-    for p : persons {
+void greet_people(Resource<Time> time, Query<Name> persons) {
+    for (auto p : persons) {
         std::cout << "hello " << p.getName() << std::endl;
     }
 }
@@ -407,19 +391,12 @@ void greet_people(Ressource<Time> time, Query<Name> persons) {
 The `delta` field on `Time` gives us the time that has passed since the last update. But in order to run our system once every two seconds, we must track the amount of time that has passed over a series of updates.
 ```cpp
 
-class GreetTime {
-    private:
-    Time _time;
-
-    public:
-    GreetTime(Time time) : _time(time) {}
-    ~GreetTime() {}
-
-    Time getTime() { return _time }
+struct GreetTime {
+    Timer greet;
 }
 
-void greet_people(Ressource<GreetTimer> time, Query<Name> persons) {
-    if (time.getTime().get().delta_seconds() >= 2) {
+void greet_people(Resource<GreetTimer> timer, Resource<Time> time, Query<Name> persons) {
+    if (timer.get().greet.tick(time.delta()).just_finished()) {
         for p : persons {
             std::cout << "hello " << p.getName() << std::endl;
         }
@@ -431,17 +408,14 @@ Now all that's left is adding a `GreetTimer` Resource to our `HelloPlugin`.
 class HelloPlugin : public Plugin {
     public:
     void build(App &app) {
-        app.init_component<Name>();
         app.init_component<Person>();
-        app.insert_resource(GreetTimer(Time()));
+        app.insert_resource(GreetTimer{Timer(2, Timer::Repeating)});
         app.add_systems<core_stage::Startup>(add_people);
         app.add_systems<core_stage::Update>(hello_world, greet_people);
     }
 };
 ```
 
-
-[1]: https://github.com/Arthur-Aillet/Cevy "Title"
-[2]: https://github.com/Arthur-Aillet/RType "Title"
-[3]: https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16 "Title"
-[4]: https://github.com/microsoft/vcpkg "Title"
+[1]: https://github.com/Arthur-Aillet/Cevy "Cevy"
+[2]: https://github.com/Arthur-Aillet/RType "Rtype"
+[3]: https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16 "VS"
