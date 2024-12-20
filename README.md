@@ -1,3 +1,5 @@
+/!\ The repository is moving to the [AgarthaSoftware Github](https://github.com/Agartha-Software/Cevy) /!\
+
 ## What is C++evy?
 
 C++evy is an entity component system game engine built in C++, and try to be the C++ alternative of Rust's Bevy!
